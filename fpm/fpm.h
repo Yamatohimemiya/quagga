@@ -88,7 +88,7 @@
  */
 
 /*
- * Local host as a default server for fpm connection 
+ * Local host as a default server for fpm connection
  */
 #define FPM_DEFAULT_IP (htonl(INADDR_LOOPBACK))
 
@@ -125,7 +125,7 @@ typedef struct fpm_msg_hdr_t_ {
    * order.
    */
 	uint16_t msg_len;
-} __attribute__((packed)) fpm_msg_hdr_t;
+}  fpm_msg_hdr_t;
 
 #ifdef __SUNPRO_C
 	#pragma pack()

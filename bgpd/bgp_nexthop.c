@@ -369,7 +369,6 @@ static int show_ip_bgp_nexthop_table(struct vty *vty, int detail) {
 	struct bgp_nexthop_cache *bnc;
 	char buf[INET6_ADDRSTRLEN];
 	struct nexthop *nexthop;
-	time_t tbuf;
 	afi_t afi;
 
 	vty_out(vty, "Current BGP nexthop cache:%s", VTY_NEWLINE);

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2006 Sun Microsystems, Inc.
  *
  * This file is part of Quagga.
@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Quagga; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -49,13 +49,10 @@ void zebra_redistribute_default_delete(int a, struct zserv *b, int c, vrf_id_t v
 void redistribute_add(struct prefix *a, struct rib *b, struct rib *c) {
 	return;
 }
-#ifdef HAVE_SYS_WEAK_ALIAS_PRAGMA
-	#pragma weak redistribute_delete = redistribute_add
-#else
+
 void redistribute_delete(struct prefix *a, struct rib *b) {
 	return;
 }
-#endif
 
 void zebra_interface_up_update(struct interface *a) {
 	return;

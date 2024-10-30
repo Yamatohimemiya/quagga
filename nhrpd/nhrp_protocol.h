@@ -103,7 +103,7 @@ struct nhrp_packet_header {
 			uint16_t offset;
 		} error;
 	} u;
-} __attribute__((packed));
+};
 
 struct nhrp_cie_header {
 	uint8_t code;
@@ -115,16 +115,16 @@ struct nhrp_cie_header {
 	uint8_t nbma_subaddress_len;
 	uint8_t protocol_address_len;
 	uint8_t preference;
-} __attribute__((packed));
+};
 
 struct nhrp_extension_header {
 	uint16_t type;
 	uint16_t length;
-} __attribute__((packed));
+};
 
 struct nhrp_cisco_authentication_extension {
 	uint32_t type;
 	uint8_t secret[8];
-} __attribute__((packed));
+};
 
 #endif

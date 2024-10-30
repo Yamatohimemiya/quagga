@@ -73,7 +73,7 @@ void nhrp_interface_update_mtu(struct interface *ifp, afi_t afi) {
 static void nhrp_interface_update_source(struct interface *ifp) {
 	struct nhrp_interface *nifp = ifp->info;
 
-	if(!nifp->source || !nifp->nbmaifp || nifp->linkidx == nifp->nbmaifp->ifindex) {
+	if(!nifp->source || !nifp->nbmaifp || nifp->linkidx == (unsigned int) nifp->nbmaifp->ifindex) {
 		return;
 	}
 

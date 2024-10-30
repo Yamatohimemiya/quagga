@@ -182,7 +182,6 @@ if test "x${cflags_specified}" = "x" ; then
         	AC_MSG_WARN([upgrade to libtool >= 2.4.6!])
         fi
         AC_C_FLAG([-D_FORTIFY_SOURCE=2])
-        AC_C_FLAG([-Wformat])
         AC_C_FLAG([-Wformat-security])
         AC_C_FLAG([-fpie])
         AC_C_FLAG([-fno-omit-frame-pointer])
@@ -193,6 +192,7 @@ if test "x${cflags_specified}" = "x" ; then
         AC_C_FLAG([-Wpointer-arith])
         AC_C_FLAG([-Wbad-function-cast])
         AC_C_FLAG([-Wwrite-strings])
+        AC_C_FLAG([-Wno-format-truncation])
         if test x"${enable_gcc_ultra_verbose}" = x"yes" ; then
           AC_C_FLAG([-Wcast-qual])
           AC_C_FLAG([-Wstrict-prototypes])

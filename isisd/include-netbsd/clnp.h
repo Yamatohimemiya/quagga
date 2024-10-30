@@ -104,7 +104,7 @@ struct clnp_fixed {
 					 * byte */
 	u_char cnf_cksum_msb;  /* checksum high byte */
 	u_char cnf_cksum_lsb;  /* checksum low byte */
-} __attribute__((packed));
+};
 
 #define CNF_TYPE 0x1f
 #define CNF_ERR_OK 0x20

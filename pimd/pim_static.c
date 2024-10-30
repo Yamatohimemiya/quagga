@@ -268,7 +268,7 @@ int pim_static_write_mroute(struct vty *vty, struct interface *ifp) {
 	for(ALL_LIST_ELEMENTS_RO(qpim_static_route_list, node, sroute)) {
 		pim_inet4_dump("<ifaddr?>", sroute->group, gbuf, sizeof(gbuf));
 		pim_inet4_dump("<ifaddr?>", sroute->source, sbuf, sizeof(sbuf));
-		if(sroute->iif == ifp->ifindex) {
+		if(sroute->iif == (unsigned int) ifp->ifindex) {
 			int i;
 			for(i = 0; i < MAXVIFS; i++) {
 				if(sroute->oif_ttls[i]) {

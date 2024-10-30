@@ -5,7 +5,7 @@
    Copyright (C) 2013 by Internet Systems Consortium, Inc. ("ISC")
 
 This file is part of GNU Zebra.
- 
+
 GNU Zebra is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published
 by the Free Software Foundation; either version 2, or (at your
@@ -2231,7 +2231,7 @@ static char **cmd_complete_command_real(vector vline, struct vty *vty, int *stat
 
 		/* In case of 'command \t' pattern.  Do you need '?' command at
          the end of the line. */
-		if(vector_slot(vline, index) == '\0') {
+		if(vector_slot(vline, index) == 0x00) {
 			*status = CMD_ERR_NOTHING_TODO;
 		} else {
 			*status = CMD_ERR_NO_MATCH;
@@ -3602,7 +3602,7 @@ void install_default(enum node_type node) {
 	/* VIEW_NODE is inited below, via install_default_basic, and
      install_element's of commands to VIEW_NODE automatically are
      also installed to ENABLE_NODE.
-    
+
      For all other nodes, we must ensure install_default_basic is
      also called/
    */

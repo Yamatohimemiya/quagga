@@ -3,22 +3,22 @@
  *                             LSP processing
  *
  * Copyright (C) 2001,2002   Sampo Saaristo
- *                           Tampere University of Technology      
+ *                           Tampere University of Technology
  *                           Institute of Communications Engineering
  * Copyright (C) 2013-2015   Christian Franke <chris@opensourcerouting.org>
  *
- * This program is free software; you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free 
- * Software Foundation; either version 2 of the License, or (at your option) 
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
  *
- * This program is distributed in the hope that it will be useful,but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for 
+ * This program is distributed in the hope that it will be useful,but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
@@ -211,14 +211,14 @@ void lsp_search_and_destroy(u_char *id, dict_t *lspdb) {
 		node = dict_delete(lspdb, node);
 		lsp = dnode_get(node);
 		/*
-       * If this is a zero lsp, remove all the frags now 
+       * If this is a zero lsp, remove all the frags now
        */
 		if(LSP_FRAGMENT(lsp->lsp_header->lsp_id) == 0) {
 			if(lsp->lspu.frags) {
 				lsp_remove_frags(lsp->lspu.frags, lspdb);
 			}
 		} else {
-			/* 
+			/*
 	   * else just remove this frag, from the zero lsps' frag list
 	   */
 			if(lsp->lspu.zero_lsp && lsp->lspu.zero_lsp->lspu.frags) {
@@ -943,53 +943,6 @@ static void lsp_tlv_fit(struct isis_lsp *lsp, struct list **from, struct list **
 	return;
 }
 
-/* Process IS_NEIGHBOURS TLV with TE subTLVs */
-static void lsp_te_tlv_fit(struct isis_lsp *lsp, struct list **from, struct list **to, int frag_thold) {
-	int count, size = 0;
-	struct listnode *node, *nextnode;
-	struct te_is_neigh *elem;
-
-	/* Start computing real size of TLVs */
-	for(ALL_LIST_ELEMENTS(*from, node, nextnode, elem)) {
-		size = size + elem->sub_tlvs_length + IS_NEIGHBOURS_LEN;
-	}
-
-	/* can we fit all ? */
-	if(!FRAG_NEEDED(lsp->pdu, frag_thold, size)) {
-		tlv_add_te_is_neighs(*from, lsp->pdu);
-		if(listcount(*to) != 0) {
-			for(ALL_LIST_ELEMENTS(*from, node, nextnode, elem)) {
-				listnode_add(*to, elem);
-				list_delete_node(*from, node);
-			}
-		} else {
-			list_free(*to);
-			*to = *from;
-			*from = NULL;
-		}
-	} else {
-		/* fit all we can */
-		/* Compute remaining place in LSP PDU */
-		count = FRAG_THOLD(lsp->pdu, frag_thold) - 2 - (STREAM_SIZE(lsp->pdu) - STREAM_REMAIN(lsp->pdu));
-		/* Determine size of TE SubTLVs */
-		elem = (struct te_is_neigh *) listgetdata((struct listnode *) listhead(*from));
-		count = count - elem->sub_tlvs_length - IS_NEIGHBOURS_LEN;
-		if(count > 0) {
-			while(count > 0) {
-				listnode_add(*to, listgetdata((struct listnode *) listhead(*from)));
-				listnode_delete(*from, listgetdata((struct listnode *) listhead(*from)));
-
-				elem = (struct te_is_neigh *) listgetdata((struct listnode *) listhead(*from));
-				count = count - elem->sub_tlvs_length - IS_NEIGHBOURS_LEN;
-			}
-
-			tlv_add_te_is_neighs(*to, lsp->pdu);
-		}
-	}
-	lsp->lsp_header->pdu_len = htons(stream_get_endp(lsp->pdu));
-	return;
-}
-
 static u_int16_t lsp_rem_lifetime(struct isis_area *area, int level) {
 	u_int16_t rem_lifetime;
 
@@ -1150,7 +1103,7 @@ static void lsp_build_ext_reach(struct isis_lsp *lsp, struct isis_area *area, st
 }
 
 /*
- * Builds the LSP data part. This func creates a new frag whenever 
+ * Builds the LSP data part. This func creates a new frag whenever
  * area->lsp_frag_threshold is exceeded.
  */
 static void lsp_build(struct isis_lsp *lsp, struct isis_area *area) {
@@ -1840,7 +1793,7 @@ int lsp_regenerate_schedule(struct isis_area *area, int level, int all_pseudo) {
  */
 
 /*
- * 7.3.8 and 7.3.10 Generation of level 1 and 2 pseudonode LSPs 
+ * 7.3.8 and 7.3.10 Generation of level 1 and 2 pseudonode LSPs
  */
 static void lsp_build_pseudo(struct isis_lsp *lsp, struct isis_circuit *circuit, int level) {
 	struct isis_adjacency *adj;
@@ -1858,7 +1811,7 @@ static void lsp_build_pseudo(struct isis_lsp *lsp, struct isis_circuit *circuit,
 	lsp->lsp_header->lsp_bits = lsp_bits_generate(level, 0, circuit->area->attached_bit);
 
 	/*
-   * add self to IS neighbours 
+   * add self to IS neighbours
    */
 	if(circuit->area->oldmetric) {
 		if(lsp->tlv_data.is_neighs == NULL) {
@@ -2327,14 +2280,14 @@ void lsp_purge_pseudo(u_char *id, struct isis_circuit *circuit, int level) {
 }
 
 /*
- * Purge own LSP that is received and we don't have. 
+ * Purge own LSP that is received and we don't have.
  * -> Do as in 7.3.16.4
  */
 void lsp_purge_non_exist(int level, struct isis_link_state_hdr *lsp_hdr, struct isis_area *area) {
 	struct isis_lsp *lsp;
 
 	/*
-   * We need to create the LSP to be purged 
+   * We need to create the LSP to be purged
    */
 	lsp = XCALLOC(MTYPE_ISIS_LSP, sizeof(struct isis_lsp));
 	lsp->area = area;

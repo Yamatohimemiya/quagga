@@ -86,7 +86,7 @@ struct esis_fixed {
 	u_char esis_ht_lsb;    /* holding time (seconds) low byte */
 	u_char esis_cksum_msb; /* checksum high byte */
 	u_char esis_cksum_lsb; /* checksum low byte */
-} __attribute__((packed));
+};
 
 /*
  * Values for ESIS datagram options

@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -92,7 +92,7 @@ void *zzcalloc(int type, size_t size) {
 	return memory;
 }
 
-/* 
+/*
  * Given a pointer returned by zmalloc or zzcalloc, free it and
  * return a pointer to a new size, basically acting like realloc().
  * Requires: ptr was returned by zmalloc, zzcalloc, or zrealloc with the
@@ -312,7 +312,7 @@ static int show_memory_vty(struct vty *vty, struct memory_list *list) {
 
 #ifdef HAVE_MALLINFO
 static int show_memory_mallinfo(struct vty *vty) {
-	struct mallinfo minfo = mallinfo();
+	struct mallinfo2 minfo = mallinfo2();
 	char buf[MTYPE_MEMSTR_LEN];
 
 	vty_out(vty, "System allocator statistics:%s", VTY_NEWLINE);

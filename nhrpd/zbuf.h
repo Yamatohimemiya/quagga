@@ -104,7 +104,7 @@ static inline uint8_t zbuf_get8(struct zbuf *zb) {
 static inline uint32_t zbuf_get32(struct zbuf *zb) {
 	struct unaligned32 {
 		uint32_t value;
-	} __attribute__((packed));
+	};
 
 	struct unaligned32 *v = zbuf_pull(zb, struct unaligned32);
 	if(v) {
@@ -116,7 +116,7 @@ static inline uint32_t zbuf_get32(struct zbuf *zb) {
 static inline uint16_t zbuf_get_be16(struct zbuf *zb) {
 	struct unaligned16 {
 		uint16_t value;
-	} __attribute__((packed));
+	};
 
 	struct unaligned16 *v = zbuf_pull(zb, struct unaligned16);
 	if(v) {
@@ -163,7 +163,7 @@ static inline void zbuf_put8(struct zbuf *zb, uint8_t val) {
 static inline void zbuf_put_be16(struct zbuf *zb, uint16_t val) {
 	struct unaligned16 {
 		uint16_t value;
-	} __attribute__((packed));
+	};
 
 	struct unaligned16 *v = zbuf_push(zb, struct unaligned16);
 	if(v) {
@@ -174,7 +174,7 @@ static inline void zbuf_put_be16(struct zbuf *zb, uint16_t val) {
 static inline void zbuf_put_be32(struct zbuf *zb, uint32_t val) {
 	struct unaligned32 {
 		uint32_t value;
-	} __attribute__((packed));
+	};
 
 	struct unaligned32 *v = zbuf_push(zb, struct unaligned32);
 	if(v) {

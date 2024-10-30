@@ -432,7 +432,7 @@ int vtysh_config_from_file(struct vty *vty, FILE *fp) {
 }
 
 /* We don't care about the point of the cursor when '?' is typed. */
-static int vtysh_rl_describe(void) {
+static int vtysh_rl_describe(int a, int b) {
 	int ret;
 	unsigned int i;
 	vector vline;

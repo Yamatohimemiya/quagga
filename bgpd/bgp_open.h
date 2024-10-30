@@ -44,7 +44,7 @@ struct capability_orf_entry {
 		u_char type;
 		u_char mode;
 	} orfs[];
-} __attribute__((packed));
+};
 
 #pragma pack()
 

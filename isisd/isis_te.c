@@ -915,7 +915,7 @@ void mpls_te_print_detail(struct vty *vty, struct te_is_neigh *te) {
 
 	zlog_debug("ISIS MPLS-TE: Show database TE detail");
 
-	if(te->sub_tlvs == NULL) {
+	if(te == NULL) {
 		return;
 	}
 

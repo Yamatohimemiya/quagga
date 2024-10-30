@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #ifndef _ZEBRA_LINKLIST_H
@@ -83,7 +83,7 @@ extern void list_add_node_prev(struct list *, struct listnode *, void *);
 extern void list_add_node_next(struct list *, struct listnode *, void *);
 extern void list_add_list(struct list *, struct list *);
 
-/* List iteration macro. 
+/* List iteration macro.
  * Usage: for (ALL_LIST_ELEMENTS (...) { ... }
  * It is safe to delete the listnode using this macro.
  */
@@ -130,7 +130,7 @@ extern void list_add_list(struct list *, struct list *);
 
 /* Deprecated: 20050406 */
 #if !defined(QUAGGA_NO_DEPRECATED_INTERFACES)
-	#warning "Using deprecated libzebra interfaces"
+//	#warning "Using deprecated libzebra interfaces"
 	#define LISTNODE_ADD(L, N) LISTNODE_ATTACH(L, N)
 	#define LISTNODE_DELETE(L, N) LISTNODE_DETACH(L, N)
 	#define nextnode(X) ((X) = (X)->next)
