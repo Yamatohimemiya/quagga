@@ -8,6 +8,7 @@
 AC_PREREQ([2.71])
 
 AC_INIT([Quagga],[1.2.5],[https://bugzilla.quagga.net])
+
 CONFIG_ARGS="$*"
 AC_SUBST(CONFIG_ARGS)
 AC_CONFIG_SRCDIR(lib/zebra.h)
@@ -22,7 +23,7 @@ AC_CANONICAL_TARGET()
 
 # Disable portability warnings -- our automake code (in particular
 # common.am) uses some constructs specific to gmake.
-AM_INIT_AUTOMAKE([1.6 -Wno-portability])
+AM_INIT_AUTOMAKE([foreign 1.6 -Wno-portability])
 
 m4_ifndef([AM_SILENT_RULES], [m4_define([AM_SILENT_RULES],[])])
 AM_SILENT_RULES([yes])
