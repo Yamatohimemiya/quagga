@@ -476,7 +476,7 @@ show_ip_bgp_nexthop_table (struct vty *vty, int detail)
 	      tbuf = time(NULL) - (bgp_clock() - bnc->last_update);
 	      vty_out (vty, "  Last update: %s", ctime(&tbuf));
 #else
-	      vty_out (vty, "  Last update: %s", ctime(&bnc->uptime));
+	      vty_out (vty, "  Last update: %s", ctime(&bnc->last_update));
 #endif /* HAVE_CLOCK_MONOTONIC */
 	      vty_out(vty, "%s", VTY_NEWLINE);
 	    }
