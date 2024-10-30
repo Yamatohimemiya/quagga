@@ -44,7 +44,7 @@
  */
 struct ethaddr {
     u_char octet[ETHER_ADDR_LEN];
-} __packed;
+};
 
 
 /*

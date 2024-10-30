@@ -50,6 +50,7 @@ int64_t                   qpim_mroute_socket_creation = 0; /* timestamp of creat
 struct thread            *qpim_mroute_socket_reader = 0;
 int                       qpim_mroute_oif_highest_vif_index = -1;
 struct list              *qpim_channel_oil_list = 0;
+struct in_addr            qpim_all_pim_routers_addr;
 int                       qpim_t_periodic = PIM_DEFAULT_T_PERIODIC; /* Period between Join/Prune Messages */
 struct list              *qpim_upstream_list = 0;
 struct zclient           *qpim_zclient_update = 0;
