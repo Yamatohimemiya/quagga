@@ -2,21 +2,21 @@
  * IS-IS Rout(e)ing protocol - isis_main.c
  *
  * Copyright (C) 2001,2002   Sampo Saaristo
- *                           Tampere University of Technology      
+ *                           Tampere University of Technology
  *                           Institute of Communications Engineering
  *
- * This program is free software; you can redistribute it and/or modify it 
- * under the terms of the GNU General Public Licenseas published by the Free 
- * Software Foundation; either version 2 of the License, or (at your option) 
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public Licenseas published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
  *
- * This program is distributed in the hope that it will be useful,but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for 
+ * This program is distributed in the hope that it will be useful,but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
@@ -79,17 +79,18 @@ struct zebra_privs_t isisd_privs = {
 /* isisd options */
 struct option longopts[] = {
 	{ "daemon", no_argument, NULL, 'd' },
-	      { "config_file", required_argument, NULL, 'f' },
+	{ "config_file", required_argument, NULL, 'f' },
 	{ "pid_file", required_argument, NULL, 'i' },
-	      { "socket", required_argument, NULL, 'z' },
+	{ "socket", required_argument, NULL, 'z' },
 	{ "vty_addr", required_argument, NULL, 'A' },
-	      { "vty_port", required_argument, NULL, 'P' },
+	{ "vty_port", required_argument, NULL, 'P' },
 	{ "user", required_argument, NULL, 'u' },
-	      { "group", required_argument, NULL, 'g' },
+	{ "group", required_argument, NULL, 'g' },
+	{ "skip_runas", no_argument, NULL, 'S' },
 	{ "version", no_argument, NULL, 'v' },
-	      { "dryrun", no_argument, NULL, 'C' },
+	{ "dryrun", no_argument, NULL, 'C' },
 	{ "help", no_argument, NULL, 'h' },
-	      { 0 }
+	{ 0 }
 };
 
 /* Configuration file and directory. */
@@ -138,6 +139,7 @@ Daemon which manages IS-IS routing\n\n\
 -P, --vty_port     Set vty's port number\n\
 -u, --user         User to run as\n\
 -g, --group        Group to run as\n\
+-S, --skip_runas   Skip user and group run as\n\
 -v, --version      Print program version\n\
 -C, --dryrun       Check configuration for validity and exit\n\
 -h, --help         Display this help and exit\n\
@@ -216,6 +218,7 @@ int main(int argc, char **argv, char **envp) {
 	char *config_file = NULL;
 	char *vty_addr = NULL;
 	int dryrun = 0;
+	int skip_runas = 0;
 
 	/* Get the programname without the preceding path. */
 	progname = ((p = strrchr(argv[0], '/')) ? ++p : argv[0]);
@@ -235,7 +238,7 @@ int main(int argc, char **argv, char **envp) {
 
 	/* Command line argument treatment. */
 	while(1) {
-		opt = getopt_long(argc, argv, "df:i:z:hA:p:P:u:g:vC", longopts, 0);
+		opt = getopt_long(argc, argv, "df:i:z:hA:p:P:u:g:vCS", longopts, 0);
 
 		if(opt == EOF) {
 			break;
@@ -260,6 +263,7 @@ int main(int argc, char **argv, char **envp) {
 				break;
 			case 'u': isisd_privs.user = optarg; break;
 			case 'g': isisd_privs.group = optarg; break;
+			case 'S': skip_runas = 1; break;
 			case 'v':
 				printf("ISISd version %s\n", ISISD_VERSION);
 				printf("Copyright (c) 2001-2002 Sampo Saaristo,"
@@ -282,6 +286,9 @@ int main(int argc, char **argv, char **envp) {
 	/*
    *  initializations
    */
+	if(skip_runas) {
+		memset(&isisd_privs, 0, sizeof(isisd_privs));
+	}
 	zprivs_init(&isisd_privs);
 	signal_init(master, array_size(isisd_signals), isisd_signals);
 	cmd_init(1);

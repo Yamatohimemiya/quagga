@@ -11,12 +11,12 @@
   WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
   along with this program; see the file COPYING; if not, write to the
   Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston,
   MA 02110-1301 USA
-  
+
   $QuaggaId: $Format:%an, %ai, %h$ $
 */
 
@@ -58,6 +58,7 @@ struct option longopts[] = {
 	{ "pid_file", required_argument, NULL, 'i' },
 	{ "vty_addr", required_argument, NULL, 'A' },
 	{ "vty_port", required_argument, NULL, 'P' },
+	{ "skip_runas", no_argument, NULL, 'S' },
 	{ "version", no_argument, NULL, 'v' },
 	{ "debug_zclient", no_argument, NULL, 'Z' },
 	{ "help", no_argument, NULL, 'h' },
@@ -100,6 +101,7 @@ Daemon which manages PIM.\n\n\
 -z, --socket         Set path of zebra socket\n\
 -A, --vty_addr       Set vty's bind address\n\
 -P, --vty_port       Set vty's port number\n\
+-S, --skip_runas   Skip user and group run as\n\
 -v, --version        Print program version\n\
 "
 
@@ -126,6 +128,7 @@ int main(int argc, char **argv, char **envp) {
 	int daemon_mode = 0;
 	char *config_file = NULL;
 	char *zebra_sock_path = NULL;
+	int skip_runas = 0;
 
 	umask(0027);
 
@@ -137,7 +140,7 @@ int main(int argc, char **argv, char **envp) {
 	while(1) {
 		int opt;
 
-		opt = getopt_long(argc, argv, "df:i:z:A:P:vZh", longopts, 0);
+		opt = getopt_long(argc, argv, "df:i:z:A:P:vZhS", longopts, 0);
 
 		if(opt == EOF) {
 			break;
@@ -151,6 +154,7 @@ int main(int argc, char **argv, char **envp) {
 			case 'z': zebra_sock_path = optarg; break;
 			case 'A': vty_addr = optarg; break;
 			case 'P': vty_port = atoi(optarg); break;
+			case 'S': skip_runas = 1; break;
 			case 'v':
 				printf(PIMD_PROGNAME " version %s\n", PIMD_VERSION);
 				print_version(QUAGGA_PROGNAME);
@@ -168,9 +172,12 @@ int main(int argc, char **argv, char **envp) {
 
 	zlog_notice("Quagga %s " PIMD_PROGNAME " %s starting", QUAGGA_VERSION, PIMD_VERSION);
 
-	/* 
+	/*
    * Initializations
    */
+	if(skip_runas) {
+		memset(&pimd_privs, 0, sizeof(pimd_privs));
+	}
 	zprivs_init(&pimd_privs);
 	pim_signals_init();
 	cmd_init(1);

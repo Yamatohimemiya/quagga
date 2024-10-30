@@ -392,7 +392,7 @@ int main(int argc, char **argv) {
 			case 'n': bgp_option_set(BGP_OPT_NO_FIB); break;
 			case 'u': bgpd_privs.user = optarg; break;
 			case 'g': bgpd_privs.group = optarg; break;
-			case 'S': /* skip run as = override bgpd_privs */ skip_runas = 1; break;
+			case 'S': skip_runas = 1; break;
 			case 'v':
 				print_version(progname);
 				exit(0);

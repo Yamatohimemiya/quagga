@@ -50,6 +50,7 @@ struct option longopts[] = {
 	{ "help", no_argument, NULL, 'h' },
 	    { "user", required_argument, NULL, 'u' },
 	      { "group", required_argument, NULL, 'g' },
+	{ "skip_runas", no_argument, NULL, 'S' },
 	 { 0 }
 };
 
@@ -62,6 +63,7 @@ static void usage(char *progname, int status) {
 Daemon which does 'slow' things.\n\n\
 -u, --user         User to run as\n\
 -g, --group        Group to run as\n\
+-S, --skip_runas   Skip user and group run as\n\
 -h, --help         Display this help and exit\n\
 \n\
 Report bugs to %s\n",
@@ -77,6 +79,7 @@ int main(int argc, char **argv) {
 	char *p;
 	char *progname;
 	struct zprivs_ids_t ids;
+	int skip_runas = 0;
 
 	/* Set umask before anything for security */
 	umask(0027);
@@ -87,7 +90,7 @@ int main(int argc, char **argv) {
 	while(1) {
 		int opt;
 
-		opt = getopt_long(argc, argv, "hu:g:", longopts, 0);
+		opt = getopt_long(argc, argv, "hu:g:S", longopts, 0);
 
 		if(opt == EOF) {
 			break;
@@ -97,6 +100,7 @@ int main(int argc, char **argv) {
 			case 0: break;
 			case 'u': test_privs.user = optarg; break;
 			case 'g': test_privs.group = optarg; break;
+			case 'S': skip_runas = 1; break;
 			case 'h': usage(progname, 0); break;
 			default: usage(progname, 1); break;
 		}
@@ -104,6 +108,9 @@ int main(int argc, char **argv) {
 
 	/* Library inits. */
 	memory_init();
+	if(skip_runas) {
+		memset(&test_privs, 0, sizeof(test_privs));
+	}
 	zprivs_init(&test_privs);
 
 #define PRIV_STATE() ((test_privs.current_state() == ZPRIVS_RAISED) ? "Raised" : "Lowered")
@@ -118,7 +125,9 @@ int main(int argc, char **argv) {
 	zprivs_get_ids(&ids);
 
 	/* terminate privileges */
-	zprivs_terminate(&test_privs);
+	if(test_privs.user) { /* NULL if skip_runas flag set */
+		zprivs_terminate(&test_privs);
+	}
 
 	/* but these should continue to work... */
 	printf("%s\n", PRIV_STATE());

@@ -14,9 +14,9 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with GNU Zebra; see the file COPYING.  If not, write to the 
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
- * Boston, MA 02111-1307, USA.  
+ * along with GNU Zebra; see the file COPYING.  If not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -72,17 +72,18 @@ struct zebra_privs_t ospf6d_privs = {
 /* ospf6d options, we use GNU getopt library. */
 struct option longopts[] = {
 	{ "daemon", no_argument, NULL, 'd' },
-	      { "config_file", required_argument, NULL, 'f' },
+	{ "config_file", required_argument, NULL, 'f' },
 	{ "pid_file", required_argument, NULL, 'i' },
-	      { "socket", required_argument, NULL, 'z' },
+	{ "socket", required_argument, NULL, 'z' },
 	{ "vty_addr", required_argument, NULL, 'A' },
-	      { "vty_port", required_argument, NULL, 'P' },
+	{ "vty_port", required_argument, NULL, 'P' },
 	{ "user", required_argument, NULL, 'u' },
-	      { "group", required_argument, NULL, 'g' },
+	{ "group", required_argument, NULL, 'g' },
+	{ "skip_runas", no_argument, NULL, 'S' },
 	{ "version", no_argument, NULL, 'v' },
-	      { "dryrun", no_argument, NULL, 'C' },
+	{ "dryrun", no_argument, NULL, 'C' },
 	{ "help", no_argument, NULL, 'h' },
-	      { 0 }
+	{ 0 }
 };
 
 /* Configuration file and directory. */
@@ -115,6 +116,7 @@ Daemon which manages OSPF version 3.\n\n\
 -P, --vty_port     Set vty's port number\n\
 -u, --user         User to run as\n\
 -g, --group        Group to run as\n\
+-S, --skip_runas   Skip user and group run as\n\
 -v, --version      Print program version\n\
 -C, --dryrun       Check configuration for validity and exit\n\
 -h, --help         Display this help and exit\n\
@@ -215,6 +217,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	int vty_port = 0;
 	char *config_file = NULL;
 	int dryrun = 0;
+	int skip_runas = 0;
 
 	/* Set umask before anything for security */
 	umask(0027);
@@ -224,7 +227,7 @@ int main(int argc, char *argv[], char *envp[]) {
 
 	/* Command line argument treatment. */
 	while(1) {
-		opt = getopt_long(argc, argv, "df:i:z:hp:A:P:u:g:vC", longopts, 0);
+		opt = getopt_long(argc, argv, "df:i:z:hp:A:P:u:g:vCS", longopts, 0);
 
 		if(opt == EOF) {
 			break;
@@ -251,6 +254,7 @@ int main(int argc, char *argv[], char *envp[]) {
 				break;
 			case 'u': ospf6d_privs.user = optarg; break;
 			case 'g': ospf6d_privs.group = optarg; break;
+			case 'S': skip_runas = 1; break;
 			case 'v':
 				print_version(progname);
 				exit(0);
@@ -272,6 +276,9 @@ int main(int argc, char *argv[], char *envp[]) {
 
 	/* Initializations. */
 	zlog_default = openzlog(progname, ZLOG_OSPF6, LOG_CONS | LOG_NDELAY | LOG_PID, LOG_DAEMON);
+	if(skip_runas) {
+		memset(&ospf6d_privs, 0, sizeof(ospf6d_privs));
+	}
 	zprivs_init(&ospf6d_privs);
 	/* initialize zebra libraries */
 	signal_init(master, array_size(ospf6_signals), ospf6_signals);

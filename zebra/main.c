@@ -84,6 +84,7 @@ struct option longopts[] = {
 #endif  /* HAVE_NETLINK */
 	{ "user", required_argument, NULL, 'u' },
 	{ "group", required_argument, NULL, 'g' },
+	{ "skip_runas", no_argument, NULL, 'S' },
 	{ "version", no_argument, NULL, 'v' },
 	{ 0 }
 };
@@ -276,6 +277,7 @@ int main(int argc, char **argv) {
 	char *progname;
 	char *zserv_path = NULL;
 	char *fpm_format = NULL;
+	int skip_runas = 0;
 
 	/* Set umask before anything for security */
 	umask(0027);
@@ -289,9 +291,9 @@ int main(int argc, char **argv) {
 		int opt;
 
 #ifdef HAVE_NETLINK
-		opt = getopt_long(argc, argv, "bdkf:F:i:z:hA:P:ru:g:vs:C", longopts, 0);
+		opt = getopt_long(argc, argv, "bdkf:F:i:z:hA:P:ru:g:vs:CS", longopts, 0);
 #else
-		opt = getopt_long(argc, argv, "bdkf:F:i:z:hA:P:ru:g:vC", longopts, 0);
+		opt = getopt_long(argc, argv, "bdkf:F:i:z:hA:P:ru:g:vCS", longopts, 0);
 #endif /* HAVE_NETLINK */
 
 		if(opt == EOF) {
@@ -327,6 +329,7 @@ int main(int argc, char **argv) {
 #endif /* HAVE_NETLINK */
 			case 'u': zserv_privs.user = optarg; break;
 			case 'g': zserv_privs.group = optarg; break;
+			case 'S': skip_runas = 1; break;
 			case 'v':
 				print_version(progname);
 				exit(0);
@@ -340,6 +343,9 @@ int main(int argc, char **argv) {
 	zebrad.master = thread_master_create();
 
 	/* privs initialise */
+	if(skip_runas) {
+		memset(&zserv_privs, 0, sizeof(zserv_privs));
+	}
 	zprivs_init(&zserv_privs);
 
 	/* Vty related initialize. */

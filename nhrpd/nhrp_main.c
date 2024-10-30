@@ -45,6 +45,7 @@ struct option longopts[] = {
 	{ "vty_port", required_argument, NULL, 'P' },
 	{ "user", required_argument, NULL, 'u' },
 	{ "group", required_argument, NULL, 'g' },
+	{ "skip_runas", no_argument, NULL, 'S' },
 	{ "version", no_argument, NULL, 'v' },
 	{ 0 }
 };
@@ -82,6 +83,7 @@ Daemon which manages NHRP protocol.\n\n\
 -P, --vty_port     Set vty's port number\n\
 -u, --user         User to run as\n\
 -g, --group        Group to run as\n\
+-S, --skip_runas   Skip user and group run as\n\
 -v, --version      Print program version\n\
 -h, --help         Display this help and exit\n\
 \n\
@@ -92,11 +94,11 @@ Report bugs to %s\n",
 	exit(status);
 }
 
-static void parse_arguments(const char *progname, int argc, char **argv) {
+static void parse_arguments(const char *progname, int argc, char **argv, int *skip_runas) {
 	int opt;
 
 	while(1) {
-		opt = getopt_long(argc, argv, "df:i:z:hA:P:u:g:v", longopts, 0);
+		opt = getopt_long(argc, argv, "df:i:z:hA:P:u:g:vS", longopts, 0);
 		if(opt < 0) {
 			break;
 		}
@@ -116,6 +118,7 @@ static void parse_arguments(const char *progname, int argc, char **argv) {
 				break;
 			case 'u': nhrpd_privs.user = optarg; break;
 			case 'g': nhrpd_privs.group = optarg; break;
+			case 'S': *skip_runas = 1; break;
 			case 'v':
 				print_version(progname);
 				exit(0);
@@ -144,8 +147,9 @@ static void nhrp_request_stop(void) {
 	/* vty_terminate(); */
 	cmd_terminate();
 	/* signal_terminate(); */
-	zprivs_terminate(&nhrpd_privs);
-
+	if(nhrpd_privs.user) { /* NULL if skip_runas flag set */
+		zprivs_terminate(&nhrpd_privs);
+	}
 	debugf(NHRP_DEBUG_COMMON, "Remove pid file.");
 	if(pid_file) {
 		unlink(pid_file);
@@ -174,6 +178,7 @@ static struct quagga_signal_t sighandlers[] = {
 
 int main(int argc, char **argv) {
 	const char *progname;
+	int skip_runas = 0;
 
 	/* Set umask before anything for security */
 	umask(0027);
@@ -181,10 +186,13 @@ int main(int argc, char **argv) {
 	zlog_default = openzlog(progname, ZLOG_NHRP, LOG_CONS | LOG_NDELAY | LOG_PID, LOG_DAEMON);
 	zlog_set_level(NULL, ZLOG_DEST_STDOUT, LOG_WARNING);
 
-	parse_arguments(progname, argc, argv);
+	parse_arguments(progname, argc, argv, &skip_runas);
 
 	/* Library inits. */
 	master = thread_master_create();
+	if(skip_runas) {
+		memset(&nhrpd_privs, 0, sizeof(nhrpd_privs));
+	}
 	zprivs_init(&nhrpd_privs);
 	signal_init(master, array_size(sighandlers), sighandlers);
 	cmd_init(1);

@@ -51,6 +51,7 @@ static struct option longopts[] = {
 	{ "retain", no_argument, NULL, 'r' },
 	{ "user", required_argument, NULL, 'u' },
 	{ "group", required_argument, NULL, 'g' },
+	{ "skip_runas", no_argument, NULL, 'S' },
 	{ "version", no_argument, NULL, 'v' },
 	{ 0 }
 };
@@ -111,6 +112,7 @@ Daemon which manages RIP version 1 and 2.\n\n\
 -r, --retain       When program terminates, retain added route by ripd.\n\
 -u, --user         User to run as\n\
 -g, --group        Group to run as\n\
+-S, --skip_runas   Skip user and group run as\n\
 -v, --version      Print program version\n\
 -h, --help         Display this help and exit\n\
 \n\
@@ -178,6 +180,7 @@ int main(int argc, char **argv) {
 	int daemon_mode = 0;
 	int dryrun = 0;
 	char *progname;
+	int skip_runas = 0;
 
 	/* Set umask before anything for security */
 	umask(0027);
@@ -192,7 +195,7 @@ int main(int argc, char **argv) {
 	while(1) {
 		int opt;
 
-		opt = getopt_long(argc, argv, "df:i:z:hA:P:u:g:rvC", longopts, 0);
+		opt = getopt_long(argc, argv, "df:i:z:hA:P:u:g:rvCS", longopts, 0);
 
 		if(opt == EOF) {
 			break;
@@ -221,6 +224,7 @@ int main(int argc, char **argv) {
 			case 'C': dryrun = 1; break;
 			case 'u': ripd_privs.user = optarg; break;
 			case 'g': ripd_privs.group = optarg; break;
+			case 'S': skip_runas = 1; break;
 			case 'v':
 				print_version(progname);
 				exit(0);
@@ -234,6 +238,9 @@ int main(int argc, char **argv) {
 	master = thread_master_create();
 
 	/* Library initialization. */
+	if(skip_runas) {
+		memset(&ripd_privs, 0, sizeof(ripd_privs));
+	}
 	zprivs_init(&ripd_privs);
 	signal_init(master, array_size(ripd_signals), ripd_signals);
 	cmd_init(1);

@@ -55,14 +55,14 @@ struct thread_master *master;
 /* Command line options. */
 struct option longopts[] = {
 	{ "batch", no_argument, NULL, 'b' },
-	       { "daemon", no_argument, NULL, 'd' },
-	     { "config_file", required_argument, NULL, 'f' },
+	{ "daemon", no_argument, NULL, 'd' },
+	{ "config_file", required_argument, NULL, 'f' },
 	{ "help", no_argument, NULL, 'h' },
-	       { "vty_addr", required_argument, NULL, 'A' },
-	     { "vty_port", required_argument, NULL, 'P' },
+	{ "vty_addr", required_argument, NULL, 'A' },
+	{ "vty_port", required_argument, NULL, 'P' },
 	{ "version", no_argument, NULL, 'v' },
-	       { "rib_hold", required_argument, NULL, 'r' },
-	     { 0 }
+	{ "rib_hold", required_argument, NULL, 'r' },
+	{ 0 }
 };
 
 zebra_capabilities_t _caps_p[] = {

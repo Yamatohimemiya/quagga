@@ -88,6 +88,7 @@ struct option longopts[] = {
 	{ "vty_port", required_argument, NULL, 'P' },
 	{ "user", required_argument, NULL, 'u' },
 	{ "group", required_argument, NULL, 'g' },
+	{ "skip_runas", no_argument, NULL, 'S' },
 	{ "apiserver", no_argument, NULL, 'a' },
 	{ "version", no_argument, NULL, 'v' },
 	{ 0 }
@@ -120,6 +121,7 @@ Daemon which manages OSPF.\n\n\
 -P, --vty_port     Set vty's port number\n\
 -u, --user         User to run as\n\
 -g, --group        Group to run as\n\
+-S, --skip_runas   Skip user and group run as\n\
 -a. --apiserver    Enable OSPF apiserver\n\
 -v, --version      Print program version\n\
 -C, --dryrun       Check configuration for validity and exit\n\
@@ -175,6 +177,7 @@ int main(int argc, char **argv) {
 	char *config_file = NULL;
 	char *progname;
 	int dryrun = 0;
+	int skip_runas = 0;
 
 	/* Set umask before anything for security */
 	umask(0027);
@@ -190,7 +193,7 @@ int main(int argc, char **argv) {
 	while(1) {
 		int opt;
 
-		opt = getopt_long(argc, argv, "df:i:z:hA:P:u:g:avC", longopts, 0);
+		opt = getopt_long(argc, argv, "df:i:z:hA:P:u:g:avCS", longopts, 0);
 
 		if(opt == EOF) {
 			break;
@@ -217,6 +220,7 @@ int main(int argc, char **argv) {
 				break;
 			case 'u': ospfd_privs.user = optarg; break;
 			case 'g': ospfd_privs.group = optarg; break;
+			case 'S': skip_runas = 1; break;
 #ifdef SUPPORT_OSPF_API
 			case 'a': ospf_apiserver_enable = 1; break;
 #endif /* SUPPORT_OSPF_API */
@@ -246,6 +250,9 @@ int main(int argc, char **argv) {
 	master = om->master;
 
 	/* Library inits. */
+	if(skip_runas) {
+		memset(&ospfd_privs, 0, sizeof(ospfd_privs));
+	}
 	zprivs_init(&ospfd_privs);
 	signal_init(master, array_size(ospf_signals), ospf_signals);
 	cmd_init(1);
