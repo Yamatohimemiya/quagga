@@ -94,25 +94,6 @@ dnl autoconf 2.59 appears not to support AC_PROG_SED
 dnl AC_PROG_SED
 AC_CHECK_PROG([SED],[sed],[sed],[/bin/false])
 
-dnl Check for pdflatex and latexmk, in case someone wants to build
-dnl PDFs from TeX (as used to be case for HACKING)
-AC_CHECK_PROG([PDFLATEX],[pdflatex],[pdflatex],[/bin/false])
-AC_CHECK_PROG([LATEXMK],[latexmk],[latexmk],[/bin/false])
-if test "x$PDFLATEX" = "x/bin/false" -o "x$LATEXMK" = "x/bin/false"; then
-	AC_MSG_WARN([Will not be able to make PDF versions of TeX documents])
-else
-	HAVE_LATEX=true
-fi
-AM_CONDITIONAL([HAVE_LATEX], [test "x$HAVE_LATEX" = "xtrue"])
-dnl for making HACKING.pdf from HACKING.md using pandoc
-AC_CHECK_PROG([PANDOC],[pandoc],[pandoc],[/bin/false])
-if test "x$PDFLATEX" = "x/bin/false" -o "x$PANDOC" = "x/bin/false"; then
-	AC_MSG_WARN([Will not be able to make PDF versions of MD documents])
-else
-	HAVE_PANDOC=true
-fi
-AM_CONDITIONAL([HAVE_PANDOC], [test "x$HAVE_PANDOC" = "xtrue"])
-
 if test "x${GCC}" != "xyes" ; then
   AC_MSG_CHECKING([whether we are using SunPro compiler])
   AC_EGREP_CPP([^__SUNPRO_C.*0x5(7|8|9)], ["__SUNPRO_C" __SUNPRO_C],
@@ -280,8 +261,6 @@ AC_ARG_WITH(pkg-git-version,
 	[ test "x$withval" != "xno" && with_pkg_git_version="yes" ])
 AC_ARG_ENABLE(vtysh,
   AS_HELP_STRING([--disable-vtysh], [do not build integrated vty shell for Quagga]))
-AC_ARG_ENABLE(doc,
-  AS_HELP_STRING([--disable-doc], [do not build docs]))
 AC_ARG_ENABLE(zebra,
   AS_HELP_STRING([--disable-zebra], [do not build zebra daemon]))
 AC_ARG_ENABLE(bgpd,
@@ -1199,13 +1178,6 @@ QUAGGA_INCLUDES
 #endif
 ])dnl
 
-dnl disable doc check
-if test "${enable_doc}" = "no";then
-  DOC=""
-else
-  DOC="doc"
-fi
-
 dnl --------------------
 dnl Daemon disable check
 dnl --------------------
@@ -1642,7 +1614,7 @@ AC_MSG_RESULT($ac_cv_htonl_works)
 AC_CONFIG_FILES([Makefile lib/Makefile qpb/Makefile zebra/Makefile ripd/Makefile
 	  ripngd/Makefile bgpd/Makefile ospfd/Makefile watchquagga/Makefile
 	  ospf6d/Makefile isisd/Makefile vtysh/Makefile
-	  doc/Makefile ospfclient/Makefile tests/Makefile m4/Makefile
+	  ospfclient/Makefile tests/Makefile m4/Makefile
 	  pimd/Makefile nhrpd/Makefile
 	  redhat/Makefile
 	  pkgsrc/Makefile
