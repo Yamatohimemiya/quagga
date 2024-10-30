@@ -1,6 +1,7 @@
 /*
  * Packet interface
  * Copyright (C) 1999 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -17,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -806,7 +807,7 @@ size_t stream_write(struct stream *s, const void *ptr, size_t size) {
 	return size;
 }
 
-/* Return current read pointer. 
+/* Return current read pointer.
  * DEPRECATED!
  * Use stream_get_pnt_to if you must, but decoding streams properly
  * is preferred

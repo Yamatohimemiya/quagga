@@ -1,5 +1,6 @@
 /* FIFO common header.
    Copyright (C) 2015 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of Quagga.
 

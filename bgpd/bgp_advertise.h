@@ -1,5 +1,6 @@
 /* BGP advertisement and adjacency
    Copyright (C) 1996, 97, 98, 99, 2000 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 

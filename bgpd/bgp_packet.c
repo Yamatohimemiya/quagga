@@ -1,5 +1,6 @@
 /* BGP packet management routine.
    Copyright (C) 1999 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 
@@ -1101,7 +1102,7 @@ static int bgp_collision_detect(struct peer *new, struct in_addr remote_id) {
          closing of the newly created connection. */
 		if(peer->status == Established) {
 			/* GR may do things slightly differently to classic RFC .  Punt to
-           * open_receive, see below 
+           * open_receive, see below
            */
 			if(CHECK_FLAG(peer->sflags, PEER_STATUS_NSF_MODE)) {
 				continue;
@@ -1316,14 +1317,14 @@ static int bgp_open_receive(struct peer *peer, bgp_size_t size) {
        * 'realpeer' which represents the configuration and any earlier FSM
        * (outbound, unless the remote side has opened two connections to
        * us), and a 'peer' which here represents an inbound connection that
-       * has not yet been reconciled with a 'realpeer'.  
-       * 
+       * has not yet been reconciled with a 'realpeer'.
+       *
        * As 'peer' has just sent an OPEN that reconciliation must now
        * happen, as only the 'realpeer' can ever proceed to Established.
        *
        * bgp_collision_detect should have resolved any collisions with
        * realpeers that are in states OpenSent, OpenConfirm or Established,
-       * and may have sent a notify on the 'realpeer' connection. 
+       * and may have sent a notify on the 'realpeer' connection.
        * bgp_accept will have rejected any connections where the 'realpeer'
        * is in Idle or >Established (though, that status may have changed
        * since).
@@ -1510,7 +1511,7 @@ static int bgp_open_receive(struct peer *peer, bgp_size_t size) {
 		}
 	}
 
-	/* 
+	/*
    * Assume that the peer supports the locally configured set of
    * AFI/SAFIs if the peer did not send us any Mulitiprotocol
    * capabilities, or if 'override-capability' is configured.
@@ -1657,7 +1658,7 @@ static int bgp_update_receive(struct peer *peer, bgp_size_t size) {
    * to reset the session for, most particularly any partial/optional
    * attributes that have 'tunneled' over speakers that don't understand
    * them. Instead we withdraw only the prefix concerned.
-   * 
+   *
    * Complicates the flow a little though..
    */
 	bgp_attr_parse_ret_t attr_parse_ret = BGP_ATTR_PARSE_PROCEED;
@@ -2182,7 +2183,7 @@ static int bgp_capability_msg_parse(struct peer *peer, u_char *pnt, bgp_size_t l
 	return 0;
 }
 
-/* Dynamic Capability is received. 
+/* Dynamic Capability is received.
  *
  * This is exported for unit-test purposes
  */

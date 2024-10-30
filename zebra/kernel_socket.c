@@ -1,5 +1,6 @@
 /* Kernel communication using routing socket.
  * Copyright (C) 1999 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -16,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -395,7 +396,7 @@ int ifm_read(struct if_msghdr *ifm) {
 	cp = (void *) (ifm + 1);
 
 #ifdef SUNOS_5
-	/* 
+	/*
    * XXX This behavior should be narrowed to only the kernel versions
    * for which the structures returned do not match the headers.
    *
@@ -421,7 +422,7 @@ int ifm_read(struct if_msghdr *ifm) {
 		zlog_debug("%s: sdl ifname %s", __func__, (ifnlen ? ifname : "(nil)"));
 	}
 
-	/* 
+	/*
    * Look up on ifindex first, because ifindices are the primary handle for
    * interfaces across the user/kernel boundary, for most systems.  (Some
    * messages, such as up/down status changes on NetBSD, do not include a
@@ -441,7 +442,7 @@ int ifm_read(struct if_msghdr *ifm) {
 		}
 	}
 
-	/* 
+	/*
    * If we dont have an ifp, try looking up by name.  Particularly as some
    * systems (Solaris) have a 1:many mapping of ifindex:ifname - the ifname
    * is therefore our unique handle to that interface.
@@ -489,7 +490,7 @@ int ifm_read(struct if_msghdr *ifm) {
 		if(IS_ZEBRA_DEBUG_KERNEL) {
 			zlog_debug("%s: updated/created ifp, ifname %s, ifindex %d", __func__, ifp->name, ifp->ifindex);
 		}
-		/* 
+		/*
        * Fill in newly created interface structure, or larval
        * structure with ifindex IFINDEX_INTERNAL.
        */
@@ -720,9 +721,9 @@ int ifam_read(struct ifa_msghdr *ifam) {
 	if_refresh(ifp);
 
 #ifdef SUNOS_5
-	/* In addition to lacking IFANNOUNCE, on SUNOS IFF_UP is strange. 
+	/* In addition to lacking IFANNOUNCE, on SUNOS IFF_UP is strange.
    * See comments for SUNOS_5 in interface.c::if_flags_mangle.
-   * 
+   *
    * Here we take care of case where the real IFF_UP was previously
    * unset (as kept in struct zebra_if.primary_state) and the mangled
    * IFF_UP (ie IFF_UP set || listcount(connected) has now transitioned
@@ -1217,11 +1218,11 @@ static void routing_socket(struct zebra_vrf *zvrf) {
 		return;
 	}
 
-	/* XXX: Socket should be NONBLOCK, however as we currently 
+	/* XXX: Socket should be NONBLOCK, however as we currently
    * discard failed writes, this will lead to inconsistencies.
    * For now, socket must be blocking.
    */
-	/*if (fcntl (routing_sock, F_SETFL, O_NONBLOCK) < 0) 
+	/*if (fcntl (routing_sock, F_SETFL, O_NONBLOCK) < 0)
     zlog_warn ("Can't set O_NONBLOCK to routing socket");*/
 
 	if(zserv_privs.change(ZPRIVS_LOWER)) {

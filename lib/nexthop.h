@@ -1,6 +1,7 @@
 /*
  * Nexthop structure definition.
  * Copyright (C) 1997, 98, 99, 2001 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  * Copyright (C) 2013 Cumulus Networks, Inc.
  *
  * This file is part of Quagga.

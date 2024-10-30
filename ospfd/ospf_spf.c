@@ -1,5 +1,6 @@
 /* OSPF SPF calculation.
    Copyright (C) 1999, 2000 Kunihiro Ishiguro, Toshiaki Takada
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 
@@ -405,9 +406,9 @@ static void ospf_spf_flush_parents(struct vertex *w) {
 	}
 }
 
-/* 
+/*
  * Consider supplied next-hop for inclusion to the supplied list of
- * equal-cost next-hops, adjust list as neccessary.  
+ * equal-cost next-hops, adjust list as neccessary.
  */
 static void ospf_spf_add_parent(struct vertex *v, struct vertex *w, struct vertex_nexthop *newhop, unsigned int distance) {
 	struct vertex_parent *vp, *wp;
@@ -488,9 +489,9 @@ static unsigned int ospf_nexthop_calculation(struct ospf_area *area, struct vert
 
 	if(v == area->spf) {
 		/* 16.1.1 para 4.  In the first case, the parent vertex (V) is the
-	 root (the calculating router itself).  This means that the 
+	 root (the calculating router itself).  This means that the
 	 destination is either a directly connected network or directly
-	 connected router.  The outgoing interface in this case is simply 
+	 connected router.  The outgoing interface in this case is simply
          the OSPF interface connecting to the destination network/router.
       */
 
@@ -587,9 +588,9 @@ static unsigned int ospf_nexthop_calculation(struct ospf_area *area, struct vert
 			else if(l->m[0].type == LSA_LINK_TYPE_VIRTUALLINK) {
 				struct ospf_vl_data *vl_data;
 
-				/* VLink implementation limitations: 
+				/* VLink implementation limitations:
                * a) vl_data can only reference one nexthop, so no ECMP
-               *    to backbone through VLinks. Though transit-area 
+               *    to backbone through VLinks. Though transit-area
                *    summaries may be considered, and those can be ECMP.
                * b) We can only use /one/ VLink, even if multiple ones
                *    exist this router through multiple transit-areas.
@@ -636,7 +637,7 @@ static unsigned int ospf_nexthop_calculation(struct ospf_area *area, struct vert
 					/* ...For each link in the router-LSA that points back to the
 		   * parent network, the link's Link Data field provides the IP
 		   * address of a next hop router.  The outgoing interface to
-		   * use can then be derived from the next hop IP address (or 
+		   * use can then be derived from the next hop IP address (or
 		   * it can be inherited from the parent network).
 		   */
 					nh = vertex_nexthop_new();
@@ -649,7 +650,7 @@ static unsigned int ospf_nexthop_calculation(struct ospf_area *area, struct vert
 			}
 		}
 		/* NB: This code is non-trivial.
-       * 
+       *
        * E.g. it is not enough to know that V connects to the root. It is
        * also important that the while above, looping through all links from
        * W->V found at least one link, so that we know there is
@@ -865,7 +866,7 @@ static void ospf_spf_next(struct vertex *v, struct ospf_area *area, struct pqueu
 			}
 			/* equal to. */
 			else if(w->distance == distance) {
-				/* Found an equal-cost path to W.  
+				/* Found an equal-cost path to W.
                * Calculate nexthop of to W from V. */
 				ospf_nexthop_calculation(area, v, w, l, distance, lsa_pos);
 			}
@@ -879,7 +880,7 @@ static void ospf_spf_next(struct vertex *v, struct ospf_area *area, struct pqueu
 				if(ospf_nexthop_calculation(area, v, w, l, distance, lsa_pos)) {
 					/* Decrease the key of the node in the heap.
                  * trickle-sort it up towards root, just in case this
-                 * node should now be the new root due the cost change. 
+                 * node should now be the new root due the cost change.
                  * (next pqueu_{de,en}queue will fully re-heap the queue).
                  */
 					trickle_up(w_lsa->stat, candidate);
@@ -964,7 +965,7 @@ static void ospf_spf_process_stubs(struct ospf_area *area, struct vertex *v, str
 		}
 
 		/* the first level of routers connected to the root
-       * should have 'parent_is_root' set, including those 
+       * should have 'parent_is_root' set, including those
        * connected via a network vertex.
        */
 		if(area->spf == v) {

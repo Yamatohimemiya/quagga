@@ -1,5 +1,6 @@
 /* Zebra VTY functions
  * Copyright (C) 2002 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -14,9 +15,9 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with GNU Zebra; see the file COPYING.  If not, write to the 
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
- * Boston, MA 02111-1307, USA.  
+ * along with GNU Zebra; see the file COPYING.  If not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -56,7 +57,7 @@ zebra_static_ipv4_safi (struct vty *vty, safi_t safi, int add_cmd,
   u_char flag = 0;
   route_tag_t tag = 0;
   vrf_id_t vrf_id = VRF_DEFAULT;
-  
+
   ret = str2prefix (dest_str, &p);
   if (ret <= 0)
     {
@@ -138,7 +139,7 @@ zebra_static_ipv4_safi (struct vty *vty, safi_t safi, int add_cmd,
 
     return CMD_SUCCESS;
   }
-  
+
   /* When gateway is A.B.C.D format, gate is treated as nexthop
      address other case gate is treated as interface name. */
   ret = inet_aton (gate_str, &gate);
@@ -459,7 +460,7 @@ DEFUN (show_ip_rpf_addr_vrf_all,
 }
 
 /* Static route configuration.  */
-DEFUN (ip_route, 
+DEFUN (ip_route,
        ip_route_cmd,
        "ip route A.B.C.D/M (A.B.C.D|INTERFACE|null0)",
        IP_STR
@@ -1064,7 +1065,7 @@ DEFUN (ip_route_mask_flags_tag_distance2_vrf,
 				 argv[2], argv[3], argv[4], argv[5]);
 }
 
-DEFUN (no_ip_route, 
+DEFUN (no_ip_route,
        no_ip_route_cmd,
        "no ip route A.B.C.D/M (A.B.C.D|INTERFACE|null0)",
        NO_STR
@@ -2134,13 +2135,13 @@ vty_show_ip_route_detail (struct vty *vty, struct route_node *rn, int mcast)
 	  vty_out (vty, "  Last update ");
 
 	  if (uptime < ONE_DAY_SECOND)
-	    vty_out (vty,  "%02d:%02d:%02d", 
+	    vty_out (vty,  "%02d:%02d:%02d",
 		     tm->tm_hour, tm->tm_min, tm->tm_sec);
 	  else if (uptime < ONE_WEEK_SECOND)
-	    vty_out (vty, "%dd%02dh%02dm", 
+	    vty_out (vty, "%dd%02dh%02dm",
 		     tm->tm_yday, tm->tm_hour, tm->tm_min);
 	  else
-	    vty_out (vty, "%02dw%dd%02dh", 
+	    vty_out (vty, "%02dw%dd%02dh",
 		     tm->tm_yday/7,
 		     tm->tm_yday - ((tm->tm_yday/7) * 7), tm->tm_hour);
 	  vty_out (vty, " ago%s", VTY_NEWLINE);
@@ -2247,9 +2248,9 @@ vty_show_ip_route (struct vty *vty, struct route_node *rn, struct rib *rib)
 			 CHECK_FLAG (nexthop->flags, NEXTHOP_FLAG_FIB)
 			 ? '*' : ' ',
 			 prefix2str (&rn->p, buf, sizeof buf));
-		
+
 	  /* Distance and metric display. */
-	  if (rib->type != ZEBRA_ROUTE_CONNECT 
+	  if (rib->type != ZEBRA_ROUTE_CONNECT
 	      && rib->type != ZEBRA_ROUTE_KERNEL)
 	    len += vty_out (vty, " [%d/%d]", rib->distance,
 			    rib->metric);
@@ -2356,13 +2357,13 @@ vty_show_ip_route (struct vty *vty, struct route_node *rn, struct rib *rib)
 #define ONE_WEEK_SECOND 60*60*24*7
 
 	  if (uptime < ONE_DAY_SECOND)
-	    vty_out (vty,  ", %02d:%02d:%02d", 
+	    vty_out (vty,  ", %02d:%02d:%02d",
 		     tm->tm_hour, tm->tm_min, tm->tm_sec);
 	  else if (uptime < ONE_WEEK_SECOND)
-	    vty_out (vty, ", %dd%02dh%02dm", 
+	    vty_out (vty, ", %dd%02dh%02dm",
 		     tm->tm_yday, tm->tm_hour, tm->tm_min);
 	  else
-	    vty_out (vty, ", %02dw%dd%02dh", 
+	    vty_out (vty, ", %02dw%dd%02dh",
 		     tm->tm_yday/7,
 		     tm->tm_yday - ((tm->tm_yday/7) * 7), tm->tm_hour);
 	}
@@ -2784,8 +2785,8 @@ vty_show_ip_route_summary (struct vty *vty, struct route_table *table)
 	      fib_cnt[ZEBRA_ROUTE_TOTAL]++;
 	      fib_cnt[rib->type]++;
 	    }
-	  if (rib->type == ZEBRA_ROUTE_BGP && 
-	      CHECK_FLAG (rib->flags, ZEBRA_FLAG_IBGP)) 
+	  if (rib->type == ZEBRA_ROUTE_BGP &&
+	      CHECK_FLAG (rib->flags, ZEBRA_FLAG_IBGP))
 	    {
 	      rib_cnt[ZEBRA_ROUTE_IBGP]++;
 	      if (CHECK_FLAG (nexthop->flags, NEXTHOP_FLAG_FIB)
@@ -2799,29 +2800,29 @@ vty_show_ip_route_summary (struct vty *vty, struct route_table *table)
            ((rib_table_info_t *)table->info)->zvrf->vrf_id,
            VTY_NEWLINE);
 
-  for (i = 0; i < ZEBRA_ROUTE_MAX; i++) 
+  for (i = 0; i < ZEBRA_ROUTE_MAX; i++)
     {
       if (rib_cnt[i] > 0)
 	{
 	  if (i == ZEBRA_ROUTE_BGP)
 	    {
-	      vty_out (vty, "%-20s %-20d %-20d %s", "ebgp", 
+	      vty_out (vty, "%-20s %-20d %-20d %s", "ebgp",
 		       rib_cnt[ZEBRA_ROUTE_BGP] - rib_cnt[ZEBRA_ROUTE_IBGP],
 		       fib_cnt[ZEBRA_ROUTE_BGP] - fib_cnt[ZEBRA_ROUTE_IBGP],
 		       VTY_NEWLINE);
-	      vty_out (vty, "%-20s %-20d %-20d %s", "ibgp", 
+	      vty_out (vty, "%-20s %-20d %-20d %s", "ibgp",
 		       rib_cnt[ZEBRA_ROUTE_IBGP], fib_cnt[ZEBRA_ROUTE_IBGP],
 		       VTY_NEWLINE);
 	    }
-	  else 
-	    vty_out (vty, "%-20s %-20d %-20d %s", zebra_route_string(i), 
+	  else
+	    vty_out (vty, "%-20s %-20d %-20d %s", zebra_route_string(i),
 		     rib_cnt[i], fib_cnt[i], VTY_NEWLINE);
 	}
     }
 
   vty_out (vty, "------%s", VTY_NEWLINE);
-  vty_out (vty, "%-20s %-20d %-20d %s", "Totals", rib_cnt[ZEBRA_ROUTE_TOTAL], 
-	   fib_cnt[ZEBRA_ROUTE_TOTAL], VTY_NEWLINE);  
+  vty_out (vty, "%-20s %-20d %-20d %s", "Totals", rib_cnt[ZEBRA_ROUTE_TOTAL],
+	   fib_cnt[ZEBRA_ROUTE_TOTAL], VTY_NEWLINE);
   vty_out (vty, "%s", VTY_NEWLINE);
 }
 
@@ -3284,7 +3285,7 @@ static int
 static_config_ipv4 (struct vty *vty, safi_t safi, const char *cmd)
 {
   struct route_node *rn;
-  struct static_route *si;  
+  struct static_route *si;
   struct route_table *stable;
   struct zebra_vrf *zvrf;
   vrf_iter_t iter;
@@ -3351,7 +3352,7 @@ DEFUN (show_ip_protocol,
         IP_STR
        "IP protocol filtering status\n")
 {
-    int i; 
+    int i;
 
     vty_out(vty, "Protocol    : route-map %s", VTY_NEWLINE);
     vty_out(vty, "------------------------%s", VTY_NEWLINE);
@@ -3389,7 +3390,7 @@ static_ipv6_func (struct vty *vty, int add_cmd, const char *dest_str,
   vrf_id_t vrf_id = VRF_DEFAULT;
   u_char flag = 0;
   route_tag_t tag = 0;
-  
+
   ret = str2prefix (dest_str, &p);
   if (ret <= 0)
     {
@@ -5167,7 +5168,7 @@ static int
 static_config_ipv6 (struct vty *vty)
 {
   struct route_node *rn;
-  struct static_route *si;  
+  struct static_route *si;
   int write;
   char buf[BUFSIZ];
   struct route_table *stable;
@@ -5266,7 +5267,7 @@ static int config_write_vty(struct vty *vty)
                proto_rm[AFI_IP][ZEBRA_ROUTE_MAX], VTY_NEWLINE);
 
   return 1;
-}   
+}
 
 /* table node for protocol filtering */
 static struct cmd_node protocol_node = { PROTOCOL_NODE, "", 1 };

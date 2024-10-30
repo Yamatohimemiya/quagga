@@ -4,6 +4,7 @@
 ;; Copyright (C) 1998 Kunihiro Ishiguro
 
 ;; Author:     1998 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 ;;                  SeonMeyong HEO
 ;; Maintainer: kunihiro@zebra.org
 ;;             seirios@Matrix.IRI.Co.JP
@@ -97,7 +98,7 @@
 
 (defun bgp-mode ()
   (progn
-    (setq mode-name "bgp") 
+    (setq mode-name "bgp")
     (bgp-font-lock))
   (major-mode-define))
 

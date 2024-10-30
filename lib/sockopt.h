@@ -1,5 +1,6 @@
 /* Router advertisement
  * Copyright (C) 1999 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -16,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #ifndef _ZEBRA_SOCKOPT_H
@@ -91,7 +92,7 @@ extern int setsockopt_ipv4_tos(int sock, int tos);
 extern int setsockopt_ifindex(int, int, ifindex_t);
 extern ifindex_t getsockopt_ifindex(int, struct msghdr *);
 
-/* swab the fields in iph between the host order and system order expected 
+/* swab the fields in iph between the host order and system order expected
  * for IP_HDRINCL.
  */
 extern void sockopt_iphdrincl_swab_htosys(struct ip *iph);

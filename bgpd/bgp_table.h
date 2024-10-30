@@ -1,5 +1,6 @@
 /* BGP routing table
    Copyright (C) 1998, 2001 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 
@@ -67,7 +68,7 @@ struct bgp_node {
 
 /*
  * bgp_table_iter_t
- * 
+ *
  * Structure that holds state for iterating over a bgp table.
  */
 typedef struct bgp_table_iter_t_ {

@@ -1,5 +1,6 @@
 /* Virtual terminal interface shell.
  * Copyright (C) 2000 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -16,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -183,7 +184,7 @@ static int vtysh_client_execute(struct vtysh_client *vclient, const char *line, 
 		pbuf += nbytes;
 
 		/* See if a line exists in buffer, if so parse and consume it, and
-        * reset read position. If 3 nulls has been encountered consume the buffer before 
+        * reset read position. If 3 nulls has been encountered consume the buffer before
         * next read.
         */
 		if(((eoln = strrchr(buf, '\n')) == NULL) && (numnulls < 3)) {
@@ -202,10 +203,10 @@ static int vtysh_client_execute(struct vtysh_client *vclient, const char *line, 
 		eoln++;
 		left = (size_t) (buf + bufsz - eoln);
 		/*
-        * This check is required since when a config line split between two consecutive reads, 
-        * then buf will have first half of config line and current read will bring rest of the 
-        * line. So in this case eoln will be 1 here, hence calculation of left will be wrong. 
-        * In this case we don't need to do memmove, because we have already seen 3 nulls.  
+        * This check is required since when a config line split between two consecutive reads,
+        * then buf will have first half of config line and current read will bring rest of the
+        * line. So in this case eoln will be 1 here, hence calculation of left will be wrong.
+        * In this case we don't need to do memmove, because we have already seen 3 nulls.
         */
 		if(left < bufsz) {
 			memmove(buf, eoln, left);

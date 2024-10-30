@@ -1,5 +1,6 @@
 /* BGP routing information base
    Copyright (C) 1996, 97, 98, 2000 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 
@@ -26,7 +27,7 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 
 struct bgp_nexthop_cache;
 
-/* Ancillary information to struct bgp_info, 
+/* Ancillary information to struct bgp_info,
  * used for uncommonly used data (aggregation, MPLS, etc.)
  * and lazily allocated to save memory.
  */

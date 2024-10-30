@@ -1,5 +1,6 @@
 /* AS path management routines.
    Copyright (C) 1996, 97, 98, 99 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
    Copyright (C) 2005 Sun Microsystems, Inc.
 
 This file is part of GNU Zebra.
@@ -72,7 +73,7 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 /* Types and length of X,Y suitable for packing? */
 #define ASSEGMENTS_PACKABLE(X, Y) (ASSEGMENT_TYPES_PACKABLE((X), (Y)) && (((X)->length + (Y)->length) <= AS_SEGMENT_MAX))
 
-/* As segment header - the on-wire representation 
+/* As segment header - the on-wire representation
  * NOT the internal representation!
  */
 struct assegment_header {
@@ -733,8 +734,8 @@ static int assegments_parse(struct stream *s, size_t length, struct assegment **
 
 /* AS path parse function.  pnt is a pointer to byte stream and length
    is length of byte stream.  If there is same AS path in the the AS
-   path hash then return it else make new AS path structure. 
-   
+   path hash then return it else make new AS path structure.
+
    On error NULL is returned.
  */
 struct aspath *aspath_parse(struct stream *s, size_t length, int use32bit) {
@@ -743,7 +744,7 @@ struct aspath *aspath_parse(struct stream *s, size_t length, int use32bit) {
 
 	/* If length is odd it's malformed AS path. */
 	/* Nit-picking: if (use32bit == 0) it is malformed if odd,
-   * otherwise its malformed when length is larger than 2 and (length-2) 
+   * otherwise its malformed when length is larger than 2 and (length-2)
    * is not dividable by 4.
    * But... this time we're lazy
    */
@@ -1296,10 +1297,10 @@ struct aspath *aspath_prepend(struct aspath *as1, struct aspath *as2) {
 	}
 
 	if(seg1->type == AS_SEQUENCE) {
-		/* We have two chains of segments, as1->segments and seg2, 
+		/* We have two chains of segments, as1->segments and seg2,
        * and we have to attach them together, merging the attaching
        * segments together into one.
-       * 
+       *
        * 1. dupe as1->segments onto head of as2
        * 2. merge seg2's asns onto last segment of this new chain
        * 3. attach chain after seg2
@@ -1325,7 +1326,7 @@ struct aspath *aspath_prepend(struct aspath *as1, struct aspath *as2) {
 		assegment_free(seg2);
 
 		/* we've now prepended as1's segment chain to as2, merging
-       * the inbetween AS_SEQUENCE of seg2 in the process 
+       * the inbetween AS_SEQUENCE of seg2 in the process
        */
 		aspath_str_update(as2);
 		return as2;
@@ -1622,15 +1623,15 @@ struct aspath *aspath_delete_confed_seq(struct aspath *aspath) {
 
 	seg = aspath->segments;
 
-	/* "if the first path segment of the AS_PATH is 
+	/* "if the first path segment of the AS_PATH is
    *  of type AS_CONFED_SEQUENCE,"
    */
 	if(aspath->segments->type != AS_CONFED_SEQUENCE) {
 		return aspath;
 	}
 
-	/* "... that segment and any immediately following segments 
-   *  of the type AS_CONFED_SET or AS_CONFED_SEQUENCE are removed 
+	/* "... that segment and any immediately following segments
+   *  of the type AS_CONFED_SET or AS_CONFED_SEQUENCE are removed
    *  from the AS_PATH attribute,"
    */
 	while(seg && (seg->type == AS_CONFED_SEQUENCE || seg->type == AS_CONFED_SET)) {
@@ -1695,7 +1696,7 @@ unsigned long aspath_count(void) {
 	return ashash->count;
 }
 
-/* 
+/*
    Theoretically, one as path can have:
 
    One BGP packet size should be less than 4096.

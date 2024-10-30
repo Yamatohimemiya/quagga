@@ -1,6 +1,7 @@
-/* BGP-4 Finite State Machine   
+/* BGP-4 Finite State Machine
    From RFC1771 [A Border Gateway Protocol 4 (BGP-4)]
    Copyright (C) 1996, 97, 98 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 
@@ -352,7 +353,7 @@ static int bgp_graceful_stale_timer_expire(struct thread *thread) {
 void bgp_fsm_change_status(struct peer *peer, int status) {
 	bgp_dump_state(peer, peer->status, status);
 
-	/* Transition into Clearing or Deleted must /always/ clear all routes.. 
+	/* Transition into Clearing or Deleted must /always/ clear all routes..
    * (and must do so before actually changing into Deleted..
    */
 	if(status >= Clearing) {
@@ -526,15 +527,15 @@ int bgp_stop(struct peer *peer) {
 	return 0;
 }
 
-/* first-val * 2**x back-off, where x is the number of sucessive calls 
- * originally used for peer v_start back-off 
+/* first-val * 2**x back-off, where x is the number of sucessive calls
+ * originally used for peer v_start back-off
  */
 __attribute__((unused)) static int back_off_exp2(const int first, int val, const int max) {
 	val <<= 1;
 	return (val < max ? val : max);
 }
 
-/* exponential back off, but biased downward by the initial value. 
+/* exponential back off, but biased downward by the initial value.
  * this bias is significant at lower values, and tends to
  * insignificance fairly quickly, so it is equal to the previous at
  * scale.  Is below first-val * 1.7**x at x == 6, and below first-val
@@ -607,7 +608,7 @@ static int bgp_connect_success(struct peer *peer) {
    * and OPENs before they have sent.
    *
    * As a hack, delay sending OPEN on an inbound accept-peer session
-   * _IF_ we locally have an outbound connection in progress, i.e. 
+   * _IF_ we locally have an outbound connection in progress, i.e.
    * we're in middle of a connection collision. If we delay, we delay until
    * an Open is received - as per old Quagga behaviour.
    */

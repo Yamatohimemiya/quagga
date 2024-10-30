@@ -1,5 +1,6 @@
 /* Zebra daemon server routine.
  * Copyright (C) 1997, 98, 99 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -14,9 +15,9 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with GNU Zebra; see the file COPYING.  If not, write to the 
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
- * Boston, MA 02111-1307, USA.  
+ * along with GNU Zebra; see the file COPYING.  If not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -244,7 +245,7 @@ int zsend_interface_link_params(struct zserv *client, struct interface *ifp) {
 }
 
 /* Interface address is added/deleted. Send ZEBRA_INTERFACE_ADDRESS_ADD or
- * ZEBRA_INTERFACE_ADDRESS_DELETE to the client. 
+ * ZEBRA_INTERFACE_ADDRESS_DELETE to the client.
  *
  * A ZEBRA_INTERFACE_ADDRESS_ADD is sent in the following situations:
  * - in response to a 3-byte ZEBRA_INTERFACE_ADD request
@@ -259,13 +260,13 @@ int zsend_interface_link_params(struct zserv *client, struct interface *ifp) {
  *    - for the vty commands "ip address A.B.C.D/M [<secondary>|<label LINE>]"
  *      and "no bandwidth <1-10000000>", "ipv6 address X:X::X:X/M"
  *    - when an RTM_NEWADDR message is received from the kernel,
- * 
- * The call tree that triggers ZEBRA_INTERFACE_ADDRESS_DELETE: 
+ *
+ * The call tree that triggers ZEBRA_INTERFACE_ADDRESS_DELETE:
  *
  *                   zsend_interface_address(DELETE)
- *                           ^                         
- *                           |                        
- *          zebra_interface_address_delete_update    
+ *                           ^
+ *                           |
+ *          zebra_interface_address_delete_update
  *             ^                        ^      ^
  *             |                        |      if_delete_update
  *             |                        |
@@ -306,9 +307,9 @@ int zsend_interface_address(int cmd, struct zserv *client, struct interface *ifp
 	blen = prefix_blen(p);
 	stream_put(s, &p->u.prefix, blen);
 
-	/* 
+	/*
    * XXX gnu version does not send prefixlen for ZEBRA_INTERFACE_ADDRESS_DELETE
-   * but zebra_interface_address_delete_read() in the gnu version 
+   * but zebra_interface_address_delete_read() in the gnu version
    * expects to find it
    */
 	stream_putc(s, p->prefixlen);
@@ -375,8 +376,8 @@ int zsend_interface_update(int cmd, struct zserv *client, struct interface *ifp)
  * ZEBRA_IPV6_ROUTE_DELETE via zsend_route_multipath when:
  * - a "ip route"  or "ipv6 route" vty command is issued, a prefix is
  * - deleted from zebra's rib, and this info
- *   has to be redistributed to the clients 
- * 
+ *   has to be redistributed to the clients
+ *
  * XXX The ZEBRA_IPV*_ROUTE_ADD message is also sent by the client to the
  * zebra server when the client wants to tell the zebra server to add a
  * route to the kernel (zapi_ipv4_add etc. ).  Since it's essentially the
@@ -415,12 +416,12 @@ int zsend_route_multipath(int cmd, struct zserv *client, struct prefix *p, struc
 	stream_putc(s, p->prefixlen);
 	stream_write(s, (u_char *) &p->u.prefix, psize);
 
-	/* 
+	/*
    * XXX The message format sent by zebra below does not match the format
    * of the corresponding message expected by the zebra server
    * itself (e.g., see zread_ipv4_add). The nexthop_num is not set correctly,
    * (is there a bug on the client side if more than one segment is sent?)
-   * nexthop ZEBRA_NEXTHOP_IPV4 is never set, ZEBRA_NEXTHOP_IFINDEX 
+   * nexthop ZEBRA_NEXTHOP_IPV4 is never set, ZEBRA_NEXTHOP_IFINDEX
    * is hard-coded.
    */
 	/* Nexthop */
@@ -814,9 +815,9 @@ static int zread_interface_delete(struct zserv *client, u_short length, vrf_id_t
 }
 
 /* This function support multiple nexthop. */
-/* 
+/*
  * Parse the ZEBRA_IPV4_ROUTE_ADD sent from client. Update rib and
- * add kernel route. 
+ * add kernel route.
  */
 static int zread_ipv4_add(struct zserv *client, u_short length, vrf_id_t vrf_id) {
 	int i;

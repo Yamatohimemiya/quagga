@@ -1,5 +1,6 @@
 /* AS regular expression routine
    Copyright (C) 1999 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 
@@ -30,7 +31,7 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 #include "bgp_regex.h"
 
 /* Character `_' has special mean.  It represents [,{}() ] and the
-   beginning of the line(^) and the end of the line ($).  
+   beginning of the line(^) and the end of the line ($).
 
    (^|[,{}() ]|$) */
 

@@ -1,5 +1,6 @@
 /* Route filtering function.
  * Copyright (C) 1998, 1999 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -1112,7 +1113,7 @@ DEFUN(no_access_list_all, no_access_list_all_cmd, "no access-list (<1-99>|<100-1
 	}
 
 	master = access->master;
-	/* transfer ownership of access->name to a local, to retain 
+	/* transfer ownership of access->name to a local, to retain
    * a while longer, past access_list being freed */
 	name = access->name;
 	access->name = NULL;

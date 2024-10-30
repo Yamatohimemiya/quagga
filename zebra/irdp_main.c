@@ -18,18 +18,19 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
-/* 
+/*
  * This work includes work with the following copywrite:
  *
  * Copyright (C) 1997, 2000 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  */
 
-/* 
- * Thanks to Jens Låås at Swedish University of Agricultural Sciences
+/*
+ * Thanks to Jens Lï¿½ï¿½s at Swedish University of Agricultural Sciences
  * for reviewing and tests.
  */
 
@@ -257,7 +258,7 @@ void irdp_advert_off(struct interface *ifp) {
 		for(ALL_LIST_ELEMENTS(ifp->connected, node, nnode, ifc)) {
 			p = ifc->address;
 
-			/* Output some packets with Lifetime 0 
+			/* Output some packets with Lifetime 0
            we should add a wait...
         */
 
@@ -274,7 +275,7 @@ void process_solicit(struct interface *ifp) {
 	struct irdp_interface *irdp = &zi->irdp;
 	u_int32_t timer;
 
-	/* When SOLICIT is active we reject further incoming solicits 
+	/* When SOLICIT is active we reject further incoming solicits
      this keeps down the answering rate so we don't have think
      about DoS attacks here. */
 

@@ -1,5 +1,6 @@
 /* BGP-4, BGP-4+ daemon program
    Copyright (C) 1996, 97, 98, 99, 2000 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 
@@ -641,7 +642,7 @@ static void peer_free(struct peer *peer) {
 	assert(peer->status == Deleted);
 
 	/* this /ought/ to have been done already through bgp_stop earlier,
-   * but just to be sure.. 
+   * but just to be sure..
    */
 	bgp_timer_set(peer);
 	BGP_READ_OFF(peer->t_read);

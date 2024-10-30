@@ -1,5 +1,6 @@
 /* BGP VTY interface.
    Copyright (C) 1996, 97, 98, 99, 2000 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 
@@ -1828,7 +1829,7 @@ static int peer_rsclient_set_vty(struct vty *vty, const char *peer_str, int afi,
 		for(ALL_LIST_ELEMENTS(group->peer, node, nnode, peer)) {
 			pfilter = &peer->filter[afi][safi];
 
-			/* Members of a non-RS-Client group should not be RS-Clients, as that 
+			/* Members of a non-RS-Client group should not be RS-Clients, as that
              is checked when the become part of the peer-group */
 			ret = peer_af_flag_set(peer, afi, safi, PEER_FLAG_RSERVER_CLIENT);
 			if(ret < 0) {

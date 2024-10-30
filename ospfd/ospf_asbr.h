@@ -1,6 +1,7 @@
 /*
  * OSPF AS Boundary Router functions.
  * Copyright (C) 1999, 2000 Kunihiro Ishiguro, Toshiaki Takada
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *

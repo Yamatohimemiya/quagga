@@ -1,5 +1,6 @@
 /* Route map function.
    Copyright (C) 1998, 1999 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 
@@ -636,7 +637,7 @@ int route_map_delete_set(struct route_map_index *index, const char *set_name, co
    The matrix for a route-map looks like this:
    (note, this includes the description for the "NEXT"
    and "GOTO" frobs now
-  
+
               Match   |   No Match
                       |
     permit    action  |     cont
@@ -645,7 +646,7 @@ int route_map_delete_set(struct route_map_index *index, const char *set_name, co
                       |
     deny      deny    |     cont
                       |
-  
+
    action)
       -Apply Set statements, accept route
       -If Call statement is present jump to the specified route-map, if it
@@ -657,10 +658,10 @@ int route_map_delete_set(struct route_map_index *index, const char *set_name, co
       -Route is denied by route-map.
    cont)
       -Goto Next index
-  
+
    If we get no matches after we've processed all updates, then the route
    is dropped too.
-  
+
    Some notes on the new "CALL", "NEXT" and "GOTO"
      call WORD        - If this clause is matched, then the set statements
                         are executed and then we jump to route-map 'WORD'. If
@@ -673,7 +674,7 @@ int route_map_delete_set(struct route_map_index *index, const char *set_name, co
                         first clause greater than this. In order to ensure
                         route-maps *always* exit, you cannot jump backwards.
                         Sorry ;)
-  
+
    We need to make sure our route-map processing matches the above
 */
 
@@ -688,7 +689,7 @@ static route_map_result_t route_map_apply_match(struct route_map_rule_list *matc
 	} else {
 		for(match = match_list->head; match; match = match->next) {
 			/* Try each match statement in turn, If any do not return
-             RMAP_MATCH, return, otherwise continue on to next match 
+             RMAP_MATCH, return, otherwise continue on to next match
              statement. All match statements must match for end-result
              to be a match. */
 			ret = (*match->cmd->func_apply)(match->value, prefix, type, object);

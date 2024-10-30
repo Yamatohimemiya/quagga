@@ -1,10 +1,11 @@
 
-/* 
+/*
  * Interface functions.
  * Copyright (C) 1997, 98 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
- * 
+ *
  * GNU Zebra is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published
  * by the Free Software Foundation; either version 2, or (at your
@@ -886,7 +887,7 @@ ifaddr_ipv4_lookup (struct in_addr *addr, ifindex_t ifindex)
       rn = route_node_lookup (ifaddr_ipv4_table, (struct prefix *) &p);
       if (! rn)
 	return NULL;
-      
+
       ifp = rn->info;
       route_unlock_node (rn);
       return ifp;

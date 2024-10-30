@@ -1,6 +1,7 @@
 /*
  * Memory management routine
  * Copyright (C) 1998 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *

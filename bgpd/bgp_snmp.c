@@ -1,5 +1,6 @@
 /* BGP4 SNMP support
    Copyright (C) 1999, 2000 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 

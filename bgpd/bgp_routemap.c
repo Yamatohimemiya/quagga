@@ -1,5 +1,6 @@
 /* Route map function of bgpd.
    Copyright (C) 1998, 1999 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 
@@ -1182,7 +1183,7 @@ static route_map_result_t route_set_community(void *rule, struct prefix *prefix,
 		if(rcs->additive && old) {
 			merge = community_merge(community_dup(old), rcs->com);
 
-			/* HACK: if the old community is not intern'd, 
+			/* HACK: if the old community is not intern'd,
            * we should free it here, or all reference to it may be lost.
            * Really need to cleanup attribute caching sometime.
            */

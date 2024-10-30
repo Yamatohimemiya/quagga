@@ -3,6 +3,7 @@
  * Copyright (C) 2000 IP Infusion Inc.
  *
  * Written by Kunihiro Ishiguro <kunihiro@zebra.org>
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -19,7 +20,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -1326,8 +1327,8 @@ static struct ospf_interface *ospf_snmp_if_lookup_next(struct in_addr *ifaddr, i
 			osif = listgetdata(nn);
 			*ifaddr = osif->addr;
 			*ifindex = osif->ifindex;
-			/* Because no instance is specified, we don't care about the kind of 
-           * interface (usual or unnumbered), just returning the first valid 
+			/* Because no instance is specified, we don't care about the kind of
+           * interface (usual or unnumbered), just returning the first valid
            * OSPF interface */
 			oi = ospf_if_lookup_by_local_addr(ospf, osif->ifp, *ifaddr);
 			if(oi) {

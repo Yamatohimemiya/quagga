@@ -1,5 +1,6 @@
 /* RIP SNMP support
  * Copyright (C) 1999 Kunihiro Ishiguro <kunihiro@zebra.org>
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -16,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -469,7 +470,7 @@ static u_char *rip2PeerTable(struct variable *v, oid name[], size_t *length, int
 		case RIP2PEERDOMAIN: *val_len = 2; return (u_char *) &domain;
 
 		case RIP2PEERLASTUPDATE:
-	#if 0 
+	#if 0
       /* We don't know the SNMP agent startup time. We have two choices here:
        * - assume ripd startup time equals SNMP agent startup time
        * - don't support this variable, at all

@@ -1,6 +1,7 @@
 /*
  * Prefix related functions.
  * Copyright (C) 1997, 98, 99 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -17,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -298,7 +299,7 @@ void prefix_copy(struct prefix *dest, const struct prefix *src) {
 	}
 }
 
-/* 
+/*
  * Return 1 if the address/netmask contained in the prefix structure
  * is the same, and else return 0.  For this routine, 'same' requires
  * that not only the prefix length and the network part be the same,
@@ -900,7 +901,7 @@ in_addr_t ipv4_broadcast_addr(in_addr_t hostaddr, int masklen) {
 		       (hostaddr ^ ~mask.s_addr);
 }
 
-/* Utility function to convert ipv4 netmask to prefixes 
+/* Utility function to convert ipv4 netmask to prefixes
    ex.) "1.1.0.0" "255.255.0.0" => "1.1.0.0/16"
    ex.) "1.0.0.0" NULL => "1.0.0.0/8"                   */
 int netmask_str2prefix_str(const char *net_str, const char *mask_str, char *prefix_str) {

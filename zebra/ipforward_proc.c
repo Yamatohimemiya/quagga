@@ -1,6 +1,7 @@
 /*
  * Fetch ipforward value by reading /proc filesystem.
  * Copyright (C) 1997 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -17,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -52,8 +53,8 @@ int ipforward(void) {
 	/* We don't care about the first line. */
 	dropline(fp);
 
-	/* Get ip_statistics.IpForwarding : 
-     1 => ip forwarding enabled 
+	/* Get ip_statistics.IpForwarding :
+     1 => ip forwarding enabled
      2 => ip forwarding off. */
 	if(fgets(buf, 6, fp)) {
 		sscanf(buf, "Ip: %d", &ipforwarding);

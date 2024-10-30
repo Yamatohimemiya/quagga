@@ -1,5 +1,6 @@
 /* Community attribute related functions.
    Copyright (C) 1998, 2001 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 
@@ -175,7 +176,7 @@ struct community *community_uniq_sort(struct community *com) {
 
    For Well-known communities value, below keyword is used.
 
-   0x0             "internet"    
+   0x0             "internet"
    0xFFFFFF01      "no-export"
    0xFFFFFF02      "no-advertise"
    0xFFFFFF03      "local-AS"

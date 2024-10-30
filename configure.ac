@@ -3,6 +3,7 @@
 ## autoconf will generate configure script.
 ##
 ##  Copyright (c) 1996, 97, 98, 99, 2000 Kunihiro Ishiguro <kunihiro@zebra.org>
+##  (C)2024 Hikaru Yamatohimemiya
 ##  Portions Copyright (c) 2003 Paul Jakma <paul@dishone.st>
 ##
 AC_PREREQ([2.71])

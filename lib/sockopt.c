@@ -1,5 +1,6 @@
 /* setsockopt functions
  * Copyright (C) 1999 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -16,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -467,7 +468,7 @@ ifindex_t getsockopt_ifindex(int af, struct msghdr *msgh) {
 
 /* swab iph between order system uses for IP_HDRINCL and host order */
 void sockopt_iphdrincl_swab_htosys(struct ip *iph) {
-	/* BSD and derived take iph in network order, except for 
+	/* BSD and derived take iph in network order, except for
    * ip_len and ip_off
    */
 #ifndef HAVE_IP_HDRINCL_BSD_ORDER
@@ -561,7 +562,7 @@ int sockopt_tcp_signature(int sock, union sockunion *su, const char *password) {
 		#ifdef HAVE_IPV6
 		/* If this does not work, then all users of this sockopt will need to
        * differentiate between IPv4 and IPv6, and keep seperate sockets for
-       * each. 
+       * each.
        *
        * Sadly, it doesn't seem to work at present. It's unknown whether
        * this is a bug or not.

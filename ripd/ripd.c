@@ -1,6 +1,7 @@
 /* RIP version 1 and 2.
  * Copyright (C) 2005 6WIND <alain.ritoux@6wind.com>
  * Copyright (C) 1997, 98, 99 Kunihiro Ishiguro <kunihiro@zebra.org>
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -17,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -534,7 +535,7 @@ static void rip_rte_process(struct rte *rte, struct sockaddr_in *from, struct in
 			if(rinfo->nexthop.s_addr != 0) {
 				old_dist = old_dist ? old_dist : ZEBRA_RIP_DISTANCE_DEFAULT;
 			}
-			/* If imported route does not have STRICT precedence, 
+			/* If imported route does not have STRICT precedence,
              mark it as a ghost */
 			if(new_dist <= old_dist && rte->metric != RIP_METRIC_INFINITY) {
 				rip_ecmp_replace(&newinfo);
@@ -874,7 +875,7 @@ static void rip_auth_prepare_str_send(struct rip_interface *ri, struct key *key,
 
 /* Write RIPv2 simple password authentication information
  *
- * auth_str is presumed to be 2 bytes and correctly prepared 
+ * auth_str is presumed to be 2 bytes and correctly prepared
  * (left justified and zero padded).
  */
 static void rip_auth_simple_write(struct stream *s, char *auth_str, int len) {
@@ -887,7 +888,7 @@ static void rip_auth_simple_write(struct stream *s, char *auth_str, int len) {
 	return;
 }
 
-/* write RIPv2 MD5 "authentication header" 
+/* write RIPv2 MD5 "authentication header"
  * (uses the auth key data field)
  *
  * Digest offset field is set to 0.
@@ -919,9 +920,9 @@ static size_t rip_auth_md5_ah_write(struct stream *s, struct rip_interface *ri, 
 		stream_putc(s, 1);
 	}
 
-	/* Auth Data Len.  Set 16 for MD5 authentication data. Older ripds 
+	/* Auth Data Len.  Set 16 for MD5 authentication data. Older ripds
    * however expect RIP_HEADER_SIZE + RIP_AUTH_MD5_SIZE so we allow for this
-   * to be configurable. 
+   * to be configurable.
    */
 	stream_putc(s, ri->md5_auth_len);
 
@@ -1121,12 +1122,12 @@ static void rip_response_process(struct rip_packet *packet, int size, struct soc
 			}
 		}
 
-		/* For RIPv1, there won't be a valid netmask.  
+		/* For RIPv1, there won't be a valid netmask.
 
 	This is a best guess at the masks.  If everyone was using old
 	Ciscos before the 'ip subnet zero' option, it would be almost
 	right too :-)
-      
+
 	Cisco summarize ripv1 advertisments to the classful boundary
 	(/16 for class B's) except when the RIP packet does to inside
 	the classful network in question.  */
@@ -1293,12 +1294,12 @@ static int rip_send_packet(u_char *buf, int size, struct sockaddr_in *to, struct
        * ZEBRA_IFA_SECONDARY is set on linux when an interface is configured
        * with multiple addresses on the same subnet: the first address
        * on the subnet is configured "primary", and all subsequent addresses
-       * on that subnet are treated as "secondary" addresses. 
-       * In order to avoid routing-table bloat on other rip listeners, 
+       * on that subnet are treated as "secondary" addresses.
+       * In order to avoid routing-table bloat on other rip listeners,
        * we do not send out RIP packets with ZEBRA_IFA_SECONDARY source addrs.
        * XXX Since Linux is the only system for which the ZEBRA_IFA_SECONDARY
        * flag is set, we would end up sending a packet for a "secondary"
-       * source address on non-linux systems.  
+       * source address on non-linux systems.
        */
 		if(IS_RIP_DEBUG_PACKET) {
 			zlog_debug("duplicate dropped");
@@ -1336,7 +1337,7 @@ static int rip_send_packet(u_char *buf, int size, struct sockaddr_in *to, struct
 		/*
        * we have to open a new socket for each packet because this
        * is the most portable way to bind to a different source
-       * ipv4 address for each packet. 
+       * ipv4 address for each packet.
        */
 		if((send_sock = rip_create_socket(&from)) < 0) {
 			zlog_warn("rip_send_packet could not create socket.");
@@ -1766,7 +1767,7 @@ static int rip_read(struct thread *t) {
      security, RIP-1 messages should be ignored when authentication is
      in use (see section 4.1); otherwise, the routing information from
      authenticated messages will be propagated by RIP-1 routers in an
-     unauthenticated manner. 
+     unauthenticated manner.
   */
 	/* We make an exception for RIPv1 REQUEST packets, to which we'll
    * always reply regardless of authentication settings, because:
@@ -2022,13 +2023,13 @@ void rip_output_process(struct connected *ifc, struct sockaddr_in *to, int route
 			/* Split horizon. */
 			/* if (split_horizon == rip_split_horizon) */
 			if(ri->split_horizon == RIP_SPLIT_HORIZON) {
-				/* 
-	     * We perform split horizon for RIP and connected route. 
+				/*
+	     * We perform split horizon for RIP and connected route.
 	     * For rip routes, we want to suppress the route if we would
              * end up sending the route back on the interface that we
              * learned it from, with a higher metric. For connected routes,
              * we suppress the route if the prefix is a subset of the
-             * source address that we are going to use for the packet 
+             * source address that we are going to use for the packet
              * (in order to handle the case when multiple subnets are
              * configured on the same interface).
              */
@@ -2116,17 +2117,17 @@ void rip_output_process(struct connected *ifc, struct sockaddr_in *to, int route
 				rinfo->metric_out = RIP_METRIC_INFINITY;
 			}
 
-			/* Perform split-horizon with poisoned reverse 
+			/* Perform split-horizon with poisoned reverse
 	 * for RIP and connected routes.
 	 **/
 			if(ri->split_horizon == RIP_SPLIT_HORIZON_POISONED_REVERSE) {
-				/* 
-	     * We perform split horizon for RIP and connected route. 
+				/*
+	     * We perform split horizon for RIP and connected route.
 	     * For rip routes, we want to suppress the route if we would
              * end up sending the route back on the interface that we
              * learned it from, with a higher metric. For connected routes,
              * we suppress the route if the prefix is a subset of the
-             * source address that we are going to use for the packet 
+             * source address that we are going to use for the packet
              * (in order to handle the case when multiple subnets are
              * configured on the same interface).
              */
@@ -2262,9 +2263,9 @@ static void rip_update_process(int route_type) {
 		}
 
 		if(ri->running) {
-			/* 
+			/*
 	   * If there is no version configuration in the interface,
-	   * use rip's version setting. 
+	   * use rip's version setting.
 	   */
 			int vsend = ((ri->ri_send == RI_RIP_UNSPEC) ? rip->version_send : ri->ri_send);
 
@@ -2487,7 +2488,7 @@ int rip_request_send(struct sockaddr_in *to, struct interface *ifp, u_char versi
 	rte->metric = htonl(RIP_METRIC_INFINITY);
 
 	if(connected) {
-		/* 
+		/*
        * connected is only sent for ripv1 case, or when
        * interface does not support multicast.  Caller loops
        * over each connected address for this case.

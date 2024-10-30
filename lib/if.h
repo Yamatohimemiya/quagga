@@ -1,5 +1,6 @@
 /* Interface related header.
    Copyright (C) 1997, 98, 99 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 
@@ -282,7 +283,7 @@ struct connected {
 #define ZEBRA_IFA_UNNUMBERED (1 << 2)
 	/* N.B. the ZEBRA_IFA_PEER flag should be set if and only if
      a peer address has been configured.  If this flag is set,
-     the destination field must contain the peer address.  
+     the destination field must contain the peer address.
      Otherwise, if this flag is not set, the destination address
      will either contain a broadcast address or be NULL.
    */
@@ -381,7 +382,7 @@ extern struct interface *if_lookup_by_name_len_vrf(const char *ifname, size_t na
 extern struct interface *if_get_by_name_len_vrf(const char *ifname, size_t namelen, vrf_id_t vrf_id);
 
 /* Delete the interface, but do not free the structure, and leave it in the
-   interface list.  It is often advisable to leave the pseudo interface 
+   interface list.  It is often advisable to leave the pseudo interface
    structure because there may be configuration information attached. */
 extern void if_delete_retain(struct interface *);
 

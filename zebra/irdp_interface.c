@@ -18,18 +18,19 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
-/* 
+/*
  * This work includes work with the following copywrite:
  *
  * Copyright (C) 1997, 2000 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  */
 
-/* 
- * Thanks to Jens Låås at Swedish University of Agricultural Sciences
+/*
+ * Thanks to Jens Lï¿½ï¿½s at Swedish University of Agricultural Sciences
  * for reviewing and tests.
  */
 

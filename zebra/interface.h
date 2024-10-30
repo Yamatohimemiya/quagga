@@ -1,5 +1,6 @@
 /* Interface function header.
  * Copyright (C) 1999 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -16,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #ifndef _ZEBRA_INTERFACE_H
@@ -83,7 +84,7 @@ struct rtadvconf {
 	/* The TRUE/FALSE value to be placed in the "Managed address
      configuration" flag field in the Router Advertisement.  See
      [ADDRCONF].
- 
+
      Default: FALSE */
 	int AdvManagedFlag;
 
@@ -153,16 +154,16 @@ struct rtadvconf {
 		#define ND_RA_FLAG_HOME_AGENT 0x20
 	#endif
 
-	/* The value to be placed in Home Agent Information option if Home 
+	/* The value to be placed in Home Agent Information option if Home
      Flag is set.
      Default: 0 */
 	int HomeAgentPreference;
 
-	/* The value to be placed in Home Agent Information option if Home 
-     Flag is set. Lifetime (seconds) MUST not be greater than 18.2 
-     hours. 
+	/* The value to be placed in Home Agent Information option if Home
+     Flag is set. Lifetime (seconds) MUST not be greater than 18.2
+     hours.
      The value 0 has special meaning: use of AdvDefaultLifetime value.
-     
+
      Default: 0 */
 	int HomeAgentLifetime;
 	#define RTADV_MAX_HALIFETIME 65520 /* 18.2 hours */

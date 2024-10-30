@@ -1,6 +1,7 @@
 /*
  * Interface looking up by ioctl ().
  * Copyright (C) 1997, 98 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -17,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -151,7 +152,7 @@ static int if_get_index(struct interface *ifp) {
 	#endif
 
 #else
-	/* Linux 2.2.X does not provide individual interface index 
+	/* Linux 2.2.X does not provide individual interface index
    for aliases and we know it. For others issue a warning. */
 	#if !defined(HAVE_BROKEN_ALIASES)
 		#warning "Using if_fake_index. You may want to add appropriate"

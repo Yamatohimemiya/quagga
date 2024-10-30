@@ -1,6 +1,7 @@
 /*
  * Packet interface
  * Copyright (C) 1999 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -17,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #ifndef _ZEBRA_STREAM_H
@@ -78,7 +79,7 @@
  * The stream is empty from endp to size. Without adjusting getp, there are
  * still endp-getp bytes of valid data to be read from the stream.
  *
- * Methods are provided to get and put to/from the stream, as well as 
+ * Methods are provided to get and put to/from the stream, as well as
  * retrieve the values of the 3 markers and manipulate the getp marker.
  *
  * Note:
@@ -97,7 +98,7 @@ struct stream {
 
 	/* Remainder is ***private*** to stream
    * direct access is frowned upon!
-   * Use the appropriate functions/macros 
+   * Use the appropriate functions/macros
    */
 	size_t getp;	     /* next get position */
 	size_t endp;	     /* last valid data position */
@@ -127,7 +128,7 @@ struct stream_fifo {
 #define STREAM_DATA(S) ((S)->data)
 #define STREAM_REMAIN(S) STREAM_WRITEABLE((S))
 
-/* Stream prototypes. 
+/* Stream prototypes.
  * For stream_{put,get}S, the S suffix mean:
  *
  * c: character (unsigned byte)
@@ -191,7 +192,7 @@ extern int stream_putd(struct stream *, double);
 #undef stream_read
 #undef stream_write
 
-/* Deprecated: assumes blocking I/O.  Will be removed. 
+/* Deprecated: assumes blocking I/O.  Will be removed.
    Use stream_read_try instead.  */
 extern int stream_read(struct stream *, int, size_t);
 

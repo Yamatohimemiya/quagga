@@ -1,5 +1,6 @@
 /* BGP routing information
    Copyright (C) 1996, 97, 98, 99 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
    Copyright (C) 2016 Job Snijders <job@instituut.net>
 
 This file is part of GNU Zebra.
@@ -184,7 +185,7 @@ void bgp_info_add(struct bgp_node *rn, struct bgp_info *ri) {
 	peer_lock(ri->peer); /* bgp_info peer reference */
 }
 
-/* Do the actual removal of info from RIB, for use by bgp_process 
+/* Do the actual removal of info from RIB, for use by bgp_process
    completion callback *only* */
 static void bgp_info_reap(struct bgp_node *rn, struct bgp_info *ri) {
 	if(ri->next) {
@@ -1282,7 +1283,7 @@ static void bgp_best_selection(struct bgp *bgp, struct bgp_node *rn, struct bgp_
 		}
 
 		if(BGP_INFO_HOLDDOWN(ri)) {
-			/* reap REMOVED routes, if needs be 
+			/* reap REMOVED routes, if needs be
            * selected route must stay for a while longer though
            */
 			if(CHECK_FLAG(ri->flags, BGP_INFO_REMOVED) && (ri != old_select)) {
@@ -1378,7 +1379,7 @@ static int bgp_process_announce_selected(struct peer *peer, struct bgp_info *sel
 			}
 			break;
 		case BGP_TABLE_RSCLIENT:
-			/* Announcement to peer->conf.  If the route is filtered, 
+			/* Announcement to peer->conf.  If the route is filtered,
            withdraw it. */
 			if(selected && bgp_announce_check_rsclient(selected, peer, p, &attr, afi, safi)) {
 				bgp_adj_out_set(rn, peer, p, &attr, afi, safi, selected);
@@ -1700,7 +1701,7 @@ static void bgp_rib_remove(struct bgp_node *rn, struct bgp_info *ri, struct peer
 static void bgp_rib_withdraw(struct bgp_node *rn, struct bgp_info *ri, struct peer *peer, afi_t afi, safi_t safi, struct prefix_rd *prd) {
 	int status = BGP_DAMP_NONE;
 
-	/* apply dampening, if result is suppressed, we'll be retaining 
+	/* apply dampening, if result is suppressed, we'll be retaining
    * the bgp_info in the RIB for historical reference.
    */
 	if(CHECK_FLAG(peer->bgp->af_flags[afi][safi], BGP_CONFIG_DAMPENING) && peer->sort == BGP_PEER_EBGP) {
@@ -2990,9 +2991,9 @@ int bgp_nlri_parse_ip(struct peer *peer, struct attr *attr, struct bgp_nlri *pac
 		/* Check address. */
 		if(packet->afi == AFI_IP && packet->safi == SAFI_UNICAST) {
 			if(IN_CLASSD(ntohl(p.u.prefix4.s_addr))) {
-				/* 
- 	      * From RFC4271 Section 6.3: 
-	      * 
+				/*
+ 	      * From RFC4271 Section 6.3:
+	      *
 	      * If a prefix in the NLRI field is semantically incorrect
 	      * (e.g., an unexpected multicast IP address), an error SHOULD
 	      * be logged locally, and the prefix SHOULD be ignored.
@@ -10200,7 +10201,7 @@ ravg_tally (unsigned long count, unsigned long oldavg, unsigned long newval)
   unsigned long newtot = (count-1) * oldavg + (newval * TALLY_SIGFIG);
   unsigned long res = (newtot * TALLY_SIGFIG) / count;
   unsigned long ret = newtot / count;
-  
+
   if ((res % TALLY_SIGFIG) > (TALLY_SIGFIG/2))
     return ret + 1;
   else
@@ -10290,7 +10291,7 @@ static int bgp_table_stats_walker(struct thread *t) {
 				ts->counts[BGP_STATS_ASPATH_TOTHOPS] += hops;
 				ts->counts[BGP_STATS_ASPATH_TOTSIZE] += size;
 #if 0
-              ts->counts[BGP_STATS_ASPATH_AVGHOPS] 
+              ts->counts[BGP_STATS_ASPATH_AVGHOPS]
                 = ravg_tally (ts->counts[BGP_STATS_ASPATH_COUNT],
                               ts->counts[BGP_STATS_ASPATH_AVGHOPS],
                               hops);
@@ -12677,7 +12678,7 @@ static void bgp_distance_free(struct bgp_distance *bdistance) {
 	XFREE(MTYPE_BGP_DISTANCE, bdistance);
 }
 
-/* XXX: Ideally, this should re-announce affected routes to zebra. 
+/* XXX: Ideally, this should re-announce affected routes to zebra.
  * See Bugzilla #949
  */
 static int bgp_distance_set(struct vty *vty, const char *distance_str, const char *ip_str, const char *access_list_str) {
@@ -13884,7 +13885,7 @@ void bgp_route_init(void) {
 	install_element(VIEW_NODE, &show_bgp_view_ipv6_safi_rsclient_prefix_cmd);
 
 	/* Restricted:
-   * VIEW_NODE - (set of dangerous commands) - (commands dependent on prev) 
+   * VIEW_NODE - (set of dangerous commands) - (commands dependent on prev)
    */
 	install_element(RESTRICTED_NODE, &show_bgp_ipv6_route_cmd);
 	install_element(RESTRICTED_NODE, &show_bgp_ipv6_safi_route_cmd);

@@ -1,6 +1,7 @@
 /*
  * Interface function.
  * Copyright (C) 1997, 1999 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -17,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -250,10 +251,10 @@ int if_subnet_delete(struct interface *ifp, struct connected *ifc) {
  * ******************** Solaris flags hacks **************************
  *
  * Solaris IFF_UP flag reflects only the primary interface as the
- * routing socket only sends IFINFO for the primary interface.  Hence  
- * ~IFF_UP does not per se imply all the logical interfaces are also   
+ * routing socket only sends IFINFO for the primary interface.  Hence
+ * ~IFF_UP does not per se imply all the logical interfaces are also
  * down - which we only know of as addresses. Instead we must determine
- * whether the interface really is up or not according to how many   
+ * whether the interface really is up or not according to how many
  * addresses are still attached. (Solaris always sends RTM_DELADDR if
  * an interface, logical or not, goes ~IFF_UP).
  *
@@ -935,7 +936,7 @@ static void if_dump_vty(struct vty *vty, struct interface *ifp) {
 #endif	       /* HAVE_NET_RT_IFLIST */
 }
 
-/* Wrapper hook point for zebra daemon so that ifindex can be set 
+/* Wrapper hook point for zebra daemon so that ifindex can be set
  * DEFUN macro not used as extract.pl HAS to ignore this
  * See also interface_cmd in lib/if.c
  */

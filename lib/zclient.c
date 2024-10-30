@@ -1,5 +1,6 @@
 /* Zebra's client library.
  * Copyright (C) 1999 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  * Copyright (C) 2005 Andrew J. Schorr
  *
  * This file is part of GNU Zebra.
@@ -458,13 +459,13 @@ static int zclient_connect(struct thread *t) {
 	return zclient_start(zclient);
 }
 
-/* 
+/*
   * "xdr_encode"-like interface that allows daemon (client) to send
   * a message to zebra server for a route that needs to be
   * added/deleted to the kernel. Info about the route is specified
   * by the caller in a struct zapi_ipv4. zapi_ipv4_read() then writes
   * the info down the zclient socket using the stream_* functions.
-  * 
+  *
   * The corresponding read ("xdr_decode") function on the server
   * side is zread_ipv4_add()/zread_ipv4_delete().
   *
@@ -476,11 +477,11 @@ static int zclient_connect(struct thread *t) {
   * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
   * | Destination IPv4 Prefix for route                             |
   * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  * | Nexthop count | 
+  * | Nexthop count |
   * +-+-+-+-+-+-+-+-+
   *
-  * 
-  * A number of IPv4 nexthop(s) or nexthop interface index(es) are then 
+  *
+  * A number of IPv4 nexthop(s) or nexthop interface index(es) are then
   * described, as per the Nexthop count. Each nexthop described as:
   *
   * +-+-+-+-+-+-+-+-+
@@ -490,13 +491,13 @@ static int zclient_connect(struct thread *t) {
   * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
   *
   * Alternatively, if the flags field has ZEBRA_FLAG_BLACKHOLE or
-  * ZEBRA_FLAG_REJECT is set then Nexthop count is set to 1, then _no_ 
+  * ZEBRA_FLAG_REJECT is set then Nexthop count is set to 1, then _no_
   * nexthop information is provided, and the message describes a prefix
   * to blackhole or reject route.
   *
   * If ZAPI_MESSAGE_DISTANCE is set, the distance value is written as a 1
   * byte value.
-  * 
+  *
   * If ZAPI_MESSAGE_METRIC is set, the metric value is written as an 8
   * byte value.
   *
@@ -623,10 +624,10 @@ int zapi_ipv6_route(u_char cmd, struct zclient *zclient, struct prefix_ipv6 *p, 
 }
 #endif /* HAVE_IPV6 */
 
-/* 
+/*
  * send a ZEBRA_REDISTRIBUTE_ADD or ZEBRA_REDISTRIBUTE_DELETE
  * for the route type (ZEBRA_ROUTE_KERNEL etc.). The zebra server will
- * then set/unset redist[type] in the client handle (a struct zserv) for the 
+ * then set/unset redist[type] in the client handle (a struct zserv) for the
  * sending client
  */
 int zebra_redistribute_send(int command, struct zclient *zclient, int type, vrf_id_t vrf_id) {
@@ -667,7 +668,7 @@ void zebra_router_id_update_read(struct stream *s, struct prefix *rid) {
 }
 
 /* Interface addition from zebra daemon. */
-/*  
+/*
  * The format of the message sent with type ZEBRA_INTERFACE_ADD or
  * ZEBRA_INTERFACE_DELETE from zebra to the client is:
  *     0                   1                   2                   3
@@ -701,7 +702,7 @@ void zebra_router_id_update_read(struct stream *s, struct prefix *rid) {
  * |  Hardware Address      if HW lenght different from 0          |
  * |   ...                  max INTERFACE_HWADDR_MAX               |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |  Link_params? |  Whether a link-params follows: 1 or 0.       
+ * |  Link_params? |  Whether a link-params follows: 1 or 0.
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * |  Link_params    0 or 1 INTERFACE_LINK_PARAMS_SIZE sized       |
  * |   ....          (struct if_link_params).                      |
@@ -723,7 +724,7 @@ struct interface *zebra_interface_add_read(struct stream *s, vrf_id_t vrf_id) {
 	return ifp;
 }
 
-/* 
+/*
  * Read interface up/down msg (ZEBRA_INTERFACE_UP/ZEBRA_INTERFACE_DOWN)
  * from zebra server.  The format of this message is the same as
  * that sent for ZEBRA_INTERFACE_ADD/ZEBRA_INTERFACE_DELETE (see

@@ -1,6 +1,7 @@
 /*
  * Logging of zebra
  * Copyright (C) 1997, 1998, 1999 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -17,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #define QUAGGA_DEFINE_DESC_TABLE
@@ -761,7 +762,7 @@ const char *lookup(const struct message *mes, int key) {
 }
 
 /* Older/faster version of message lookup function, but requires caller to pass
- * in the array size (instead of relying on a 0 key to terminate the search). 
+ * in the array size (instead of relying on a 0 key to terminate the search).
  *
  * The return value is the message string if found, or the 'none' pointer
  * provided otherwise.

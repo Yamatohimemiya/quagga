@@ -1,5 +1,6 @@
 /* BGP open message handling
    Copyright (C) 1999 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 

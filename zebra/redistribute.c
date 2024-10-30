@@ -1,5 +1,6 @@
 /* Redistribution Handler
  * Copyright (C) 1998 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -16,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -171,7 +172,7 @@ zebra_redistribute (struct zserv *client, int type, vrf_id_t vrf_id)
     for (rn = route_top (table); rn; rn = route_next (rn))
       RNODE_FOREACH_RIB (rn, newrib)
 	if (CHECK_FLAG (newrib->flags, ZEBRA_FLAG_SELECTED)
-	    && newrib->type == type 
+	    && newrib->type == type
 	    && newrib->distance != DISTANCE_INFINITY
 	    && zebra_check_addr (&rn->p))
 	  {
@@ -186,7 +187,7 @@ redistribute_add (struct prefix *p, struct rib *rib, struct rib *rib_old)
 {
   struct listnode *node, *nnode;
   struct zserv *client;
-  
+
   for (ALL_LIST_ELEMENTS (zebrad.client_list, node, nnode, client))
     {
       if ((is_default (p) &&
@@ -204,7 +205,7 @@ redistribute_add (struct prefix *p, struct rib *rib, struct rib *rib_old)
 	      zsend_route_multipath (ZEBRA_IPV6_ROUTE_ADD, client, p, rib);
 	    }
         }
-      else if (rib_old && vrf_bitmap_check (client->redist[rib_old->type], 
+      else if (rib_old && vrf_bitmap_check (client->redist[rib_old->type],
                                             rib_old->vrf_id))
         {
           /* redistribute_add has implicit withdraw semantics, so there
@@ -286,14 +287,14 @@ zebra_redistribute_default_add (int command, struct zserv *client, int length,
 {
   vrf_bitmap_set (client->redist_default, vrf_id);
   zebra_redistribute_default (client, vrf_id);
-}     
+}
 
 void
 zebra_redistribute_default_delete (int command, struct zserv *client,
     int length, vrf_id_t vrf_id)
 {
   vrf_bitmap_unset (client->redist_default, vrf_id);
-}     
+}
 
 /* Interface up information. */
 void
@@ -338,7 +339,7 @@ zebra_interface_add_update (struct interface *ifp)
 
   if (IS_ZEBRA_DEBUG_EVENT)
     zlog_debug ("MESSAGE: ZEBRA_INTERFACE_ADD %s", ifp->name);
-    
+
   for (ALL_LIST_ELEMENTS (zebrad.client_list, node, nnode, client))
     if (client->ifinfo)
       {

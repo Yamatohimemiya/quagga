@@ -1,5 +1,6 @@
 /* Thread management routine
  * Copyright (C) 1998, 2000 Kunihiro Ishiguro <kunihiro@zebra.org>
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -16,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 /* #define DEBUG */
@@ -189,7 +190,7 @@ int quagga_gettime(enum quagga_clkid clkid, struct timeval *tv) {
 	}
 }
 
-/* time_t value in terms of stabilised absolute time. 
+/* time_t value in terms of stabilised absolute time.
  * replacement for POSIX time()
  */
 time_t quagga_time(time_t *t) {
@@ -992,13 +993,13 @@ unsigned long thread_consumed_time(RUSAGE_T *now, RUSAGE_T *start, unsigned long
 	return timeval_elapsed(now->real, start->real);
 }
 
-/* We should aim to yield after THREAD_YIELD_TIME_SLOT milliseconds. 
+/* We should aim to yield after THREAD_YIELD_TIME_SLOT milliseconds.
    Note: we are using real (wall clock) time for this calculation.
    It could be argued that CPU time may make more sense in certain
    contexts.  The things to consider are whether the thread may have
    blocked (in which case wall time increases, but CPU time does not),
    or whether the system is heavily loaded with other processes competing
-   for CPU time.  On balance, wall clock time seems to make sense. 
+   for CPU time.  On balance, wall clock time seems to make sense.
    Plus it has the added benefit that gettimeofday should be faster
    than calling getrusage. */
 int thread_should_yield(struct thread *thread) {
@@ -1027,8 +1028,8 @@ struct thread *thread_current = NULL;
 
 /* We check thread consumed time. If the system has getrusage, we'll
    use that to get in-depth stats on the performance of the thread in addition
-   to wall clock time stats from gettimeofday. 
- 
+   to wall clock time stats from gettimeofday.
+
    'Dummy' threads (e.g.  see funcname_thread_execute) must have
    thread->master == NULL.
  */

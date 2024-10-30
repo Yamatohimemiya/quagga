@@ -1,5 +1,6 @@
 /* Kernel routing table updates using netlink over GNU/Linux system.
  * Copyright (C) 1997, 98, 99 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -16,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -221,7 +222,7 @@ static int netlink_request(int family, int type, struct nlsock *nl) {
 	req.nlh.nlmsg_seq = ++nl->seq;
 	req.g.rtgen_family = family;
 
-	/* linux appears to check capabilities on every message 
+	/* linux appears to check capabilities on every message
    * have to raise caps for every message sent
    */
 	if(zserv_privs.change(ZPRIVS_RAISE)) {
@@ -1209,7 +1210,7 @@ int netlink_route_read(struct zebra_vrf *zvrf) {
 	return 0;
 }
 
-/* Utility function  comes from iproute2. 
+/* Utility function  comes from iproute2.
    Authors:	Alexey Kuznetsov, <kuznet@ms2.inr.ac.ru> */
 int addattr_l(struct nlmsghdr *n, size_t maxlen, int type, void *data, size_t alen) {
 	size_t len;
@@ -1249,7 +1250,7 @@ int rta_addattr_l(struct rtattr *rta, size_t maxlen, int type, void *data, size_
 	return 0;
 }
 
-/* Utility function comes from iproute2. 
+/* Utility function comes from iproute2.
    Authors:	Alexey Kuznetsov, <kuznet@ms2.inr.ac.ru> */
 int addattr32(struct nlmsghdr *n, size_t maxlen, int type, int data) {
 	size_t len;
@@ -1315,8 +1316,8 @@ static int netlink_talk(struct nlmsghdr *n, struct nlsock *nl, struct zebra_vrf 
 		return -1;
 	}
 
-	/* 
-   * Get reply from netlink socket. 
+	/*
+   * Get reply from netlink socket.
    * The reply should either be an acknowlegement or an error.
    */
 	return netlink_parse_info(netlink_talk_filter, nl, zvrf);

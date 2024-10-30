@@ -1,6 +1,7 @@
 /*
- * Buffering to output and input. 
+ * Buffering to output and input.
  * Copyright (C) 1998 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -70,7 +71,7 @@ typedef enum {
    be written immediately is added to the buffer queue. */
 extern buffer_status_t buffer_write(struct buffer *, int fd, const void *, size_t);
 
-/* This function attempts to flush some (but perhaps not all) of 
+/* This function attempts to flush some (but perhaps not all) of
    the queued data to the given file descriptor. */
 extern buffer_status_t buffer_flush_available(struct buffer *, int fd);
 
@@ -85,7 +86,7 @@ extern buffer_status_t buffer_flush_all(struct buffer *, int fd);
 /* Attempt to write enough data to the given fd to fill a window of the
    given width and height (and remove the data written from the buffer).
 
-   If !no_more, then a message saying " --More-- " is appended. 
+   If !no_more, then a message saying " --More-- " is appended.
    If erase is true, then first overwrite the previous " --More-- " message
    with spaces.
 

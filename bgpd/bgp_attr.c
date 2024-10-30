@@ -1,5 +1,6 @@
 /* BGP attributes management routines.
    Copyright (C) 1996, 97, 98, 1999 Kunihiro Ishiguro
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 
@@ -169,7 +170,7 @@ cluster_dup (struct cluster_list *cluster)
     }
   else
     new->list = NULL;
-  
+
   return new;
 }
 #endif
@@ -931,7 +932,7 @@ static int bgp_attr_flag_invalid(struct bgp_attr_parser_args *args) {
 	}
 
 	/* "For well-known attributes and for optional non-transitive attributes,
-   *  the Partial bit MUST be set to 0." 
+   *  the Partial bit MUST be set to 0."
    */
 	if(CHECK_FLAG(flags, BGP_ATTR_FLAG_PARTIAL)) {
 		if(!CHECK_FLAG(flags, BGP_ATTR_FLAG_OPTIONAL)) {
@@ -1247,7 +1248,7 @@ static bgp_attr_parse_ret_t bgp_attr_munge_as4_attrs(struct peer *const peer, st
 	if(!attr->aspath) {
 		/* NULL aspath shouldn't be possible as bgp_attr_parse should have
        * checked that all well-known, mandatory attributes were present.
-       * 
+       *
        * Can only be a problem with peer itself - hard error
        */
 		return BGP_ATTR_PARSE_ERROR;
@@ -1282,7 +1283,7 @@ static bgp_attr_parse_ret_t bgp_attr_munge_as4_attrs(struct peer *const peer, st
 			/* received both.
            * if the as_number in aggregator is not AS_TRANS,
            *  then AS4_AGGREGATOR and AS4_PATH shall be ignored
-           *        and the Aggregator shall be taken as 
+           *        and the Aggregator shall be taken as
            *        info on the aggregating node, and the AS_PATH
            *        shall be taken as the AS_PATH
            *  otherwise
@@ -2006,7 +2007,7 @@ bgp_attr_parse_ret_t bgp_attr_parse(struct peer *peer, struct attr *attr, bgp_si
 		}
 	}
 
-	/* 
+	/*
    * At this place we can see whether we got AS4_PATH and/or
    * AS4_AGGREGATOR from a 16Bit peer and act accordingly.
    * We can not do this before we've read all attributes because
@@ -2330,7 +2331,7 @@ bgp_size_t bgp_packet_attribute(struct bgp *bgp, struct peer *peer, struct strea
 	stream_putw(s, 0);
 	stream_putw_at(s, aspath_sizep, aspath_put(s, aspath, use32bit));
 
-	/* OLD session may need NEW_AS_PATH sent, if there are 4-byte ASNs 
+	/* OLD session may need NEW_AS_PATH sent, if there are 4-byte ASNs
    * in the path
    */
 	if(!use32bit && aspath_has_as4(aspath)) {
@@ -2545,7 +2546,7 @@ bgp_size_t bgp_packet_attribute(struct bgp *bgp, struct peer *peer, struct strea
        * Hm, I wonder...  confederation things *should* only be at
        * the beginning of an aspath, right?  Then we should use
        * aspath_delete_confed_seq for this, because it is already
-       * there! (JK) 
+       * there! (JK)
        * Folks, talk to me: what is reasonable here!?
        */
 		aspath = aspath_delete_confed_seq(aspath);

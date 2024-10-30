@@ -1,7 +1,8 @@
 /*
  * Daemonize routine
  * Copyright (C) 1997, 1999 Kunihiro Ishiguro
- * 
+ * (C)2024 Hikaru Yamatohimemiya
+ *
  * This file is part of GNU Zebra.
  *
  * GNU Zebra is free software; you can redistribute it and/or modify

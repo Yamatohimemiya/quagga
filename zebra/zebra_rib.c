@@ -1,5 +1,6 @@
 /* Routing Information Base.
  * Copyright (C) 1997, 98, 99, 2001 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -16,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -1255,7 +1256,7 @@ static void rib_process(struct route_node *rn) {
 }
 
 /* Take a list of route_node structs and return 1, if there was a record
- * picked from it and processed by rib_process(). Don't process more, 
+ * picked from it and processed by rib_process(). Don't process more,
  * than one RN record; operate only in the specified sub-queue.
  */
 static unsigned int process_subq(struct list *subq, u_char qindex) {
@@ -1460,7 +1461,7 @@ static void rib_queue_init(struct zebra_t *zebra) {
  * ('dest'). Queueing state for a route_node is kept on the dest. The
  * dest is created on-demand by rib_link() and is kept around at least
  * as long as there are ribs hanging off it (@see rib_gc_dest()).
- * 
+ *
  * Refcounting (aka "locking" throughout the GNU Zebra and Quagga code):
  *
  * - route_nodes: refcounted by:
@@ -1504,8 +1505,8 @@ static void rib_link(struct route_node *rn, struct rib *rib) {
 }
 
 static void rib_addnode(struct route_node *rn, struct rib *rib) {
-	/* RIB node has been un-removed before route-node is processed. 
-   * route_node must hence already be on the queue for processing.. 
+	/* RIB node has been un-removed before route-node is processed.
+   * route_node must hence already be on the queue for processing..
    */
 	if(CHECK_FLAG(rib->status, RIB_ENTRY_REMOVED)) {
 		if(IS_ZEBRA_DEBUG_RIB) {
@@ -2736,7 +2737,7 @@ rib_sweep_table (struct route_table *table)
 	  if (CHECK_FLAG (rib->status, RIB_ENTRY_REMOVED))
 	    continue;
 
-	  if (rib->type == ZEBRA_ROUTE_KERNEL && 
+	  if (rib->type == ZEBRA_ROUTE_KERNEL &&
 	      CHECK_FLAG (rib->flags, ZEBRA_FLAG_SELFROUTE))
 	    {
 	      ret = rib_update_kernel (rn, rib, NULL);

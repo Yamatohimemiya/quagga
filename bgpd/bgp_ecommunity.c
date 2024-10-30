@@ -1,5 +1,6 @@
 /* BGP Extended Communities Attribute
    Copyright (C) 2000 Kunihiro Ishiguro <kunihiro@zebra.org>
+   (C)2024 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 
@@ -433,7 +434,7 @@ error:
 	return p;
 }
 
-/* Convert string to extended community attribute. 
+/* Convert string to extended community attribute.
 
    When type is already known, please specify both str and type.  str
    should not include keyword such as "rt" and "soo".  Type is
@@ -511,7 +512,7 @@ struct ecommunity *ecommunity_str2com(const char *str, int type, int keyword_inc
 	return ecom;
 }
 
-/* Convert extended community attribute to string.  
+/* Convert extended community attribute to string.
 
    Due to historical reason of industry standard implementation, there
    are three types of format.

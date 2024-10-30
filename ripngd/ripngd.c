@@ -1,5 +1,6 @@
 /* RIPng daemon
  * Copyright (C) 1998, 1999 Kunihiro Ishiguro
+ * (C)2024 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -16,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include <zebra.h>
@@ -312,7 +313,7 @@ static void ripng_nexthop_rte(struct rte *rte, struct sockaddr_in6 *from, struct
 		zlog_debug("RIPng nexthop RTE address %s tag %d prefixlen %d", inet6_ntoa(rte->addr), ntohs(rte->tag), rte->prefixlen);
 	}
 
-	/* RFC2080 2.1.1 Next Hop: 
+	/* RFC2080 2.1.1 Next Hop:
    The route tag and prefix length in the next hop RTE must be
    set to zero on sending and ignored on receiption.  */
 	if(ntohs(rte->tag) != 0) {
@@ -1535,7 +1536,7 @@ void ripng_output_process(struct interface *ifp, struct sockaddr_in6 *to, int ro
 				rinfo->metric_out = RIPNG_METRIC_INFINITY;
 			}
 
-			/* Perform split-horizon with poisoned reverse 
+			/* Perform split-horizon with poisoned reverse
 	   * for RIPng routes.
 	   **/
 			if(ri->split_horizon == RIPNG_SPLIT_HORIZON_POISONED_REVERSE) {
