@@ -5,9 +5,9 @@
 ##  Copyright (c) 1996, 97, 98, 99, 2000 Kunihiro Ishiguro <kunihiro@zebra.org>
 ##  Portions Copyright (c) 2003 Paul Jakma <paul@dishone.st>
 ##
-AC_PREREQ(2.60)
+AC_PREREQ([2.71])
 
-AC_INIT(Quagga, 1.2.5, [https://bugzilla.quagga.net])
+AC_INIT([Quagga],[1.2.5],[https://bugzilla.quagga.net])
 CONFIG_ARGS="$*"
 AC_SUBST(CONFIG_ARGS)
 AC_CONFIG_SRCDIR(lib/zebra.h)
@@ -266,7 +266,7 @@ AC_CACHE_CHECK([if ${MAKE-make} is GNU make], [quagga_cv_gnu_make],
 dnl -----------------
 dnl System extensions
 dnl -----------------
-AC_GNU_SOURCE
+AC_USE_SYSTEM_EXTENSIONS
 
 
 dnl ----------------------
@@ -835,7 +835,7 @@ AC_SUBST(LIBPAM)
 dnl -------------------------------
 dnl Endian-ness check
 dnl -------------------------------
-AC_WORDS_BIGENDIAN
+AC_C_BIGENDIAN
 
 dnl -------------------------------
 dnl check the size in byte of the C
@@ -1050,24 +1050,22 @@ AC_CHECK_HEADERS([linux/mroute.h], [], [],
 #include<netinet/in.h>
 #endif])
 AC_MSG_CHECKING([for BSD struct ip_mreq hack])
-AC_TRY_COMPILE([#ifdef HAVE_SYS_PARAM_H
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif],[#if (defined(__FreeBSD__) && ((__FreeBSD_version >= 500022 && __FreeBSD_version < 700000) || (__FreeBSD_version < 500000 && __FreeBSD_version >= 440000))) || (defined(__NetBSD__) && defined(__NetBSD_Version__) && __NetBSD_Version__ >= 106010000) || defined(__OpenBSD__) || defined(__APPLE__) || defined(__DragonFly__) || defined(__sun)
+#endif]], [[#if (defined(__FreeBSD__) && ((__FreeBSD_version >= 500022 && __FreeBSD_version < 700000) || (__FreeBSD_version < 500000 && __FreeBSD_version >= 440000))) || (defined(__NetBSD__) && defined(__NetBSD_Version__) && __NetBSD_Version__ >= 106010000) || defined(__OpenBSD__) || defined(__APPLE__) || defined(__DragonFly__) || defined(__sun)
   return (0);
 #else
   #error No support for BSD struct ip_mreq hack detected
-#endif],[AC_MSG_RESULT(yes)
-AC_DEFINE(HAVE_BSD_STRUCT_IP_MREQ_HACK,,[Can pass ifindex in struct ip_mreq])],
-AC_MSG_RESULT(no))
+#endif]])],[AC_MSG_RESULT(yes)
+AC_DEFINE(HAVE_BSD_STRUCT_IP_MREQ_HACK,,[Can pass ifindex in struct ip_mreq])],[AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING([for RFC3678 protocol-independed API])
-AC_TRY_COMPILE([
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <sys/types.h>
 #include <netinet/in.h>
-], [struct group_req gr; int sock; setsockopt(sock, IPPROTO_IP, MCAST_JOIN_GROUP, (void*)&gr, sizeof(gr));
-], [AC_MSG_RESULT(yes)
-AC_DEFINE(HAVE_RFC3678,1,[Have RFC3678 protocol-independed API])],
-AC_MSG_RESULT(no))
+]], [[struct group_req gr; int sock; setsockopt(sock, IPPROTO_IP, MCAST_JOIN_GROUP, (void*)&gr, sizeof(gr));
+]])],[AC_MSG_RESULT(yes)
+AC_DEFINE(HAVE_RFC3678,1,[Have RFC3678 protocol-independed API])],[AC_MSG_RESULT(no)])
 
 dnl ---------------------------------------------------------------
 dnl figure out how to check link-state
@@ -1425,12 +1423,12 @@ dnl -----------------------
 dnl checking for IP_PKTINFO
 dnl -----------------------
 AC_MSG_CHECKING(for IP_PKTINFO)
-AC_TRY_COMPILE([#include <netdb.h>], [
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netdb.h>]], [[
   int opt = IP_PKTINFO;
-], [
+]])],[
   AC_MSG_RESULT(yes)
   AC_DEFINE(HAVE_IP_PKTINFO, 1, [Have IP_PKTINFO])
-], [
+],[
   AC_MSG_RESULT(no)
 ])
 
@@ -1438,12 +1436,12 @@ dnl ---------------------------
 dnl checking for IP_RECVDSTADDR
 dnl ---------------------------
 AC_MSG_CHECKING(for IP_RECVDSTADDR)
-AC_TRY_COMPILE([#include <netinet/in.h>], [
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netinet/in.h>]], [[
   int opt = IP_RECVDSTADDR;
-], [
+]])],[
   AC_MSG_RESULT(yes)
   AC_DEFINE(HAVE_IP_RECVDSTADDR, 1, [Have IP_RECVDSTADDR])
-], [
+],[
   AC_MSG_RESULT(no)
 ])
 
@@ -1451,12 +1449,12 @@ dnl ----------------------
 dnl checking for IP_RECVIF
 dnl ----------------------
 AC_MSG_CHECKING(for IP_RECVIF)
-AC_TRY_COMPILE([#include <netinet/in.h>], [
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netinet/in.h>]], [[
   int opt = IP_RECVIF;
-], [
+]])],[
   AC_MSG_RESULT(yes)
   AC_DEFINE(HAVE_IP_RECVIF, 1, [Have IP_RECVIF])
-], [
+],[
   AC_MSG_RESULT(no)
 ])
 
@@ -1465,10 +1463,8 @@ dnl checking for getrusage struct and call
 dnl --------------------------------------
 if test "${enable_rusage}" != "no"; then
   AC_MSG_CHECKING(whether getrusage is available)
-  AC_TRY_COMPILE([#include <sys/resource.h>],[struct rusage ac_x; getrusage (RUSAGE_SELF, &ac_x);],
-    [AC_MSG_RESULT(yes)
-     AC_DEFINE(HAVE_RUSAGE,,rusage)],
-      AC_MSG_RESULT(no))
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/resource.h>]], [[struct rusage ac_x; getrusage (RUSAGE_SELF, &ac_x);]])],[AC_MSG_RESULT(yes)
+     AC_DEFINE(HAVE_RUSAGE,,rusage)],[AC_MSG_RESULT(no)])
 fi
 
 dnl --------------------------------------
@@ -1484,12 +1480,10 @@ dnl capabilities checks
 dnl -------------------
 if test "${enable_capabilities}" != "no"; then
   AC_MSG_CHECKING(whether prctl PR_SET_KEEPCAPS is available)
-  AC_TRY_COMPILE([#include <sys/prctl.h>],[prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);],
-    [AC_MSG_RESULT(yes)
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/prctl.h>]], [[prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);]])],[AC_MSG_RESULT(yes)
      AC_DEFINE(HAVE_PR_SET_KEEPCAPS,,prctl)
-     quagga_ac_keepcaps="yes"],
-     AC_MSG_RESULT(no)
-  )
+     quagga_ac_keepcaps="yes"],[AC_MSG_RESULT(no)
+  ])
   if test x"${quagga_ac_keepcaps}" = x"yes"; then
     AC_CHECK_HEADERS(sys/capability.h)
   fi
@@ -1502,12 +1496,10 @@ if test "${enable_capabilities}" != "no"; then
   else
     AC_CHECK_HEADERS(priv.h,
      [AC_MSG_CHECKING(Solaris style privileges are available)
-      AC_TRY_COMPILE([#include <priv.h>],[getpflags(PRIV_AWARE);],
-    	  [AC_MSG_RESULT(yes)
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <priv.h>]], [[getpflags(PRIV_AWARE);]])],[AC_MSG_RESULT(yes)
     	   AC_DEFINE(HAVE_SOLARIS_CAPABILITIES,1,getpflags)
-    	   quagga_ac_scaps="yes"],
-    	   AC_MSG_RESULT(no)
-      )
+    	   quagga_ac_scaps="yes"],[AC_MSG_RESULT(no)
+      ])
      ]
    )
   fi
