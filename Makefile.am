@@ -2,11 +2,11 @@
 
 SUBDIRS = lib qpb fpm @ZEBRA@ @BGPD@ @RIPD@ @RIPNGD@ @OSPFD@ @OSPF6D@ @NHRPD@ \
          @ISISD@ @PIMD@ @WATCHQUAGGA@ @VTYSH@ @OSPFCLIENT@ m4 @pkgsrcdir@ \
-         redhat @SOLARIS@ tests
+         tests
 
 DIST_SUBDIRS = lib qpb fpm zebra bgpd ripd ripngd ospfd ospf6d nhrpd \
-	  isisd watchquagga vtysh ospfclient m4 pkgsrc redhat tests \
-	  solaris pimd
+	  isisd watchquagga vtysh ospfclient m4 pkgsrc tests
+	  pimd
 
 EXTRA_DIST = aclocal.m4 SERVICES TODO REPORTING-BUGS INSTALL.quagga.txt \
 	update-autotools \

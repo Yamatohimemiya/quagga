@@ -29546,9 +29546,7 @@ fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_htonl_works" >&5
 printf "%s\n" "$ac_cv_htonl_works" >&6; }
 
-ac_config_files="$ac_config_files Makefile lib/Makefile qpb/Makefile zebra/Makefile ripd/Makefile ripngd/Makefile bgpd/Makefile ospfd/Makefile watchquagga/Makefile ospf6d/Makefile isisd/Makefile vtysh/Makefile ospfclient/Makefile tests/Makefile m4/Makefile pimd/Makefile nhrpd/Makefile redhat/Makefile pkgsrc/Makefile fpm/Makefile redhat/quagga.spec redhat/quagga.sysconfig lib/version.h isisd/topology/Makefile pkgsrc/bgpd.sh pkgsrc/ospf6d.sh pkgsrc/ospfd.sh pkgsrc/ripd.sh pkgsrc/ripngd.sh pkgsrc/zebra.sh"
-
-ac_config_files="$ac_config_files solaris/Makefile"
+ac_config_files="$ac_config_files Makefile lib/Makefile qpb/Makefile zebra/Makefile ripd/Makefile ripngd/Makefile bgpd/Makefile ospfd/Makefile watchquagga/Makefile ospf6d/Makefile isisd/Makefile vtysh/Makefile ospfclient/Makefile tests/Makefile m4/Makefile pimd/Makefile nhrpd/Makefile pkgsrc/Makefile fpm/Makefile lib/version.h isisd/topology/Makefile pkgsrc/bgpd.sh pkgsrc/ospf6d.sh pkgsrc/ospfd.sh pkgsrc/ripd.sh pkgsrc/ripngd.sh pkgsrc/zebra.sh"
 
 
 ac_config_files="$ac_config_files vtysh/extract.pl"
@@ -30650,11 +30648,8 @@ do
     "m4/Makefile") CONFIG_FILES="$CONFIG_FILES m4/Makefile" ;;
     "pimd/Makefile") CONFIG_FILES="$CONFIG_FILES pimd/Makefile" ;;
     "nhrpd/Makefile") CONFIG_FILES="$CONFIG_FILES nhrpd/Makefile" ;;
-    "redhat/Makefile") CONFIG_FILES="$CONFIG_FILES redhat/Makefile" ;;
     "pkgsrc/Makefile") CONFIG_FILES="$CONFIG_FILES pkgsrc/Makefile" ;;
     "fpm/Makefile") CONFIG_FILES="$CONFIG_FILES fpm/Makefile" ;;
-    "redhat/quagga.spec") CONFIG_FILES="$CONFIG_FILES redhat/quagga.spec" ;;
-    "redhat/quagga.sysconfig") CONFIG_FILES="$CONFIG_FILES redhat/quagga.sysconfig" ;;
     "lib/version.h") CONFIG_FILES="$CONFIG_FILES lib/version.h" ;;
     "isisd/topology/Makefile") CONFIG_FILES="$CONFIG_FILES isisd/topology/Makefile" ;;
     "pkgsrc/bgpd.sh") CONFIG_FILES="$CONFIG_FILES pkgsrc/bgpd.sh" ;;
@@ -30663,7 +30658,6 @@ do
     "pkgsrc/ripd.sh") CONFIG_FILES="$CONFIG_FILES pkgsrc/ripd.sh" ;;
     "pkgsrc/ripngd.sh") CONFIG_FILES="$CONFIG_FILES pkgsrc/ripngd.sh" ;;
     "pkgsrc/zebra.sh") CONFIG_FILES="$CONFIG_FILES pkgsrc/zebra.sh" ;;
-    "solaris/Makefile") CONFIG_FILES="$CONFIG_FILES solaris/Makefile" ;;
     "vtysh/extract.pl") CONFIG_FILES="$CONFIG_FILES vtysh/extract.pl" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

@@ -1618,15 +1618,12 @@ AC_CONFIG_FILES([Makefile lib/Makefile qpb/Makefile zebra/Makefile ripd/Makefile
 	  ospf6d/Makefile isisd/Makefile vtysh/Makefile
 	  ospfclient/Makefile tests/Makefile m4/Makefile
 	  pimd/Makefile nhrpd/Makefile
-	  redhat/Makefile
 	  pkgsrc/Makefile
 	  fpm/Makefile
-	  redhat/quagga.spec redhat/quagga.sysconfig
 	  lib/version.h
 	  isisd/topology/Makefile
 	  pkgsrc/bgpd.sh pkgsrc/ospf6d.sh pkgsrc/ospfd.sh
 	  pkgsrc/ripd.sh pkgsrc/ripngd.sh pkgsrc/zebra.sh])
-AC_CONFIG_FILES([solaris/Makefile])
 
 AC_CONFIG_FILES([vtysh/extract.pl],[chmod +x vtysh/extract.pl])
 ## Hack, but working solution to avoid rebuilding of quagga.info.
