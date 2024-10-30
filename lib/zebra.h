@@ -70,16 +70,10 @@ typedef int socklen_t;
 #include <sys/ksym.h>
 #endif /* HAVE_SYS_KSYM_H */
 #include <syslog.h>
-#ifdef TIME_WITH_SYS_TIME
+#ifdef HAVE_SYS_TIME_H
 # include <sys/time.h>
-# include <time.h>
-#else
-# ifdef HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else
-#  include <time.h>
-# endif
 #endif /* TIME_WITH_SYS_TIME */
+#include <time.h>
 #include <sys/uio.h>
 #include <sys/utsname.h>
 #ifdef HAVE_RUSAGE
@@ -121,7 +115,7 @@ typedef int socklen_t;
 #ifdef __va_copy
 #define va_copy(DST,SRC) __va_copy(DST,SRC)
 #else
-/* Now we are desperate; this should work on many typical platforms. 
+/* Now we are desperate; this should work on many typical platforms.
    But this is slightly dangerous, because the standard does not require
    va_copy to be a macro. */
 #define va_copy(DST,SRC) memcpy(&(DST), &(SRC), sizeof(va_list))
@@ -251,7 +245,7 @@ typedef int socklen_t;
 #endif /* HAVE_GLIBC_BACKTRACE */
 
 /* Local includes: */
-#if !(defined(__GNUC__) || defined(VTYSH_EXTRACT_PL)) 
+#if !(defined(__GNUC__) || defined(VTYSH_EXTRACT_PL))
 #define __attribute__(x)
 #endif  /* !__GNUC__ || VTYSH_EXTRACT_PL */
 
@@ -276,7 +270,7 @@ typedef int socklen_t;
 
 
 
-/* 
+/*
  * RFC 3542 defines several macros for using struct cmsghdr.
  * Here, we define those that are not present
  */
@@ -321,7 +315,7 @@ struct in_pktinfo
 };
 #endif
 
-/* 
+/*
  * OSPF Fragmentation / fragmented writes
  *
  * ospfd can support writing fragmented packets, for cases where
@@ -341,13 +335,13 @@ struct in_pktinfo
 #define WANT_OSPF_WRITE_FRAGMENT
 #endif
 
-/* 
+/*
  * IP_HDRINCL / struct ip byte order
  *
  * Linux: network byte order
  * *BSD: network, except for length and offset. (cf Stevens)
  * SunOS: nominally as per BSD. but bug: network order on LE.
- * OpenBSD: network byte order, apart from older versions which are as per 
+ * OpenBSD: network byte order, apart from older versions which are as per
  *          *BSD
  */
 #if defined(__NetBSD__) \
@@ -448,7 +442,7 @@ struct in_pktinfo
 extern const char *zebra_route_string(unsigned int route_type);
 /* Map a route type to a char.  For example, ZEBRA_ROUTE_RIPNG -> 'R'. */
 extern char zebra_route_char(unsigned int route_type);
-/* Map a zserv command type to the same string, 
+/* Map a zserv command type to the same string,
  * e.g. ZEBRA_INTERFACE_ADD -> "ZEBRA_INTERFACE_ADD" */
 /* Map a protocol name to its number. e.g. ZEBRA_ROUTE_BGP->9*/
 extern int proto_name2num(const char *s);

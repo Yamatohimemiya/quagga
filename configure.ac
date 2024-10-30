@@ -76,7 +76,7 @@ AC_PROG_CPP
 AM_PROG_CC_C_O
 AC_PROG_EGREP
 PKG_PROG_PKG_CONFIG
-AC_PROG_CC_C99
+AC_PROG_CC
 
 dnl libtool prereq.
 AC_USE_SYSTEM_EXTENSIONS
@@ -167,7 +167,7 @@ if test "x${cflags_specified}" = "x" ; then
         AC_C_FLAG([-errfmt])
         AC_C_FLAG([-xipo])
 	dnl AC_C_FLAG([-xlinkopt=2]) SPARC only dnl
-	dnl AC_C_FLAG([-xcode=pic32])dnl	
+	dnl AC_C_FLAG([-xcode=pic32])dnl
         ;;
     *)
         AC_MSG_RESULT([autodetecting])
@@ -502,7 +502,7 @@ case "${enable_multipath}" in
     ;;
   "")
     ;;
-  *)           
+  *)
     AC_MSG_FAILURE([Please specify digit to enable multipath ARG])
     ;;
 esac
@@ -535,8 +535,6 @@ AC_C_CONST
 AC_C_INLINE
 AC_C_RESTRICT
 AC_C_VOLATILE
-AC_HEADER_STDC
-AC_HEADER_TIME
 AC_HEADER_SYS_WAIT
 AC_HEADER_STDBOOL
 dnl AC_TYPE_PID_T
@@ -749,7 +747,7 @@ dnl	 [TODO] on Linux, and in [TODO] on Solaris.
 	 AC_CHECK_LIB(termcap, tputs, LIBREADLINE="$LIBREADLINE -ltermcap",
 	   [AC_CHECK_LIB(tinfo, tputs, LIBREADLINE="$LIBREADLINE -ltinfo",
 	     [AC_CHECK_LIB(curses, tputs, LIBREADLINE="$LIBREADLINE -lcurses",
-	       [AC_CHECK_LIB(ncurses, tputs, 
+	       [AC_CHECK_LIB(ncurses, tputs,
 	                     LIBREADLINE="$LIBREADLINE -lncurses")]
 	      )]
 	    )]
@@ -763,7 +761,7 @@ dnl	 [TODO] on Linux, and in [TODO] on Solaris.
 	 if test $ac_cv_header_readline_history_h = no;then
            AC_MSG_ERROR([readline is too old to have readline/history.h, please update to the latest readline library.])
 	 fi
-	 AC_CHECK_LIB(readline, rl_completion_matches, 
+	 AC_CHECK_LIB(readline, rl_completion_matches,
 	              LIBREADLINE="$LIBREADLINE",, "$LIBREADLINE")
          if test $ac_cv_lib_readline_rl_completion_matches = no; then
            AC_DEFINE(rl_completion_matches,completion_matches,Old readline)
@@ -1082,9 +1080,9 @@ AC_CHECK_HEADER([net/if.h],
     ])
     AC_CHECK_MEMBERS( [struct ifmediareq.ifm_status],
       AC_DEFINE(HAVE_BSD_LINK_DETECT,,[BSD link-detect]),
-      [], LINK_DETECT_INCLUDES)], 
+      [], LINK_DETECT_INCLUDES)],
     [],
-    QUAGGA_INCLUDES)], 
+    QUAGGA_INCLUDES)],
   [], QUAGGA_INCLUDES )
 
 dnl ---------------------------------------------------------------
@@ -1101,7 +1099,7 @@ dnl ------------------------
 dnl TCP_MD5SIG socket option
 dnl ------------------------
 
-AC_CHECK_HEADER([netinet/tcp.h], 
+AC_CHECK_HEADER([netinet/tcp.h],
    [m4_define([MD5_INCLUDES],
       QUAGGA_INCLUDES
       [#include <netinet/tcp.h>
@@ -1136,7 +1134,7 @@ else
 fi
 case $quagga_cv_ipforward_method in
   "/proc/net/snmp")  quagga_cv_ipforward_method="proc";;
-  "/dev/ip")         
+  "/dev/ip")
                      case "$host" in
                        *-freebsd*)    quagga_cv_ipforward_method="sysctl";;
                        *)             quagga_cv_ipforward_method="solaris";;
@@ -1411,7 +1409,7 @@ AC_CHECK_MEMBERS([struct sockaddr.sa_len,
 dnl ---------------------------
 dnl IRDP/pktinfo/icmphdr checks
 dnl ---------------------------
-AC_CHECK_TYPES([struct in_pktinfo], 
+AC_CHECK_TYPES([struct in_pktinfo],
  [AC_CHECK_TYPES([struct icmphdr],
    [if test "${enable_irdp}" != "no"; then
       AC_DEFINE(HAVE_IRDP,, IRDP)
@@ -1496,7 +1494,7 @@ if test "${enable_capabilities}" != "no"; then
     AC_CHECK_HEADERS(sys/capability.h)
   fi
   if test x"${ac_cv_header_sys_capability_h}" = x"yes"; then
-    AC_CHECK_LIB(cap, cap_init, 
+    AC_CHECK_LIB(cap, cap_init,
       [AC_DEFINE(HAVE_LCAPS,1,Capabilities)
        LIBCAP="-lcap"
        quagga_ac_lcaps="yes"]
@@ -1538,7 +1536,7 @@ AX_SYS_WEAK_ALIAS
 
 dnl ---------------------------
 dnl check for glibc 'backtrace'
-dnl --------------------------- 
+dnl ---------------------------
 if test x"${enable_backtrace}" != x"no" ; then
   backtrace_ok=no
   AC_CHECK_HEADER([execinfo.h], [
@@ -1631,7 +1629,7 @@ AC_DEFINE_UNQUOTED(PIM_VTYSH_PATH, "$quagga_statedir/pimd.vty",pimd vty socket)
 AC_DEFINE_UNQUOTED(DAEMON_VTY_DIR, "$quagga_statedir",daemon vty directory)
 
 dnl -------------------------------
-dnl Quagga sources should always be 
+dnl Quagga sources should always be
 dnl current wrt interfaces. Dont
 dnl allow deprecated interfaces to
 dnl be exposed.
@@ -1649,7 +1647,7 @@ AC_CACHE_VAL(ac_cv_htonl_works,
 )
 AC_MSG_RESULT($ac_cv_htonl_works)
 
-AC_CONFIG_FILES([Makefile lib/Makefile qpb/Makefile zebra/Makefile ripd/Makefile 
+AC_CONFIG_FILES([Makefile lib/Makefile qpb/Makefile zebra/Makefile ripd/Makefile
 	  ripngd/Makefile bgpd/Makefile ospfd/Makefile watchquagga/Makefile
 	  ospf6d/Makefile isisd/Makefile vtysh/Makefile
 	  doc/Makefile ospfclient/Makefile tests/Makefile m4/Makefile
@@ -1696,5 +1694,5 @@ if test x"$quagga_cv_gnu_make" = x"no"; then echo "
 Warning: The ${MAKE-make} programme detected, either in your path or
 via the MAKE variable, is not GNU Make. GNU make may be installed as
 gmake on some systems. and is required to complete a build of Quagga
-" > /dev/stderr 
+" > /dev/stderr
 fi
