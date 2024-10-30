@@ -43,8 +43,8 @@
 
 #### Version String tweak
 # Remove invalid characters form version string and replace with _
-%{expand: %%global rpmversion %(echo '1.2.4' | tr [:blank:]- _ )}
-%define		quaggaversion	1.2.4
+%{expand: %%global rpmversion %(echo '1.2.5' | tr [:blank:]- _ )}
+%define		quaggaversion	1.2.5
 
 #### Check version of texi2html 
 # Old versions don't support "--number-footnotes" option.

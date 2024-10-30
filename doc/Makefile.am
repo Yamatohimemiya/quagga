@@ -1,12 +1,14 @@
 ## Process this file with automake to produce Makefile.in.
 
+AUTOMAKE_OPTIONS = info-in-builddir
+
 # Dia, the version i have at least, doesn't do very good EPS output
-# (some of the text is scaled strangely). So this will work, but 
-# it is probably better to use something like gimp to convert the 
+# (some of the text is scaled strangely). So this will work, but
+# it is probably better to use something like gimp to convert the
 # dia exported PNG files to EPS manually.
 #
 # Here we use 'convert' from the well known 'ImageMagick' package
-# to do conversion from png to eps/pdf for figures. 
+# to do conversion from png to eps/pdf for figures.
 # PDF form is required for quagga.pdf, using PDFTex at least.
 #
 # TeX implementation, which we depend on already anyway.

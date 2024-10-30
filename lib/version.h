@@ -37,13 +37,13 @@
 
 #define QUAGGA_PROGNAME   "Quagga"
 
-#define QUAGGA_VERSION     "1.2.4" GIT_SUFFIX
+#define QUAGGA_VERSION     "1.2.5" GIT_SUFFIX
 
-#define ZEBRA_BUG_ADDRESS "https://bugzilla.quagga.net"
+#define ZEBRA_BUG_ADDRESS "http://oss.xprj.org/quagga/bugs"
 
-#define QUAGGA_URL "http://www.quagga.net"
+#define QUAGGA_URL "http://oss.xprj.org/quagga"
 
-#define QUAGGA_COPYRIGHT "Copyright 1996-2005 Kunihiro Ishiguro, et al."
+#define QUAGGA_COPYRIGHT "(C)2024 Hikaru Yamatohimemiya / Copyright 1996-2005 Kunihiro Ishiguro, et al."
 
 #define QUAGGA_CONFIG_ARGS ""
 
