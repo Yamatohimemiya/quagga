@@ -72,7 +72,7 @@ ReferenceAlignment: Right
 ReflowComments: false
 SeparateDefinitionBlocks: Always
 ShortNamespaceLines: 1
-SortIncludes: CaseInsensitive
+SortIncludes: Never
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: true
 SpaceAfterLogicalNot: false
