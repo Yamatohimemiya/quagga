@@ -27,13 +27,12 @@
 #include "vty.h"
 
 /* Nexthop structure. */
-struct rnh
-{
-  u_char flags;
-#define ZEBRA_NHT_CONNECTED  	0x1
-  struct rib *state;
-  struct list *client_list;
-  struct route_node *node;
+struct rnh {
+	u_char flags;
+#define ZEBRA_NHT_CONNECTED 0x1
+	struct rib *state;
+	struct list *client_list;
+	struct route_node *node;
 };
 
 extern struct rnh *zebra_add_rnh(struct prefix *p, vrf_id_t vrfid);

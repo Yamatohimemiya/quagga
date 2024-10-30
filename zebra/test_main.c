@@ -38,9 +38,8 @@
 #include "zebra/interface.h"
 
 /* Zebra instance */
-struct zebra_t zebrad =
-{
-  .rtm_table_default = 0,
+struct zebra_t zebrad = {
+	.rtm_table_default = 0,
 };
 
 /* process id. */
@@ -53,24 +52,22 @@ extern int rib_process_hold_time;
 struct thread_master *master;
 
 /* Command line options. */
-struct option longopts[] = 
-{
-  { "batch",       no_argument,       NULL, 'b'},
-  { "daemon",      no_argument,       NULL, 'd'},
-  { "config_file", required_argument, NULL, 'f'},
-  { "help",        no_argument,       NULL, 'h'},
-  { "vty_addr",    required_argument, NULL, 'A'},
-  { "vty_port",    required_argument, NULL, 'P'},
-  { "version",     no_argument,       NULL, 'v'},
-  { "rib_hold",	   required_argument, NULL, 'r'},
-  { 0 }
+struct option longopts[] = {
+	{ "batch", no_argument, NULL, 'b' },
+	       { "daemon", no_argument, NULL, 'd' },
+	     { "config_file", required_argument, NULL, 'f' },
+	{ "help", no_argument, NULL, 'h' },
+	       { "vty_addr", required_argument, NULL, 'A' },
+	     { "vty_port", required_argument, NULL, 'P' },
+	{ "version", no_argument, NULL, 'v' },
+	       { "rib_hold", required_argument, NULL, 'r' },
+	     { 0 }
 };
 
-zebra_capabilities_t _caps_p [] = 
-{
-  ZCAP_NET_ADMIN,
-  ZCAP_SYS_ADMIN,
-  ZCAP_NET_RAW,
+zebra_capabilities_t _caps_p[] = {
+	ZCAP_NET_ADMIN,
+	ZCAP_SYS_ADMIN,
+	ZCAP_NET_RAW,
 };
 
 /* Default configuration file path. */
@@ -80,315 +77,270 @@ char config_default[] = SYSCONFDIR DEFAULT_CONFIG_FILE;
 const char *pid_file = PATH_ZEBRA_PID;
 
 /* Help information display. */
-static void
-usage (char *progname, int status)
-{
-  if (status != 0)
-    fprintf (stderr, "Try `%s --help' for more information.\n", progname);
-  else
-    {    
-      printf ("Usage : %s [OPTION...]\n\n"\
-	      "Daemon which manages kernel routing table management and "\
-	      "redistribution between different routing protocols.\n\n"\
-	      "-b, --batch        Runs in batch mode\n"\
-	      "-d, --daemon       Runs in daemon mode\n"\
-	      "-f, --config_file  Set configuration file name\n"\
-	      "-A, --vty_addr     Set vty's bind address\n"\
-	      "-P, --vty_port     Set vty's port number\n"\
-	      "-r, --rib_hold	  Set rib-queue hold time\n"\
-              "-v, --version      Print program version\n"\
-	      "-h, --help         Display this help and exit\n"\
-	      "\n"\
-	      "Report bugs to %s\n", progname, ZEBRA_BUG_ADDRESS);
-    }
+static void usage(char *progname, int status) {
+	if(status != 0) {
+		fprintf(stderr, "Try `%s --help' for more information.\n", progname);
+	} else {
+		printf("Usage : %s [OPTION...]\n\n"
+		       "Daemon which manages kernel routing table management and "
+		       "redistribution between different routing protocols.\n\n"
+		       "-b, --batch        Runs in batch mode\n"
+		       "-d, --daemon       Runs in daemon mode\n"
+		       "-f, --config_file  Set configuration file name\n"
+		       "-A, --vty_addr     Set vty's bind address\n"
+		       "-P, --vty_port     Set vty's port number\n"
+		       "-r, --rib_hold	  Set rib-queue hold time\n"
+		       "-v, --version      Print program version\n"
+		       "-h, --help         Display this help and exit\n"
+		       "\n"
+		       "Report bugs to %s\n",
+		       progname, ZEBRA_BUG_ADDRESS);
+	}
 
-  exit (status);
+	exit(status);
 }
 
 static ifindex_t test_ifindex = 0;
 
 /* testrib commands */
-DEFUN (test_interface_state,
-       test_interface_state_cmd,
-       "state (up|down)",
-       "configure interface\n"
-       "up\n"
-       "down\n")
-{
-  struct interface *ifp;
-  if (argc < 1)
-    return CMD_WARNING;
-  
-  ifp = vty->index;
-  if (ifp->ifindex == IFINDEX_INTERNAL)
-    {
-      ifp->ifindex = ++test_ifindex;
-      ifp->mtu = 1500;
-      ifp->flags = IFF_BROADCAST|IFF_MULTICAST;
-    }
-  
-  switch (argv[0][0])
-    {
-      case 'u':
-        SET_FLAG (ifp->flags, IFF_UP);
-        if_add_update (ifp);
-        printf ("up\n");
-        break;
-      case 'd':
-        UNSET_FLAG (ifp->flags, IFF_UP);
-        if_delete_update (ifp);
-        printf ("down\n");
-        break;
-      default:
-        return CMD_WARNING;
-    }
-  return CMD_SUCCESS;
+DEFUN(test_interface_state, test_interface_state_cmd, "state (up|down)",
+      "configure interface\n"
+      "up\n"
+      "down\n") {
+	struct interface *ifp;
+	if(argc < 1) {
+		return CMD_WARNING;
+	}
+
+	ifp = vty->index;
+	if(ifp->ifindex == IFINDEX_INTERNAL) {
+		ifp->ifindex = ++test_ifindex;
+		ifp->mtu = 1500;
+		ifp->flags = IFF_BROADCAST | IFF_MULTICAST;
+	}
+
+	switch(argv[0][0]) {
+		case 'u':
+			SET_FLAG(ifp->flags, IFF_UP);
+			if_add_update(ifp);
+			printf("up\n");
+			break;
+		case 'd':
+			UNSET_FLAG(ifp->flags, IFF_UP);
+			if_delete_update(ifp);
+			printf("down\n");
+			break;
+		default: return CMD_WARNING;
+	}
+	return CMD_SUCCESS;
 }
 
-static void
-test_cmd_init (void)
-{
-  install_element (INTERFACE_NODE, &test_interface_state_cmd);
+static void test_cmd_init(void) {
+	install_element(INTERFACE_NODE, &test_interface_state_cmd);
 }
 
 /* SIGHUP handler. */
-static void 
-sighup (void)
-{
-  zlog_info ("SIGHUP received");
+static void sighup(void) {
+	zlog_info("SIGHUP received");
 
-  /* Reload of config file. */
-  ;
+	/* Reload of config file. */
+	;
 }
 
 /* SIGINT handler. */
-static void
-sigint (void)
-{
-  zlog_notice ("Terminating on signal");
+static void sigint(void) {
+	zlog_notice("Terminating on signal");
 
-  exit (0);
+	exit(0);
 }
 
 /* SIGUSR1 handler. */
-static void
-sigusr1 (void)
-{
-  zlog_rotate (NULL);
+static void sigusr1(void) {
+	zlog_rotate(NULL);
 }
 
-struct quagga_signal_t zebra_signals[] =
-{
-  { 
-    .signal = SIGHUP, 
-    .handler = &sighup,
-  },
-  {
-    .signal = SIGUSR1,
-    .handler = &sigusr1,
-  },
-  {
-    .signal = SIGINT,
-    .handler = &sigint,
-  },
-  {
-    .signal = SIGTERM,
-    .handler = &sigint,
-  },
+struct quagga_signal_t zebra_signals[] = {
+	{
+		.signal = SIGHUP,
+		.handler = &sighup,
+	 },
+	{
+		.signal = SIGUSR1,
+		.handler = &sigusr1,
+	 },
+	{
+		.signal = SIGINT,
+		.handler = &sigint,
+	 },
+	{
+		.signal = SIGTERM,
+		.handler = &sigint,
+	 },
 };
 
 /* Callback upon creating a new VRF. */
-static int
-zebra_vrf_new (vrf_id_t vrf_id, void **info)
-{
-  struct zebra_vrf *zvrf = *info;
+static int zebra_vrf_new(vrf_id_t vrf_id, void **info) {
+	struct zebra_vrf *zvrf = *info;
 
-  if (! zvrf)
-    {
-      zvrf = zebra_vrf_alloc (vrf_id);
-      *info = (void *)zvrf;
-    }
+	if(!zvrf) {
+		zvrf = zebra_vrf_alloc(vrf_id);
+		*info = (void *) zvrf;
+	}
 
-  return 0;
+	return 0;
 }
 
 /* Callback upon enabling a VRF. */
-static int
-zebra_vrf_enable (vrf_id_t vrf_id, void **info)
-{
-  struct zebra_vrf *zvrf = (struct zebra_vrf *) (*info);
+static int zebra_vrf_enable(vrf_id_t vrf_id, void **info) {
+	struct zebra_vrf *zvrf = (struct zebra_vrf *) (*info);
 
-  assert (zvrf);
+	assert(zvrf);
 
-  kernel_init (zvrf);
-  route_read (zvrf);
+	kernel_init(zvrf);
+	route_read(zvrf);
 
-  return 0;
+	return 0;
 }
 
 /* Callback upon disabling a VRF. */
-static int
-zebra_vrf_disable (vrf_id_t vrf_id, void **info)
-{
-  struct zebra_vrf *zvrf = (struct zebra_vrf *) (*info);
-  struct listnode *list_node;
-  struct interface *ifp;
+static int zebra_vrf_disable(vrf_id_t vrf_id, void **info) {
+	struct zebra_vrf *zvrf = (struct zebra_vrf *) (*info);
+	struct listnode *list_node;
+	struct interface *ifp;
 
-  assert (zvrf);
+	assert(zvrf);
 
-  rib_close_table (zvrf->table[AFI_IP][SAFI_UNICAST]);
-  rib_close_table (zvrf->table[AFI_IP6][SAFI_UNICAST]);
+	rib_close_table(zvrf->table[AFI_IP][SAFI_UNICAST]);
+	rib_close_table(zvrf->table[AFI_IP6][SAFI_UNICAST]);
 
-  for (ALL_LIST_ELEMENTS_RO (vrf_iflist (vrf_id), list_node, ifp))
-    {
-      int operative = if_is_operative (ifp);
-      UNSET_FLAG (ifp->flags, IFF_UP);
-      if (operative)
-        if_down (ifp);
-    }
+	for(ALL_LIST_ELEMENTS_RO(vrf_iflist(vrf_id), list_node, ifp)) {
+		int operative = if_is_operative(ifp);
+		UNSET_FLAG(ifp->flags, IFF_UP);
+		if(operative) {
+			if_down(ifp);
+		}
+	}
 
-  kernel_terminate (zvrf);
+	kernel_terminate(zvrf);
 
-  return 0;
+	return 0;
 }
 
 /* Zebra VRF initialization. */
-static void
-zebra_vrf_init (void)
-{
-  vrf_add_hook (VRF_NEW_HOOK, zebra_vrf_new);
-  vrf_add_hook (VRF_ENABLE_HOOK, zebra_vrf_enable);
-  vrf_add_hook (VRF_DISABLE_HOOK, zebra_vrf_disable);
-  vrf_init ();
+static void zebra_vrf_init(void) {
+	vrf_add_hook(VRF_NEW_HOOK, zebra_vrf_new);
+	vrf_add_hook(VRF_ENABLE_HOOK, zebra_vrf_enable);
+	vrf_add_hook(VRF_DISABLE_HOOK, zebra_vrf_disable);
+	vrf_init();
 }
 
 /* Main startup routine. */
-int
-main (int argc, char **argv)
-{
-  char *p;
-  char *vty_addr = NULL;
-  int vty_port = 0;
-  int batch_mode = 0;
-  int daemon_mode = 0;
-  char *config_file = NULL;
-  char *progname;
+int main(int argc, char **argv) {
+	char *p;
+	char *vty_addr = NULL;
+	int vty_port = 0;
+	int batch_mode = 0;
+	int daemon_mode = 0;
+	char *config_file = NULL;
+	char *progname;
 
-  /* Set umask before anything for security */
-  umask (0027);
+	/* Set umask before anything for security */
+	umask(0027);
 
-  /* preserve my name */
-  progname = ((p = strrchr (argv[0], '/')) ? ++p : argv[0]);
+	/* preserve my name */
+	progname = ((p = strrchr(argv[0], '/')) ? ++p : argv[0]);
 
-  zlog_default = openzlog (progname, ZLOG_ZEBRA,
-			   LOG_CONS|LOG_NDELAY|LOG_PID, LOG_DAEMON);
+	zlog_default = openzlog(progname, ZLOG_ZEBRA, LOG_CONS | LOG_NDELAY | LOG_PID, LOG_DAEMON);
 
-  while (1) 
-    {
-      int opt;
-  
-      opt = getopt_long (argc, argv, "bdf:hA:P:r:v", longopts, 0);
+	while(1) {
+		int opt;
 
-      if (opt == EOF)
-	break;
+		opt = getopt_long(argc, argv, "bdf:hA:P:r:v", longopts, 0);
 
-      switch (opt) 
-	{
-	case 0:
-	  break;
-	case 'b':
-	  batch_mode = 1;
-	case 'd':
-	  daemon_mode = 1;
-	  break;
-	case 'f':
-	  config_file = optarg;
-	  break;
-	case 'A':
-	  vty_addr = optarg;
-	  break;
-	case 'P':
-	  /* Deal with atoi() returning 0 on failure, and zebra not
+		if(opt == EOF) {
+			break;
+		}
+
+		switch(opt) {
+			case 0: break;
+			case 'b': batch_mode = 1;
+			case 'd': daemon_mode = 1; break;
+			case 'f': config_file = optarg; break;
+			case 'A': vty_addr = optarg; break;
+			case 'P':
+				/* Deal with atoi() returning 0 on failure, and zebra not
 	     listening on zebra port... */
-	  if (strcmp(optarg, "0") == 0) 
-	    {
-	      vty_port = 0;
-	      break;
-	    } 
-	  vty_port = atoi (optarg);
-	  break;
-	case 'r':
-	  rib_process_hold_time = atoi(optarg);
-	  break;
-	case 'v':
-	  print_version (progname);
-	  exit (0);
-	  break;
-	case 'h':
-	  usage (progname, 0);
-	  break;
-	default:
-	  usage (progname, 1);
-	  break;
+				if(strcmp(optarg, "0") == 0) {
+					vty_port = 0;
+					break;
+				}
+				vty_port = atoi(optarg);
+				break;
+			case 'r': rib_process_hold_time = atoi(optarg); break;
+			case 'v':
+				print_version(progname);
+				exit(0);
+				break;
+			case 'h': usage(progname, 0); break;
+			default: usage(progname, 1); break;
+		}
 	}
-    }
-  
-  /* port and conf file mandatory */
-  if (!vty_port || !config_file)
-    {
-      fprintf (stderr, "Error: --vty_port and --config_file arguments"
-                       " are both required\n");
-      usage (progname, 1);
-    }
-  
-  /* Make master thread emulator. */
-  zebrad.master = thread_master_create ();
 
-  /* Vty related initialize. */
-  signal_init (zebrad.master, array_size(zebra_signals), zebra_signals);
-  cmd_init (1);
-  vty_init (zebrad.master);
-  memory_init ();
-  zebra_debug_init ();
-  zebra_if_init ();
-  test_cmd_init ();
+	/* port and conf file mandatory */
+	if(!vty_port || !config_file) {
+		fprintf(stderr, "Error: --vty_port and --config_file arguments"
+				" are both required\n");
+		usage(progname, 1);
+	}
 
-  /* Zebra related initialize. */
-  rib_init ();
-  access_list_init ();
+	/* Make master thread emulator. */
+	zebrad.master = thread_master_create();
 
-  /* Make kernel routing socket. */
-  zebra_vrf_init ();
-  zebra_vty_init();
+	/* Vty related initialize. */
+	signal_init(zebrad.master, array_size(zebra_signals), zebra_signals);
+	cmd_init(1);
+	vty_init(zebrad.master);
+	memory_init();
+	zebra_debug_init();
+	zebra_if_init();
+	test_cmd_init();
 
-  /* Configuration file read*/
-  vty_read_config (config_file, config_default);
+	/* Zebra related initialize. */
+	rib_init();
+	access_list_init();
 
-  /* Clean up rib. */
-  rib_weed_tables ();
+	/* Make kernel routing socket. */
+	zebra_vrf_init();
+	zebra_vty_init();
 
-  /* Exit when zebra is working in batch mode. */
-  if (batch_mode)
-    exit (0);
+	/* Configuration file read*/
+	vty_read_config(config_file, config_default);
 
-  /* Daemonize. */
-  if (daemon_mode && daemon (0, 0) < 0)
-    {
-      perror("daemon start failed");
-      exit (1);
-    }
+	/* Clean up rib. */
+	rib_weed_tables();
 
-  /* Needed for BSD routing socket. */
-  pid = getpid ();
+	/* Exit when zebra is working in batch mode. */
+	if(batch_mode) {
+		exit(0);
+	}
 
-  /* Make vty server socket. */
-  vty_serv_sock (vty_addr, vty_port, "/tmp/test_zebra");
+	/* Daemonize. */
+	if(daemon_mode && daemon(0, 0) < 0) {
+		perror("daemon start failed");
+		exit(1);
+	}
 
-  /* Print banner. */
-  zlog_notice ("Zebra %s starting: vty@%d", QUAGGA_VERSION, vty_port);
+	/* Needed for BSD routing socket. */
+	pid = getpid();
 
-  thread_main (zebrad.master);
+	/* Make vty server socket. */
+	vty_serv_sock(vty_addr, vty_port, "/tmp/test_zebra");
 
-  /* Not reached... */
-  return 0;
+	/* Print banner. */
+	zlog_notice("Zebra %s starting: vty@%d", QUAGGA_VERSION, vty_port);
+
+	thread_main(zebrad.master);
+
+	/* Not reached... */
+	return 0;
 }

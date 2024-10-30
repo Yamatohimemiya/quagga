@@ -23,26 +23,26 @@
 #ifndef PIM_STATIC_H_
 #define PIM_STATIC_H_
 
-#include <zebra.h>
-#include "pim_mroute.h"
 #include "if.h"
+#include "pim_mroute.h"
+#include <zebra.h>
 
 struct static_route {
-   /* Each static route is unique by these pair of addresses */
-   struct in_addr group;
-   struct in_addr source;
+	/* Each static route is unique by these pair of addresses */
+	struct in_addr group;
+	struct in_addr source;
 
-   unsigned int   iif;
-   unsigned char  oif_ttls[MAXVIFS];
-   int            oif_count;
-   struct mfcctl  mc;
-   time_t         creation[MAXVIFS];
+	unsigned int iif;
+	unsigned char oif_ttls[MAXVIFS];
+	int oif_count;
+	struct mfcctl mc;
+	time_t creation[MAXVIFS];
 };
 
 void pim_static_route_free(struct static_route *s_route);
 
 int pim_static_add(struct interface *iif, struct interface *oif, struct in_addr group, struct in_addr source);
 int pim_static_del(struct interface *iif, struct interface *oif, struct in_addr group, struct in_addr source);
-int pim_static_write_mroute (struct vty *vty, struct interface *ifp);
+int pim_static_write_mroute(struct vty *vty, struct interface *ifp);
 
 #endif /* PIM_STATIC_H_ */

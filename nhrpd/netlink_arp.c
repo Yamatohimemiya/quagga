@@ -27,8 +27,7 @@ static int netlink_listen_fd = -1;
 
 typedef void (*netlink_dispatch_f)(struct nlmsghdr *msg, struct zbuf *zb);
 
-void netlink_update_binding(struct interface *ifp, union sockunion *proto, union sockunion *nbma)
-{
+void netlink_update_binding(struct interface *ifp, union sockunion *proto, union sockunion *nbma) {
 	struct nlmsghdr *n;
 	struct ndmsg *ndm;
 	struct zbuf *zb = zbuf_alloc(512);
@@ -42,16 +41,16 @@ void netlink_update_binding(struct interface *ifp, union sockunion *proto, union
 		.ndm_state = nbma ? NUD_REACHABLE : NUD_FAILED,
 	};
 	znl_rta_push(zb, NDA_DST, sockunion_get_addr(proto), family2addrsize(sockunion_family(proto)));
-	if (nbma)
+	if(nbma) {
 		znl_rta_push(zb, NDA_LLADDR, sockunion_get_addr(nbma), family2addrsize(sockunion_family(nbma)));
+	}
 	znl_nlmsg_complete(zb, n);
 	zbuf_send(zb, netlink_req_fd);
 	zbuf_recv(zb, netlink_req_fd);
 	zbuf_free(zb);
 }
 
-static void netlink_neigh_msg(struct nlmsghdr *msg, struct zbuf *zb)
-{
+static void netlink_neigh_msg(struct nlmsghdr *msg, struct zbuf *zb) {
 	struct ndmsg *ndm;
 	struct rtattr *rta;
 	struct nhrp_cache *c;
@@ -63,63 +62,57 @@ static void netlink_neigh_msg(struct nlmsghdr *msg, struct zbuf *zb)
 	int state;
 
 	ndm = znl_pull(zb, sizeof(*ndm));
-	if (!ndm) return;
+	if(!ndm) {
+		return;
+	}
 
 	sockunion_family(&addr) = AF_UNSPEC;
-	while ((rta = znl_rta_pull(zb, &payload)) != NULL) {
+	while((rta = znl_rta_pull(zb, &payload)) != NULL) {
 		len = zbuf_used(&payload);
-		switch (rta->rta_type) {
-		case NDA_DST:
-			sockunion_set(&addr, ndm->ndm_family, zbuf_pulln(&payload, len), len);
-			break;
+		switch(rta->rta_type) {
+			case NDA_DST: sockunion_set(&addr, ndm->ndm_family, zbuf_pulln(&payload, len), len); break;
 		}
 	}
 
 	ifp = if_lookup_by_index(ndm->ndm_ifindex);
-	if (!ifp || sockunion_family(&addr) == AF_UNSPEC)
+	if(!ifp || sockunion_family(&addr) == AF_UNSPEC) {
 		return;
+	}
 
 	c = nhrp_cache_get(ifp, &addr, 0);
-	if (!c)
+	if(!c) {
 		return;
+	}
 
-	if (msg->nlmsg_type == RTM_GETNEIGH) {
-		debugf(NHRP_DEBUG_KERNEL, "Netlink: who-has %s dev %s",
-			sockunion2str(&addr, buf, sizeof buf),
-			ifp->name);
+	if(msg->nlmsg_type == RTM_GETNEIGH) {
+		debugf(NHRP_DEBUG_KERNEL, "Netlink: who-has %s dev %s", sockunion2str(&addr, buf, sizeof buf), ifp->name);
 
-		if (c->cur.type >= NHRP_CACHE_CACHED) {
+		if(c->cur.type >= NHRP_CACHE_CACHED) {
 			nhrp_cache_set_used(c, 1);
 			netlink_update_binding(ifp, &addr, &c->cur.peer->vc->remote.nbma);
 		}
 	} else {
-		debugf(NHRP_DEBUG_KERNEL, "Netlink: update %s dev %s nud %x",
-			sockunion2str(&addr, buf, sizeof buf),
-			ifp->name, ndm->ndm_state);
+		debugf(NHRP_DEBUG_KERNEL, "Netlink: update %s dev %s nud %x", sockunion2str(&addr, buf, sizeof buf), ifp->name, ndm->ndm_state);
 
 		state = (msg->nlmsg_type == RTM_NEWNEIGH) ? ndm->ndm_state : NUD_FAILED;
 		nhrp_cache_set_used(c, state == NUD_REACHABLE);
 	}
 }
 
-static int netlink_route_recv(struct thread *t)
-{
+static int netlink_route_recv(struct thread *t) {
 	uint8_t buf[ZNL_BUFFER_SIZE];
 	int fd = THREAD_FD(t);
 	struct zbuf payload, zb;
 	struct nlmsghdr *n;
 
 	zbuf_init(&zb, buf, sizeof(buf), 0);
-	while (zbuf_recv(&zb, fd) > 0) {
-		while ((n = znl_nlmsg_pull(&zb, &payload)) != 0) {
-			debugf(NHRP_DEBUG_KERNEL, "Netlink: Received msg_type %u, msg_flags %u",
-				n->nlmsg_type, n->nlmsg_flags);
-			switch (n->nlmsg_type) {
-			case RTM_GETNEIGH:
-			case RTM_NEWNEIGH:
-			case RTM_DELNEIGH:
-				netlink_neigh_msg(n, &payload);
-				break;
+	while(zbuf_recv(&zb, fd) > 0) {
+		while((n = znl_nlmsg_pull(&zb, &payload)) != 0) {
+			debugf(NHRP_DEBUG_KERNEL, "Netlink: Received msg_type %u, msg_flags %u", n->nlmsg_type, n->nlmsg_flags);
+			switch(n->nlmsg_type) {
+				case RTM_GETNEIGH:
+				case RTM_NEWNEIGH:
+				case RTM_DELNEIGH: netlink_neigh_msg(n, &payload); break;
 			}
 		}
 	}
@@ -129,14 +122,13 @@ static int netlink_route_recv(struct thread *t)
 	return 0;
 }
 
-static void netlink_log_register(int fd, int group)
-{
+static void netlink_log_register(int fd, int group) {
 	struct nlmsghdr *n;
 	struct nfgenmsg *nf;
 	struct nfulnl_msg_config_cmd cmd;
 	struct zbuf *zb = zbuf_alloc(512);
 
-	n = znl_nlmsg_push(zb, (NFNL_SUBSYS_ULOG<<8) | NFULNL_MSG_CONFIG, NLM_F_REQUEST | NLM_F_ACK);
+	n = znl_nlmsg_push(zb, (NFNL_SUBSYS_ULOG << 8) | NFULNL_MSG_CONFIG, NLM_F_REQUEST | NLM_F_ACK);
 	nf = znl_push(zb, sizeof(*nf));
 	*nf = (struct nfgenmsg) {
 		.nfgen_family = AF_UNSPEC,
@@ -151,8 +143,7 @@ static void netlink_log_register(int fd, int group)
 	zbuf_free(zb);
 }
 
-static void netlink_log_indication(struct nlmsghdr *msg, struct zbuf *zb)
-{
+static void netlink_log_indication(struct nlmsghdr *msg, struct zbuf *zb) {
 	struct nfgenmsg *nf;
 	struct rtattr *rta;
 	struct zbuf rtapl, pktpl;
@@ -161,39 +152,38 @@ static void netlink_log_indication(struct nlmsghdr *msg, struct zbuf *zb)
 	uint32_t *in_ndx = NULL;
 
 	nf = znl_pull(zb, sizeof(*nf));
-	if (!nf) return;
+	if(!nf) {
+		return;
+	}
 
 	memset(&pktpl, 0, sizeof(pktpl));
-	while ((rta = znl_rta_pull(zb, &rtapl)) != NULL) {
-		switch (rta->rta_type) {
-		case NFULA_PACKET_HDR:
-			pkthdr = znl_pull(&rtapl, sizeof(*pkthdr));
-			break;
-		case NFULA_IFINDEX_INDEV:
-			in_ndx = znl_pull(&rtapl, sizeof(*in_ndx));
-			break;
-		case NFULA_PAYLOAD:
-			pktpl = rtapl;
-			break;
-		/* NFULA_HWHDR exists and is supposed to contain source
+	while((rta = znl_rta_pull(zb, &rtapl)) != NULL) {
+		switch(rta->rta_type) {
+			case NFULA_PACKET_HDR: pkthdr = znl_pull(&rtapl, sizeof(*pkthdr)); break;
+			case NFULA_IFINDEX_INDEV: in_ndx = znl_pull(&rtapl, sizeof(*in_ndx)); break;
+			case NFULA_PAYLOAD:
+				pktpl = rtapl;
+				break;
+				/* NFULA_HWHDR exists and is supposed to contain source
 		 * hardware address. However, for ip_gre it seems to be
 		 * the nexthop destination address if the packet matches
 		 * route. */
 		}
 	}
 
-	if (!pkthdr || !in_ndx || !zbuf_used(&pktpl))
+	if(!pkthdr || !in_ndx || !zbuf_used(&pktpl)) {
 		return;
+	}
 
 	ifp = if_lookup_by_index(htonl(*in_ndx));
-	if (!ifp)
+	if(!ifp) {
 		return;
+	}
 
 	nhrp_peer_send_indication(ifp, htons(pkthdr->hw_protocol), &pktpl);
 }
 
-static int netlink_log_recv(struct thread *t)
-{
+static int netlink_log_recv(struct thread *t) {
 	uint8_t buf[ZNL_BUFFER_SIZE];
 	int fd = THREAD_FD(t);
 	struct zbuf payload, zb;
@@ -202,14 +192,11 @@ static int netlink_log_recv(struct thread *t)
 	netlink_log_thread = NULL;
 
 	zbuf_init(&zb, buf, sizeof(buf), 0);
-	while (zbuf_recv(&zb, fd) > 0) {
-		while ((n = znl_nlmsg_pull(&zb, &payload)) != 0) {
-			debugf(NHRP_DEBUG_KERNEL, "Netlink-log: Received msg_type %u, msg_flags %u",
-				n->nlmsg_type, n->nlmsg_flags);
-			switch (n->nlmsg_type) {
-			case (NFNL_SUBSYS_ULOG<<8) | NFULNL_MSG_PACKET:
-				netlink_log_indication(n, &payload);
-				break;
+	while(zbuf_recv(&zb, fd) > 0) {
+		while((n = znl_nlmsg_pull(&zb, &payload)) != 0) {
+			debugf(NHRP_DEBUG_KERNEL, "Netlink-log: Received msg_type %u, msg_flags %u", n->nlmsg_type, n->nlmsg_flags);
+			switch(n->nlmsg_type) {
+				case(NFNL_SUBSYS_ULOG << 8) | NFULNL_MSG_PACKET: netlink_log_indication(n, &payload); break;
 			}
 		}
 	}
@@ -219,23 +206,21 @@ static int netlink_log_recv(struct thread *t)
 	return 0;
 }
 
-void netlink_set_nflog_group(int nlgroup)
-{
-	if (netlink_log_fd >= 0) {
+void netlink_set_nflog_group(int nlgroup) {
+	if(netlink_log_fd >= 0) {
 		THREAD_OFF(netlink_log_thread);
 		close(netlink_log_fd);
 		netlink_log_fd = -1;
 	}
 	netlink_nflog_group = nlgroup;
-	if (nlgroup) {
-		netlink_log_fd = znl_open(NETLINK_NETFILTER,  0);
+	if(nlgroup) {
+		netlink_log_fd = znl_open(NETLINK_NETFILTER, 0);
 		netlink_log_register(netlink_log_fd, nlgroup);
 		THREAD_READ_ON(master, netlink_log_thread, netlink_log_recv, 0, netlink_log_fd);
 	}
 }
 
-int netlink_init(void)
-{
+int netlink_init(void) {
 	netlink_req_fd = znl_open(NETLINK_ROUTE, 0);
 	netlink_listen_fd = znl_open(NETLINK_ROUTE, RTMGRP_NEIGH);
 	thread_add_read(master, netlink_route_recv, 0, netlink_listen_fd);
@@ -243,8 +228,7 @@ int netlink_init(void)
 	return 0;
 }
 
-int netlink_configure_arp(unsigned int ifindex, int pf)
-{
+int netlink_configure_arp(unsigned int ifindex, int pf) {
 	struct nlmsghdr *n;
 	struct ndtmsg *ndtm;
 	struct rtattr *rta;

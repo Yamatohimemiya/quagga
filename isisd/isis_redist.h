@@ -27,32 +27,27 @@
 #define DEFAULT_ORIGINATE 1
 #define DEFAULT_ORIGINATE_ALWAYS 2
 
-struct isis_ext_info
-{
-  int origin;
-  uint32_t metric;
-  u_char distance;
+struct isis_ext_info {
+	int origin;
+	uint32_t metric;
+	u_char distance;
 };
 
-struct isis_redist
-{
-  int redist;
-  uint32_t metric;
-  char *map_name;
-  struct route_map *map;
+struct isis_redist {
+	int redist;
+	uint32_t metric;
+	char *map_name;
+	struct route_map *map;
 };
 
 struct isis_area;
 struct prefix;
 struct vty;
 
-struct route_table *get_ext_reach(struct isis_area *area,
-                                  int family, int level);
-void isis_redist_add(int type, struct prefix *p,
-                     u_char distance, uint32_t metric);
+struct route_table *get_ext_reach(struct isis_area *area, int family, int level);
+void isis_redist_add(int type, struct prefix *p, u_char distance, uint32_t metric);
 void isis_redist_delete(int type, struct prefix *p);
-int isis_redist_config_write(struct vty *vty, struct isis_area *area,
-                             int family);
+int isis_redist_config_write(struct vty *vty, struct isis_area *area, int family);
 void isis_redist_init(void);
 void isis_redist_area_finish(struct isis_area *area);
 

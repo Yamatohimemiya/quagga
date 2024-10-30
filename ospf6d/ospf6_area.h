@@ -24,105 +24,103 @@
 
 #include "ospf6_top.h"
 
-struct ospf6_area
-{
-  /* Reference to Top data structure */
-  struct ospf6 *ospf6;
+struct ospf6_area {
+	/* Reference to Top data structure */
+	struct ospf6 *ospf6;
 
-  /* Area-ID */
-  u_int32_t area_id;
+	/* Area-ID */
+	u_int32_t area_id;
 
-  /* Area-ID string */
-  char name[16];
+	/* Area-ID string */
+	char name[16];
 
-  /* flag */
-  u_char flag;
+	/* flag */
+	u_char flag;
 
-  /* OSPF Option */
-  u_char options[3];
+	/* OSPF Option */
+	u_char options[3];
 
-  /* Summary routes to be originated (includes Configured Address Ranges) */
-  struct ospf6_route_table *range_table;
-  struct ospf6_route_table *summary_prefix;
-  struct ospf6_route_table *summary_router;
+	/* Summary routes to be originated (includes Configured Address Ranges) */
+	struct ospf6_route_table *range_table;
+	struct ospf6_route_table *summary_prefix;
+	struct ospf6_route_table *summary_router;
 
-  /* OSPF interface list */
-  struct list *if_list;
+	/* OSPF interface list */
+	struct list *if_list;
 
-  struct ospf6_lsdb *lsdb;
-  struct ospf6_lsdb *lsdb_self;
+	struct ospf6_lsdb *lsdb;
+	struct ospf6_lsdb *lsdb_self;
 
-  struct ospf6_route_table *spf_table;
-  struct ospf6_route_table *route_table;
+	struct ospf6_route_table *spf_table;
+	struct ospf6_route_table *route_table;
 
-  struct thread  *thread_spf_calculation;
-  struct thread  *thread_route_calculation;
-  u_int32_t spf_calculation;	/* SPF calculation count */
+	struct thread *thread_spf_calculation;
+	struct thread *thread_route_calculation;
+	u_int32_t spf_calculation; /* SPF calculation count */
 
-  struct thread *thread_router_lsa;
-  struct thread *thread_intra_prefix_lsa;
-  u_int32_t router_lsa_size_limit;
+	struct thread *thread_router_lsa;
+	struct thread *thread_intra_prefix_lsa;
+	u_int32_t router_lsa_size_limit;
 
-  /* Area announce list */
-  struct
-  {
-    char *name;
-    struct access_list *list;
-  } _export;
-#define EXPORT_NAME(A)  (A)->_export.name
-#define EXPORT_LIST(A)  (A)->_export.list
+	/* Area announce list */
+	struct {
+		char *name;
+		struct access_list *list;
+	} _export;
 
-  /* Area acceptance list */
-  struct
-  {
-    char *name;
-    struct access_list *list;
-  } import;
-#define IMPORT_NAME(A)  (A)->import.name
-#define IMPORT_LIST(A)  (A)->import.list
+#define EXPORT_NAME(A) (A)->_export.name
+#define EXPORT_LIST(A) (A)->_export.list
 
-  /* Type 3 LSA Area prefix-list */
-  struct
-  {
-    char *name;
-    struct prefix_list *list;
-  } plist_in;
-#define PREFIX_NAME_IN(A)  (A)->plist_in.name
-#define PREFIX_LIST_IN(A)  (A)->plist_in.list
+	/* Area acceptance list */
+	struct {
+		char *name;
+		struct access_list *list;
+	} import;
 
-  struct
-  {
-    char *name;
-    struct prefix_list *list;
-  } plist_out;
-#define PREFIX_NAME_OUT(A)  (A)->plist_out.name
-#define PREFIX_LIST_OUT(A)  (A)->plist_out.list
+#define IMPORT_NAME(A) (A)->import.name
+#define IMPORT_LIST(A) (A)->import.list
 
+	/* Type 3 LSA Area prefix-list */
+	struct {
+		char *name;
+		struct prefix_list *list;
+	} plist_in;
+
+#define PREFIX_NAME_IN(A) (A)->plist_in.name
+#define PREFIX_LIST_IN(A) (A)->plist_in.list
+
+	struct {
+		char *name;
+		struct prefix_list *list;
+	} plist_out;
+
+#define PREFIX_NAME_OUT(A) (A)->plist_out.name
+#define PREFIX_LIST_OUT(A) (A)->plist_out.list
 };
 
-#define OSPF6_AREA_ENABLE     0x01
-#define OSPF6_AREA_ACTIVE     0x02
-#define OSPF6_AREA_TRANSIT    0x04 /* TransitCapability */
-#define OSPF6_AREA_STUB       0x08
+#define OSPF6_AREA_ENABLE 0x01
+#define OSPF6_AREA_ACTIVE 0x02
+#define OSPF6_AREA_TRANSIT 0x04 /* TransitCapability */
+#define OSPF6_AREA_STUB 0x08
 
-#define IS_AREA_ENABLED(oa) (CHECK_FLAG ((oa)->flag, OSPF6_AREA_ENABLE))
-#define IS_AREA_ACTIVE(oa) (CHECK_FLAG ((oa)->flag, OSPF6_AREA_ACTIVE))
-#define IS_AREA_TRANSIT(oa) (CHECK_FLAG ((oa)->flag, OSPF6_AREA_TRANSIT))
-#define IS_AREA_STUB(oa) (CHECK_FLAG ((oa)->flag, OSPF6_AREA_STUB))
+#define IS_AREA_ENABLED(oa) (CHECK_FLAG((oa)->flag, OSPF6_AREA_ENABLE))
+#define IS_AREA_ACTIVE(oa) (CHECK_FLAG((oa)->flag, OSPF6_AREA_ACTIVE))
+#define IS_AREA_TRANSIT(oa) (CHECK_FLAG((oa)->flag, OSPF6_AREA_TRANSIT))
+#define IS_AREA_STUB(oa) (CHECK_FLAG((oa)->flag, OSPF6_AREA_STUB))
 
 /* prototypes */
-extern int ospf6_area_cmp (void *va, void *vb);
+extern int ospf6_area_cmp(void *va, void *vb);
 
-extern struct ospf6_area *ospf6_area_create (u_int32_t, struct ospf6 *);
-extern void ospf6_area_delete (struct ospf6_area *);
-extern struct ospf6_area *ospf6_area_lookup (u_int32_t, struct ospf6 *);
+extern struct ospf6_area *ospf6_area_create(u_int32_t, struct ospf6 *);
+extern void ospf6_area_delete(struct ospf6_area *);
+extern struct ospf6_area *ospf6_area_lookup(u_int32_t, struct ospf6 *);
 
-extern void ospf6_area_enable (struct ospf6_area *);
-extern void ospf6_area_disable (struct ospf6_area *);
+extern void ospf6_area_enable(struct ospf6_area *);
+extern void ospf6_area_disable(struct ospf6_area *);
 
-extern void ospf6_area_show (struct vty *, struct ospf6_area *);
+extern void ospf6_area_show(struct vty *, struct ospf6_area *);
 
-extern void ospf6_area_config_write (struct vty *vty);
-extern void ospf6_area_init (void);
+extern void ospf6_area_config_write(struct vty *vty);
+extern void ospf6_area_init(void);
 
 #endif /* OSPF_AREA_H */

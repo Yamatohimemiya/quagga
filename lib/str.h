@@ -10,7 +10,7 @@ extern int snprintf(char *, size_t, const char *, ...);
 #endif
 
 #ifndef HAVE_VSNPRINTF
-#define vsnprintf(buf, size, format, args) vsprintf(buf, format, args)
+	#define vsnprintf(buf, size, format, args) vsprintf(buf, format, args)
 #endif
 
 #ifndef HAVE_STRLCPY
@@ -26,8 +26,7 @@ extern size_t strnlen(const char *s, size_t maxlen);
 #endif
 
 #ifndef HAVE_STRNDUP
-extern char * strndup (const char *, size_t);
+extern char *strndup(const char *, size_t);
 #endif
 
 #endif /* _ZEBRA_STR_H */
-

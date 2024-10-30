@@ -23,19 +23,18 @@
 #ifndef _ZEBRA_ISIS_DYNHN_H
 #define _ZEBRA_ISIS_DYNHN_H
 
-struct isis_dynhn
-{
-  u_char id[ISIS_SYS_ID_LEN];
-  struct hostname name;
-  time_t refresh;
-  int level;
+struct isis_dynhn {
+	u_char id[ISIS_SYS_ID_LEN];
+	struct hostname name;
+	time_t refresh;
+	int level;
 };
 
-void dyn_cache_init (void);
-void isis_dynhn_insert (const u_char * id, struct hostname *hostname, int level);
-void isis_dynhn_remove (const u_char * id);
-struct isis_dynhn *dynhn_find_by_id (const u_char * id);
-struct isis_dynhn *dynhn_find_by_name (const char *hostname);
-void dynhn_print_all (struct vty *vty);
+void dyn_cache_init(void);
+void isis_dynhn_insert(const u_char *id, struct hostname *hostname, int level);
+void isis_dynhn_remove(const u_char *id);
+struct isis_dynhn *dynhn_find_by_id(const u_char *id);
+struct isis_dynhn *dynhn_find_by_name(const char *hostname);
+void dynhn_print_all(struct vty *vty);
 
 #endif /* _ZEBRA_ISIS_DYNHN_H */

@@ -27,65 +27,63 @@
 #include "prefix.h"
 
 union g_addr {
-  struct in_addr ipv4;
+	struct in_addr ipv4;
 #ifdef HAVE_IPV6
-  struct in6_addr ipv6;
+	struct in6_addr ipv6;
 #endif /* HAVE_IPV6 */
 };
 
-enum nexthop_types_t
-{
-  NEXTHOP_TYPE_IFINDEX = 1,      /* Directly connected.  */
-  NEXTHOP_TYPE_IFNAME,           /* Interface route.  */
-  NEXTHOP_TYPE_IPV4,             /* IPv4 nexthop.  */
-  NEXTHOP_TYPE_IPV4_IFINDEX,     /* IPv4 nexthop with ifindex.  */
-  NEXTHOP_TYPE_IPV4_IFNAME,      /* IPv4 nexthop with ifname.  */
-  NEXTHOP_TYPE_IPV6,             /* IPv6 nexthop.  */
-  NEXTHOP_TYPE_IPV6_IFINDEX,     /* IPv6 nexthop with ifindex.  */
-  NEXTHOP_TYPE_IPV6_IFNAME,      /* IPv6 nexthop with ifname.  */
-  NEXTHOP_TYPE_BLACKHOLE,        /* Null0 nexthop.  */
+enum nexthop_types_t {
+	NEXTHOP_TYPE_IFINDEX = 1,  /* Directly connected.  */
+	NEXTHOP_TYPE_IFNAME,	   /* Interface route.  */
+	NEXTHOP_TYPE_IPV4,	   /* IPv4 nexthop.  */
+	NEXTHOP_TYPE_IPV4_IFINDEX, /* IPv4 nexthop with ifindex.  */
+	NEXTHOP_TYPE_IPV4_IFNAME,  /* IPv4 nexthop with ifname.  */
+	NEXTHOP_TYPE_IPV6,	   /* IPv6 nexthop.  */
+	NEXTHOP_TYPE_IPV6_IFINDEX, /* IPv6 nexthop with ifindex.  */
+	NEXTHOP_TYPE_IPV6_IFNAME,  /* IPv6 nexthop with ifname.  */
+	NEXTHOP_TYPE_BLACKHOLE,	   /* Null0 nexthop.  */
 };
 
 /* Nexthop structure. */
-struct nexthop
-{
-  struct nexthop *next;
-  struct nexthop *prev;
+struct nexthop {
+	struct nexthop *next;
+	struct nexthop *prev;
 
-  /* Interface index. */
-  char *ifname;
-  ifindex_t ifindex;
+	/* Interface index. */
+	char *ifname;
+	ifindex_t ifindex;
 
-  enum nexthop_types_t type;
+	enum nexthop_types_t type;
 
-  u_char flags;
-#define NEXTHOP_FLAG_ACTIVE     (1 << 0) /* This nexthop is alive. */
-#define NEXTHOP_FLAG_FIB        (1 << 1) /* FIB nexthop. */
-#define NEXTHOP_FLAG_RECURSIVE  (1 << 2) /* Recursive nexthop. */
-#define NEXTHOP_FLAG_ONLINK     (1 << 3) /* Nexthop should be installed onlink. */
-#define NEXTHOP_FLAG_MATCHED    (1 << 4) /* Already matched vs a nexthop */
+	u_char flags;
+#define NEXTHOP_FLAG_ACTIVE (1 << 0)	/* This nexthop is alive. */
+#define NEXTHOP_FLAG_FIB (1 << 1)	/* FIB nexthop. */
+#define NEXTHOP_FLAG_RECURSIVE (1 << 2) /* Recursive nexthop. */
+#define NEXTHOP_FLAG_ONLINK (1 << 3)	/* Nexthop should be installed onlink. */
+#define NEXTHOP_FLAG_MATCHED (1 << 4)	/* Already matched vs a nexthop */
 
-  /* Nexthop address */
-  union g_addr gate;
-  union g_addr src;
+	/* Nexthop address */
+	union g_addr gate;
+	union g_addr src;
 
-  /* Nexthops obtained by recursive resolution.
+	/* Nexthops obtained by recursive resolution.
    *
    * If the nexthop struct needs to be resolved recursively,
    * NEXTHOP_FLAG_RECURSIVE will be set in flags and the nexthops
    * obtained by recursive resolution will be added to `resolved'.
    * Only one level of recursive resolution is currently supported. */
-  struct nexthop *resolved;
+	struct nexthop *resolved;
 };
 
-struct nexthop *nexthop_new (void);
-void nexthop_add (struct nexthop **target, struct nexthop *nexthop);
+struct nexthop *nexthop_new(void);
+void nexthop_add(struct nexthop **target, struct nexthop *nexthop);
 
-void copy_nexthops (struct nexthop **tnh, struct nexthop *nh);
-void nexthop_free (struct nexthop *nexthop);
-void nexthops_free (struct nexthop *nexthop);
+void copy_nexthops(struct nexthop **tnh, struct nexthop *nh);
+void nexthop_free(struct nexthop *nexthop);
+void nexthops_free(struct nexthop *nexthop);
 
-extern const char *nexthop_type_to_str (enum nexthop_types_t nh_type);
-extern int nexthop_same_no_recurse (struct nexthop *next1, struct nexthop *next2);
+extern const char *nexthop_type_to_str(enum nexthop_types_t nh_type);
+extern int nexthop_same_no_recurse(struct nexthop *next1, struct nexthop *next2);
 
 #endif /*_LIB_NEXTHOP_H */

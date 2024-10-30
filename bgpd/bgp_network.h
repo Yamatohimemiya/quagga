@@ -23,12 +23,12 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 
 #define BGP_SOCKET_SNDBUF_SIZE 65536
 
-extern int bgp_socket (unsigned short, const char *);
-extern void bgp_close (void);
-extern int bgp_connect (struct peer *);
-extern void bgp_getsockname (struct peer *);
+extern int bgp_socket(unsigned short, const char *);
+extern void bgp_close(void);
+extern int bgp_connect(struct peer *);
+extern void bgp_getsockname(struct peer *);
 
-extern void bgp_set_socket_ttl (struct peer *peer, int bgp_sock);
-extern int bgp_md5_set (struct peer *);
+extern void bgp_set_socket_ttl(struct peer *peer, int bgp_sock);
+extern int bgp_md5_set(struct peer *);
 
 #endif /* _QUAGGA_BGP_NETWORK_H */

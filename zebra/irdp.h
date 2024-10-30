@@ -34,33 +34,33 @@
 
 /* ICMP Messages */
 #ifndef ICMP_ROUTERADVERT
-#define ICMP_ROUTERADVERT 9
+	#define ICMP_ROUTERADVERT 9
 #endif /* ICMP_ROUTERADVERT */
 
 #ifndef ICMP_ROUTERSOLICIT
-#define ICMP_ROUTERSOLICIT 10
+	#define ICMP_ROUTERSOLICIT 10
 #endif /* ICMP_ROUTERSOLICT */
 
 /* Multicast groups */
 #ifndef INADDR_ALLHOSTS_GROUP
-#define INADDR_ALLHOSTS_GROUP 0xe0000001U    /* 224.0.0.1 */
-#endif /* INADDR_ALLHOSTS_GROUP */
+	#define INADDR_ALLHOSTS_GROUP 0xe0000001U /* 224.0.0.1 */
+#endif						  /* INADDR_ALLHOSTS_GROUP */
 
 #ifndef INADDR_ALLRTRS_GROUP
-#define INADDR_ALLRTRS_GROUP  0xe0000002U    /* 224.0.0.2 */
-#endif /* INADDR_ALLRTRS_GROUP */
+	#define INADDR_ALLRTRS_GROUP 0xe0000002U /* 224.0.0.2 */
+#endif						 /* INADDR_ALLRTRS_GROUP */
 
 /* Default irdp packet interval */
-#define IRDP_DEFAULT_INTERVAL 300 
+#define IRDP_DEFAULT_INTERVAL 300
 
 /* Router constants from RFC1256 */
 #define MAX_INITIAL_ADVERT_INTERVAL 16
-#define MAX_INITIAL_ADVERTISEMENTS   3
-#define MAX_RESPONSE_DELAY           2
+#define MAX_INITIAL_ADVERTISEMENTS 3
+#define MAX_RESPONSE_DELAY 2
 
 #define IRDP_MAXADVERTINTERVAL 600
 #define IRDP_MINADVERTINTERVAL 450 /* 0.75*600 */
-#define IRDP_LIFETIME         1350 /* 3*450 */
+#define IRDP_LIFETIME 1350	   /* 3*450 */
 #define IRDP_PREFERENCE 0
 
 #define ICMP_MINLEN 8
@@ -111,47 +111,42 @@
      Default: 0 
 */
 
-struct irdp_interface 
-{
-  unsigned long MaxAdvertInterval;
-  unsigned long MinAdvertInterval;
-  unsigned long Preference;
+struct irdp_interface {
+	unsigned long MaxAdvertInterval;
+	unsigned long MinAdvertInterval;
+	unsigned long Preference;
 
-  u_int32_t flags;
+	u_int32_t flags;
 
-#define IF_ACTIVE               (1<<0) /* ICMP Active */
-#define IF_BROADCAST            (1<<1) /* 255.255.255.255 */
-#define IF_SOLICIT              (1<<2) /* Solicit active */
-#define IF_DEBUG_MESSAGES       (1<<3) 
-#define IF_DEBUG_PACKET         (1<<4) 
-#define IF_DEBUG_MISC           (1<<5) 
-#define IF_SHUTDOWN             (1<<6) 
+#define IF_ACTIVE (1 << 0)    /* ICMP Active */
+#define IF_BROADCAST (1 << 1) /* 255.255.255.255 */
+#define IF_SOLICIT (1 << 2)   /* Solicit active */
+#define IF_DEBUG_MESSAGES (1 << 3)
+#define IF_DEBUG_PACKET (1 << 4)
+#define IF_DEBUG_MISC (1 << 5)
+#define IF_SHUTDOWN (1 << 6)
 
-  struct interface *ifp;
-  struct thread *t_advertise;
-  unsigned long irdp_sent;
-  u_int16_t Lifetime;
+	struct interface *ifp;
+	struct thread *t_advertise;
+	unsigned long irdp_sent;
+	u_int16_t Lifetime;
 
- struct list *AdvPrefList;
-
+	struct list *AdvPrefList;
 };
 
-struct Adv 
-{
-  struct in_addr ip;
-  int pref;
+struct Adv {
+	struct in_addr ip;
+	int pref;
 };
 
 extern void irdp_init(void);
 extern int irdp_sock_init(void);
 extern void irdp_finish(void);
-extern void irdp_config_write (struct vty *, struct interface *);
+extern void irdp_config_write(struct vty *, struct interface *);
 extern int irdp_send_thread(struct thread *t_advert);
 extern void irdp_advert_off(struct interface *ifp);
-extern void process_solicit (struct interface *ifp);
+extern void process_solicit(struct interface *ifp);
 extern int irdp_read_raw(struct thread *r);
-extern void send_packet(struct interface *ifp, struct stream *s,
-			u_int32_t dst, struct prefix *p, u_int32_t ttl);
-
+extern void send_packet(struct interface *ifp, struct stream *s, u_int32_t dst, struct prefix *p, u_int32_t ttl);
 
 #endif /* _IRDP_H */

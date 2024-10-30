@@ -23,10 +23,10 @@
 #ifndef PIM_ZEBRA_H
 #define PIM_ZEBRA_H
 
-#include "pim_igmp.h"
 #include "pim_ifchannel.h"
+#include "pim_igmp.h"
 
-void pim_zebra_init (struct thread_master *master, char *zebra_sock_path);
+void pim_zebra_init(struct thread_master *master, char *zebra_sock_path);
 
 void pim_scan_oil(void);
 

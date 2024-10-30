@@ -27,21 +27,19 @@
 /*
  * Circuit states
  */
-#define C_STATE_NA   0
-#define C_STATE_INIT 1		/* Connected to interface */
-#define C_STATE_CONF 2		/* Configured for ISIS    */
-#define C_STATE_UP   3		/* CONN | CONF            */
+#define C_STATE_NA 0
+#define C_STATE_INIT 1 /* Connected to interface */
+#define C_STATE_CONF 2 /* Configured for ISIS    */
+#define C_STATE_UP 3   /* CONN | CONF            */
 
 /*
  * Circuit events
  */
-#define ISIS_ENABLE    1
-#define IF_UP_FROM_Z   2
-#define ISIS_DISABLE   3
+#define ISIS_ENABLE 1
+#define IF_UP_FROM_Z 2
+#define ISIS_DISABLE 3
 #define IF_DOWN_FROM_Z 4
 
-struct isis_circuit *isis_csm_state_change (int event,
-					    struct isis_circuit *circuit,
-					    void *arg);
+struct isis_circuit *isis_csm_state_change(int event, struct isis_circuit *circuit, void *arg);
 
 #endif /* _ZEBRA_ISIS_CSM_H */

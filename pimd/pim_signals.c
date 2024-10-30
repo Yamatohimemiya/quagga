@@ -35,53 +35,46 @@
  * Signal handlers
  */
 
-static void pim_sighup()
-{
-  zlog_info ("SIGHUP received, ignoring");
+static void pim_sighup() {
+	zlog_info("SIGHUP received, ignoring");
 }
 
-static void pim_sigint()
-{
-  zlog_notice("Terminating on signal SIGINT");
-  pim_terminate();
-  exit(1);
+static void pim_sigint() {
+	zlog_notice("Terminating on signal SIGINT");
+	pim_terminate();
+	exit(1);
 }
 
-static void pim_sigterm()
-{
-  zlog_notice("Terminating on signal SIGTERM");
-  pim_terminate();
-  exit(1);
+static void pim_sigterm() {
+	zlog_notice("Terminating on signal SIGTERM");
+	pim_terminate();
+	exit(1);
 }
 
-static void pim_sigusr1()
-{
-  zlog_info ("SIGUSR1 received");
-  zlog_rotate (NULL);
+static void pim_sigusr1() {
+	zlog_info("SIGUSR1 received");
+	zlog_rotate(NULL);
 }
 
-static struct quagga_signal_t pimd_signals[] =
-{
-  {
-   .signal = SIGHUP,
-   .handler = &pim_sighup,
-   },
-  {
-   .signal = SIGUSR1,
-   .handler = &pim_sigusr1,
-   },
-  {
-   .signal = SIGINT,
-   .handler = &pim_sigint,
-   },
-  {
-   .signal = SIGTERM,
-   .handler = &pim_sigterm,
-   },
+static struct quagga_signal_t pimd_signals[] = {
+	{
+		.signal = SIGHUP,
+		.handler = &pim_sighup,
+	 },
+	{
+		.signal = SIGUSR1,
+		.handler = &pim_sigusr1,
+	 },
+	{
+		.signal = SIGINT,
+		.handler = &pim_sigint,
+	 },
+	{
+		.signal = SIGTERM,
+		.handler = &pim_sigterm,
+	 },
 };
 
-void pim_signals_init()
-{
-  signal_init(master, array_size(pimd_signals), pimd_signals);
+void pim_signals_init() {
+	signal_init(master, array_size(pimd_signals), pimd_signals);
 }
-

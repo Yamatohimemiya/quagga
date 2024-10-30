@@ -24,4 +24,4 @@
 
 #include "pim_version.h"
 
-const char * const PIMD_VERSION = PIMD_VERSION_STR;
+const char *const PIMD_VERSION = PIMD_VERSION_STR;

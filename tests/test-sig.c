@@ -22,55 +22,45 @@
 #include "lib/log.h"
 #include "lib/memory.h"
 
-static void
-sighup (void)
-{
-  printf ("processed hup\n");
+static void sighup(void) {
+	printf("processed hup\n");
 }
 
-static void
-sigusr1 (void)
-{
-  printf ("processed usr1\n");
+static void sigusr1(void) {
+	printf("processed usr1\n");
 }
 
-static void
-sigusr2 (void)
-{
-  printf ("processed usr2\n");
+static void sigusr2(void) {
+	printf("processed usr2\n");
 }
 
-struct quagga_signal_t sigs[] = 
-{
-  {
-    .signal = SIGHUP,
-    .handler = &sighup,
-  },
-  {
-    .signal = SIGUSR1,
-    .handler = &sigusr1,
-  },
-  {
-    .signal = SIGUSR2,
-    .handler = &sigusr2,
-  }
+struct quagga_signal_t sigs[] = {
+	{
+		.signal = SIGHUP,
+		.handler = &sighup,
+	 },
+	{
+		.signal = SIGUSR1,
+		.handler = &sigusr1,
+	 },
+	{
+		.signal = SIGUSR2,
+		.handler = &sigusr2,
+	 }
 };
 
 struct thread_master *master;
 
-int
-main (void)
-{
-  master = thread_master_create ();
-  signal_init (master, array_size(sigs), sigs);
-  
-  zlog_default = openzlog("testsig", ZLOG_NONE,
-                          LOG_CONS|LOG_NDELAY|LOG_PID, LOG_DAEMON);
-  zlog_set_level (NULL, ZLOG_DEST_SYSLOG, ZLOG_DISABLED);
-  zlog_set_level (NULL, ZLOG_DEST_STDOUT, LOG_DEBUG);
-  zlog_set_level (NULL, ZLOG_DEST_MONITOR, ZLOG_DISABLED);
-  
-  thread_main (master);
+int main(void) {
+	master = thread_master_create();
+	signal_init(master, array_size(sigs), sigs);
 
-  exit (0);
+	zlog_default = openzlog("testsig", ZLOG_NONE, LOG_CONS | LOG_NDELAY | LOG_PID, LOG_DAEMON);
+	zlog_set_level(NULL, ZLOG_DEST_SYSLOG, ZLOG_DISABLED);
+	zlog_set_level(NULL, ZLOG_DEST_STDOUT, LOG_DEBUG);
+	zlog_set_level(NULL, ZLOG_DEST_MONITOR, ZLOG_DISABLED);
+
+	thread_main(master);
+
+	exit(0);
 }

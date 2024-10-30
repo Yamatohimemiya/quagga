@@ -31,38 +31,29 @@
 /*
  * Flags structure for SSN and SRM flags
  */
-struct flags
-{
-  int maxindex;
-  struct list *free_idcs;
+struct flags {
+	int maxindex;
+	struct list *free_idcs;
 };
 
-void flags_initialize (struct flags *flags);
-long int flags_get_index (struct flags *flags);
-void flags_free_index (struct flags *flags, long int index);
-int flags_any_set (u_int32_t * flags);
+void flags_initialize(struct flags *flags);
+long int flags_get_index(struct flags *flags);
+void flags_free_index(struct flags *flags, long int index);
+int flags_any_set(u_int32_t *flags);
 
-#define ISIS_SET_FLAG(F,C) \
-        { \
-          F[C->idx>>5] |= (1<<(C->idx & 0x1F)); \
-        }
+#define ISIS_SET_FLAG(F, C) \
+	{ F[C->idx >> 5] |= (1 << (C->idx & 0x1F)); }
 
-#define ISIS_CLEAR_FLAG(F,C) \
-        { \
-          F[C->idx>>5] &= ~(1<<(C->idx & 0x1F)); \
-        }
+#define ISIS_CLEAR_FLAG(F, C) \
+	{ F[C->idx >> 5] &= ~(1 << (C->idx & 0x1F)); }
 
-#define ISIS_CHECK_FLAG(F, C)  (F[(C)->idx>>5] & (1<<(C->idx & 0x1F)))
+#define ISIS_CHECK_FLAG(F, C) (F[(C)->idx >> 5] & (1 << (C->idx & 0x1F)))
 
 /* sets all u_32int_t flags to 1 */
 #define ISIS_FLAGS_SET_ALL(FLAGS) \
-        { \
-          memset(FLAGS,0xFF,ISIS_MAX_CIRCUITS*4); \
-        }
+	{ memset(FLAGS, 0xFF, ISIS_MAX_CIRCUITS * 4); }
 
 #define ISIS_FLAGS_CLEAR_ALL(FLAGS) \
-        { \
-          memset(FLAGS,0x00,ISIS_MAX_CIRCUITS*4); \
-        }
+	{ memset(FLAGS, 0x00, ISIS_MAX_CIRCUITS * 4); }
 
 #endif /* _ZEBRA_ISIS_FLAGS_H */

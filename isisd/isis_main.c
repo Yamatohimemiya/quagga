@@ -56,43 +56,40 @@
 /* Default configuration file name */
 #define ISISD_DEFAULT_CONFIG "isisd.conf"
 /* Default vty port */
-#define ISISD_VTY_PORT       2608
+#define ISISD_VTY_PORT 2608
 
 /* isisd privileges */
-zebra_capabilities_t _caps_p[] = {
-  ZCAP_NET_RAW,
-  ZCAP_BIND
-};
+zebra_capabilities_t _caps_p[] = { ZCAP_NET_RAW, ZCAP_BIND };
 
 struct zebra_privs_t isisd_privs = {
 #if defined(QUAGGA_USER)
-  .user = QUAGGA_USER,
+	.user = QUAGGA_USER,
 #endif
 #if defined QUAGGA_GROUP
-  .group = QUAGGA_GROUP,
+	.group = QUAGGA_GROUP,
 #endif
 #ifdef VTY_GROUP
-  .vty_group = VTY_GROUP,
+	.vty_group = VTY_GROUP,
 #endif
-  .caps_p = _caps_p,
-  .cap_num_p = sizeof (_caps_p) / sizeof (*_caps_p),
-  .cap_num_i = 0
+	.caps_p = _caps_p,
+	.cap_num_p = sizeof(_caps_p) / sizeof(*_caps_p),
+	.cap_num_i = 0
 };
 
 /* isisd options */
 struct option longopts[] = {
-  {"daemon",      no_argument,       NULL, 'd'},
-  {"config_file", required_argument, NULL, 'f'},
-  {"pid_file",    required_argument, NULL, 'i'},
-  {"socket",      required_argument, NULL, 'z'},
-  {"vty_addr",    required_argument, NULL, 'A'},
-  {"vty_port",    required_argument, NULL, 'P'},
-  {"user",        required_argument, NULL, 'u'},
-  {"group",       required_argument, NULL, 'g'},
-  {"version",     no_argument,       NULL, 'v'},
-  {"dryrun",      no_argument,       NULL, 'C'},
-  {"help",        no_argument,       NULL, 'h'},
-  {0}
+	{ "daemon", no_argument, NULL, 'd' },
+	      { "config_file", required_argument, NULL, 'f' },
+	{ "pid_file", required_argument, NULL, 'i' },
+	      { "socket", required_argument, NULL, 'z' },
+	{ "vty_addr", required_argument, NULL, 'A' },
+	      { "vty_port", required_argument, NULL, 'P' },
+	{ "user", required_argument, NULL, 'u' },
+	      { "group", required_argument, NULL, 'g' },
+	{ "version", no_argument, NULL, 'v' },
+	      { "dryrun", no_argument, NULL, 'C' },
+	{ "help", no_argument, NULL, 'h' },
+	      { 0 }
 };
 
 /* Configuration file and directory. */
@@ -126,16 +123,12 @@ void sigint(void);
 void sigterm(void);
 void sigusr1(void);
 
-
 /* Help information display. */
-static void
-usage (int status)
-{
-  if (status != 0)
-    fprintf (stderr, "Try `%s --help' for more information.\n", progname);
-  else
-    {
-      printf ("Usage : %s [OPTION...]\n\n\
+static void usage(int status) {
+	if(status != 0) {
+		fprintf(stderr, "Try `%s --help' for more information.\n", progname);
+	} else {
+		printf("Usage : %s [OPTION...]\n\n\
 Daemon which manages IS-IS routing\n\n\
 -d, --daemon       Runs in daemon mode\n\
 -f, --config_file  Set configuration file name\n\
@@ -149,233 +142,195 @@ Daemon which manages IS-IS routing\n\n\
 -C, --dryrun       Check configuration for validity and exit\n\
 -h, --help         Display this help and exit\n\
 \n\
-Report bugs to %s\n", progname, ZEBRA_BUG_ADDRESS);
-    }
+Report bugs to %s\n",
+		       progname, ZEBRA_BUG_ADDRESS);
+	}
 
-  exit (status);
+	exit(status);
 }
 
-
-void
-reload ()
-{
-  zlog_debug ("Reload");
-  /* FIXME: Clean up func call here */
-  vty_reset ();
-  (void) isisd_privs.change (ZPRIVS_RAISE);
-  execve (_progpath, _argv, _envp);
-  zlog_err ("Reload failed: cannot exec %s: %s", _progpath,
-      safe_strerror (errno));
+void reload() {
+	zlog_debug("Reload");
+	/* FIXME: Clean up func call here */
+	vty_reset();
+	(void) isisd_privs.change(ZPRIVS_RAISE);
+	execve(_progpath, _argv, _envp);
+	zlog_err("Reload failed: cannot exec %s: %s", _progpath, safe_strerror(errno));
 }
 
-static void
-terminate (int i)
-{
-  exit (i);
+static void terminate(int i) {
+	exit(i);
 }
 
 /*
  * Signal handlers
  */
 
-void
-sighup (void)
-{
-  zlog_debug ("SIGHUP received");
-  reload ();
+void sighup(void) {
+	zlog_debug("SIGHUP received");
+	reload();
 
-  return;
+	return;
 }
 
-void
-sigint (void)
-{
-  zlog_notice ("Terminating on signal SIGINT");
-  terminate (0);
+void sigint(void) {
+	zlog_notice("Terminating on signal SIGINT");
+	terminate(0);
 }
 
-void
-sigterm (void)
-{
-  zlog_notice ("Terminating on signal SIGTERM");
-  terminate (0);
+void sigterm(void) {
+	zlog_notice("Terminating on signal SIGTERM");
+	terminate(0);
 }
 
-void
-sigusr1 (void)
-{
-  zlog_debug ("SIGUSR1 received");
-  zlog_rotate (NULL);
+void sigusr1(void) {
+	zlog_debug("SIGUSR1 received");
+	zlog_rotate(NULL);
 }
 
-struct quagga_signal_t isisd_signals[] =
-{
-  {
-   .signal = SIGHUP,
-   .handler = &sighup,
-   },
-  {
-   .signal = SIGUSR1,
-   .handler = &sigusr1,
-   },
-  {
-   .signal = SIGINT,
-   .handler = &sigint,
-   },
-  {
-   .signal = SIGTERM,
-   .handler = &sigterm,
-   },
+struct quagga_signal_t isisd_signals[] = {
+	{
+		.signal = SIGHUP,
+		.handler = &sighup,
+	 },
+	{
+		.signal = SIGUSR1,
+		.handler = &sigusr1,
+	 },
+	{
+		.signal = SIGINT,
+		.handler = &sigint,
+	 },
+	{
+		.signal = SIGTERM,
+		.handler = &sigterm,
+	 },
 };
 
 /*
  * Main routine of isisd. Parse arguments and handle IS-IS state machine.
  */
-int
-main (int argc, char **argv, char **envp)
-{
-  char *p;
-  int opt, vty_port = ISISD_VTY_PORT;
-  char *config_file = NULL;
-  char *vty_addr = NULL;
-  int dryrun = 0;
+int main(int argc, char **argv, char **envp) {
+	char *p;
+	int opt, vty_port = ISISD_VTY_PORT;
+	char *config_file = NULL;
+	char *vty_addr = NULL;
+	int dryrun = 0;
 
-  /* Get the programname without the preceding path. */
-  progname = ((p = strrchr (argv[0], '/')) ? ++p : argv[0]);
+	/* Get the programname without the preceding path. */
+	progname = ((p = strrchr(argv[0], '/')) ? ++p : argv[0]);
 
-  zlog_default = openzlog (progname, ZLOG_ISIS,
-			   LOG_CONS | LOG_NDELAY | LOG_PID, LOG_DAEMON);
+	zlog_default = openzlog(progname, ZLOG_ISIS, LOG_CONS | LOG_NDELAY | LOG_PID, LOG_DAEMON);
 
-  /* for reload */
-  _argc = argc;
-  _argv = argv;
-  _envp = envp;
-  getcwd (_cwd, sizeof (_cwd));
-  if (*argv[0] == '.')
-    snprintf (_progpath, sizeof (_progpath), "%s/%s", _cwd, _argv[0]);
-  else
-    snprintf (_progpath, sizeof (_progpath), "%s", argv[0]);
-
-  /* Command line argument treatment. */
-  while (1)
-    {
-      opt = getopt_long (argc, argv, "df:i:z:hA:p:P:u:g:vC", longopts, 0);
-
-      if (opt == EOF)
-	break;
-
-      switch (opt)
-	{
-	case 0:
-	  break;
-	case 'd':
-	  daemon_mode = 1;
-	  break;
-	case 'f':
-	  config_file = optarg;
-	  break;
-	case 'i':
-	  pid_file = optarg;
-	  break;
-	case 'z':
-	  zclient_serv_path_set (optarg);
-	  break;
-	case 'A':
-	  vty_addr = optarg;
-	  break;
-	case 'P':
-	  /* Deal with atoi() returning 0 on failure, and isisd not
-	     listening on isisd port... */
-	  if (strcmp (optarg, "0") == 0)
-	    {
-	      vty_port = 0;
-	      break;
-	    }
-	  vty_port = atoi (optarg);
-	  vty_port = (vty_port ? vty_port : ISISD_VTY_PORT);
-	  break;
-	case 'u':
-	  isisd_privs.user = optarg;
-	  break;
-	case 'g':
-	  isisd_privs.group = optarg;
-	  break;
-	case 'v':
-	  printf ("ISISd version %s\n", ISISD_VERSION);
-	  printf ("Copyright (c) 2001-2002 Sampo Saaristo,"
-		  " Ofer Wald and Hannes Gredler\n");
-	  print_version ("Zebra");
-	  exit (0);
-	  break;
-	case 'C':
-	  dryrun = 1;
-	  break;
-	case 'h':
-	  usage (0);
-	  break;
-	default:
-	  usage (1);
-	  break;
+	/* for reload */
+	_argc = argc;
+	_argv = argv;
+	_envp = envp;
+	getcwd(_cwd, sizeof(_cwd));
+	if(*argv[0] == '.') {
+		snprintf(_progpath, sizeof(_progpath), "%s/%s", _cwd, _argv[0]);
+	} else {
+		snprintf(_progpath, sizeof(_progpath), "%s", argv[0]);
 	}
-    }
 
-  /* thread master */
-  master = thread_master_create ();
+	/* Command line argument treatment. */
+	while(1) {
+		opt = getopt_long(argc, argv, "df:i:z:hA:p:P:u:g:vC", longopts, 0);
 
-  /* random seed from time */
-  srandom (time (NULL));
+		if(opt == EOF) {
+			break;
+		}
 
-  /*
+		switch(opt) {
+			case 0: break;
+			case 'd': daemon_mode = 1; break;
+			case 'f': config_file = optarg; break;
+			case 'i': pid_file = optarg; break;
+			case 'z': zclient_serv_path_set(optarg); break;
+			case 'A': vty_addr = optarg; break;
+			case 'P':
+				/* Deal with atoi() returning 0 on failure, and isisd not
+	     listening on isisd port... */
+				if(strcmp(optarg, "0") == 0) {
+					vty_port = 0;
+					break;
+				}
+				vty_port = atoi(optarg);
+				vty_port = (vty_port ? vty_port : ISISD_VTY_PORT);
+				break;
+			case 'u': isisd_privs.user = optarg; break;
+			case 'g': isisd_privs.group = optarg; break;
+			case 'v':
+				printf("ISISd version %s\n", ISISD_VERSION);
+				printf("Copyright (c) 2001-2002 Sampo Saaristo,"
+				       " Ofer Wald and Hannes Gredler\n");
+				print_version("Zebra");
+				exit(0);
+				break;
+			case 'C': dryrun = 1; break;
+			case 'h': usage(0); break;
+			default: usage(1); break;
+		}
+	}
+
+	/* thread master */
+	master = thread_master_create();
+
+	/* random seed from time */
+	srandom(time(NULL));
+
+	/*
    *  initializations
    */
-  zprivs_init (&isisd_privs);
-  signal_init (master, array_size (isisd_signals), isisd_signals);
-  cmd_init (1);
-  vty_init (master);
-  memory_init ();
-  access_list_init();
-  vrf_init ();
-  prefix_list_init();
-  isis_init ();
-  isis_circuit_init ();
-  isis_spf_cmds_init ();
-  isis_redist_init ();
-  isis_route_map_init();
-  isis_mpls_te_init();
+	zprivs_init(&isisd_privs);
+	signal_init(master, array_size(isisd_signals), isisd_signals);
+	cmd_init(1);
+	vty_init(master);
+	memory_init();
+	access_list_init();
+	vrf_init();
+	prefix_list_init();
+	isis_init();
+	isis_circuit_init();
+	isis_spf_cmds_init();
+	isis_redist_init();
+	isis_route_map_init();
+	isis_mpls_te_init();
 
-  /* create the global 'isis' instance */
-  isis_new (1);
+	/* create the global 'isis' instance */
+	isis_new(1);
 
-  isis_zebra_init (master);
+	isis_zebra_init(master);
 
-  /* parse config file */
-  /* this is needed three times! because we have interfaces before the areas */
-  vty_read_config (config_file, config_default);
+	/* parse config file */
+	/* this is needed three times! because we have interfaces before the areas */
+	vty_read_config(config_file, config_default);
 
-  /* Start execution only if not in dry-run mode */
-  if (dryrun)
-    return(0);
-  
-  /* demonize */
-  if (daemon_mode && daemon (0, 0) < 0)
-    {
-      zlog_err("IS-IS daemon failed: %s", strerror(errno));
-      exit (1);
-    }
+	/* Start execution only if not in dry-run mode */
+	if(dryrun) {
+		return (0);
+	}
 
-  /* Process ID file creation. */
-  if (pid_file[0] != '\0')
-    pid_output (pid_file);
+	/* demonize */
+	if(daemon_mode && daemon(0, 0) < 0) {
+		zlog_err("IS-IS daemon failed: %s", strerror(errno));
+		exit(1);
+	}
 
-  /* Make isis vty socket. */
-  vty_serv_sock (vty_addr, vty_port, ISIS_VTYSH_PATH);
+	/* Process ID file creation. */
+	if(pid_file[0] != '\0') {
+		pid_output(pid_file);
+	}
 
-  /* Print banner. */
-  zlog_notice ("Quagga-ISISd %s starting: vty@%d", QUAGGA_VERSION, vty_port);
+	/* Make isis vty socket. */
+	vty_serv_sock(vty_addr, vty_port, ISIS_VTYSH_PATH);
 
-  /* Start finite state machine. */
-  thread_main (master);
+	/* Print banner. */
+	zlog_notice("Quagga-ISISd %s starting: vty@%d", QUAGGA_VERSION, vty_port);
 
-  /* Not reached. */
-  exit (0);
+	/* Start finite state machine. */
+	thread_main(master);
+
+	/* Not reached. */
+	exit(0);
 }

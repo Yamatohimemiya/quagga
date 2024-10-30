@@ -28,57 +28,40 @@
 #include "thread.h"
 
 /* Structures here are mostly compatible with UCD SNMP 4.1.1 */
-#define MATCH_FAILED     (-1)
-#define MATCH_SUCCEEDED  0
+#define MATCH_FAILED (-1)
+#define MATCH_SUCCEEDED 0
 
 /* SYNTAX TruthValue from SNMPv2-TC. */
-#define SNMP_TRUE  1
+#define SNMP_TRUE 1
 #define SNMP_FALSE 2
 
 /* SYNTAX RowStatus from SNMPv2-TC. */
-#define SNMP_VALID  1
+#define SNMP_VALID 1
 #define SNMP_INVALID 2
 
 #define IN_ADDR_SIZE sizeof(struct in_addr)
 
 #undef REGISTER_MIB
-#define REGISTER_MIB(descr, var, vartype, theoid)		\
-    smux_register_mib(descr, (struct variable *)var, sizeof(struct vartype), \
-    sizeof(var)/sizeof(struct vartype),			\
-    theoid, sizeof(theoid)/sizeof(oid))
+#define REGISTER_MIB(descr, var, vartype, theoid) smux_register_mib(descr, (struct variable *) var, sizeof(struct vartype), sizeof(var) / sizeof(struct vartype), theoid, sizeof(theoid) / sizeof(oid))
 
-struct trap_object
-{
-  int namelen; /* Negative if the object is not indexed */
-  oid name[MAX_OID_LEN];
+struct trap_object {
+	int namelen; /* Negative if the object is not indexed */
+	oid name[MAX_OID_LEN];
 };
 
 /* Declare SMUX return value. */
 #define SNMP_LOCAL_VARIABLES \
-  static long snmp_int_val __attribute__ ((unused)); \
-  static struct in_addr snmp_in_addr_val __attribute__ ((unused));
+	static long snmp_int_val __attribute__((unused)); \
+	static struct in_addr snmp_in_addr_val __attribute__((unused));
 
-#define SNMP_INTEGER(V) \
-  ( \
-    *var_len = sizeof (snmp_int_val), \
-    snmp_int_val = V, \
-    (u_char *) &snmp_int_val \
-  )
+#define SNMP_INTEGER(V) (*var_len = sizeof(snmp_int_val), snmp_int_val = V, (u_char *) &snmp_int_val)
 
-#define SNMP_IPADDRESS(V) \
-  ( \
-    *var_len = sizeof (struct in_addr), \
-    snmp_in_addr_val = V, \
-    (u_char *) &snmp_in_addr_val \
-  )
+#define SNMP_IPADDRESS(V) (*var_len = sizeof(struct in_addr), snmp_in_addr_val = V, (u_char *) &snmp_in_addr_val)
 
-extern void smux_init (struct thread_master *tm);
-extern void smux_register_mib(const char *, struct variable *, 
-                              size_t, int, oid [], size_t);
-extern int smux_header_generic (struct variable *, oid [], size_t *, 
-                                int, size_t *, WriteMethod **);
-extern int smux_header_table (struct variable *, oid *, size_t *, 
-			      int, size_t *, WriteMethod **);
+extern void smux_init(struct thread_master *tm);
+extern void smux_register_mib(const char *, struct variable *, size_t, int, oid[], size_t);
+extern int smux_header_generic(struct variable *, oid[], size_t *, int, size_t *, WriteMethod **);
+extern int smux_header_table(struct variable *, oid *, size_t *, int, size_t *, WriteMethod **);
 
 /* For traps, three OID are provided:
 
@@ -101,16 +84,11 @@ extern int smux_header_table (struct variable *, oid *, size_t *,
  The use of the arguments may differ depending on the implementation
  used.
 */
-extern int smux_trap (struct variable *, size_t,
-		      const oid *, size_t,
-		      const oid *, size_t,
-		      const oid *, size_t,
-		      const struct trap_object *, size_t,
-		      u_char);
+extern int smux_trap(struct variable *, size_t, const oid *, size_t, const oid *, size_t, const oid *, size_t, const struct trap_object *, size_t, u_char);
 
-extern int oid_compare (const oid *, int, const oid *, int);
-extern void oid2in_addr (oid [], int, struct in_addr *);
-extern void *oid_copy (void *, const void *, size_t);
-extern void oid_copy_addr (oid [], struct in_addr *, int);
+extern int oid_compare(const oid *, int, const oid *, int);
+extern void oid2in_addr(oid[], int, struct in_addr *);
+extern void *oid_copy(void *, const void *, size_t);
+extern void oid_copy_addr(oid[], struct in_addr *, int);
 
 #endif /* _ZEBRA_SNMP_H */

@@ -26,8 +26,6 @@
 #include "rt_netlink.h"
 
 /* Interface information read by netlink. */
-void
-interface_list (struct zebra_vrf *zvrf)
-{
-  interface_lookup_netlink (zvrf);
+void interface_list(struct zebra_vrf *zvrf) {
+	interface_lookup_netlink(zvrf);
 }

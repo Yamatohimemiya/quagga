@@ -32,56 +32,48 @@
 
 struct thread_master *master;
 
-int dump_args(struct vty *vty, const char *descr,
-              int argc, const char **argv)
-{
-  int i;
-  vty_out (vty, "%s with %d args.%s", descr, argc, VTY_NEWLINE);
-  for (i = 0; i < argc; i++)
-    {
-      vty_out (vty, "[%02d]: %s%s", i, argv[i], VTY_NEWLINE);
-    }
+int dump_args(struct vty *vty, const char *descr, int argc, const char **argv) {
+	int i;
+	vty_out(vty, "%s with %d args.%s", descr, argc, VTY_NEWLINE);
+	for(i = 0; i < argc; i++) {
+		vty_out(vty, "[%02d]: %s%s", i, argv[i], VTY_NEWLINE);
+	}
 
-  return CMD_SUCCESS;
+	return CMD_SUCCESS;
 }
 
-static void vty_do_exit(void)
-{
-  printf ("\nend.\n");
-  exit (0);
+static void vty_do_exit(void) {
+	printf("\nend.\n");
+	exit(0);
 }
 
 /* main routine. */
-int
-main (int argc, char **argv)
-{
-  /* Set umask before anything for security */
-  umask (0027);
+int main(int argc, char **argv) {
+	/* Set umask before anything for security */
+	umask(0027);
 
-  /* master init. */
-  master = thread_master_create ();
+	/* master init. */
+	master = thread_master_create();
 
-  zlog_default = openzlog ("common-cli", ZLOG_NONE,
-                           LOG_CONS|LOG_NDELAY|LOG_PID, LOG_DAEMON);
-  zlog_set_level (NULL, ZLOG_DEST_SYSLOG, ZLOG_DISABLED);
-  zlog_set_level (NULL, ZLOG_DEST_STDOUT, ZLOG_DISABLED);
-  zlog_set_level (NULL, ZLOG_DEST_MONITOR, LOG_DEBUG);
+	zlog_default = openzlog("common-cli", ZLOG_NONE, LOG_CONS | LOG_NDELAY | LOG_PID, LOG_DAEMON);
+	zlog_set_level(NULL, ZLOG_DEST_SYSLOG, ZLOG_DISABLED);
+	zlog_set_level(NULL, ZLOG_DEST_STDOUT, ZLOG_DISABLED);
+	zlog_set_level(NULL, ZLOG_DEST_MONITOR, LOG_DEBUG);
 
-  /* Library inits. */
-  cmd_init (1);
-  host.name = strdup ("test");
+	/* Library inits. */
+	cmd_init(1);
+	host.name = strdup("test");
 
-  vty_init (master);
-  memory_init ();
+	vty_init(master);
+	memory_init();
 
-  test_init ();
+	test_init();
 
-  vty_stdio (vty_do_exit);
+	vty_stdio(vty_do_exit);
 
-  /* Fetch next active thread. */
-  thread_main (master);
+	/* Fetch next active thread. */
+	thread_main(master);
 
-  /* Not reached. */
-  exit (0);
+	/* Not reached. */
+	exit(0);
 }
-

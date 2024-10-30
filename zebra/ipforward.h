@@ -22,14 +22,14 @@
 #ifndef _ZEBRA_IPFORWARD_H
 #define _ZEBRA_IPFORWARD_H
 
-extern int ipforward (void);
-extern int ipforward_on (void);
-extern int ipforward_off (void);
+extern int ipforward(void);
+extern int ipforward_on(void);
+extern int ipforward_off(void);
 
 #ifdef HAVE_IPV6
-extern int ipforward_ipv6 (void);
-extern int ipforward_ipv6_on (void);
-extern int ipforward_ipv6_off (void);
+extern int ipforward_ipv6(void);
+extern int ipforward_ipv6_on(void);
+extern int ipforward_ipv6_off(void);
 #endif /* HAVE_IPV6 */
 
 #endif /* _ZEBRA_IPFORWARD_H */

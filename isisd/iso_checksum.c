@@ -45,33 +45,34 @@
  * Based on Annex C.4 of ISO/IEC 8473
  */
 
-int
-iso_csum_verify (u_char * buffer, int len, uint16_t * csum)
-{
-  u_int16_t checksum;
-  u_int32_t c0;
-  u_int32_t c1;
+int iso_csum_verify(u_char *buffer, int len, uint16_t *csum) {
+	u_int16_t checksum;
+	u_int32_t c0;
+	u_int32_t c1;
 
-  c0 = *csum & 0xff00;
-  c1 = *csum & 0x00ff;
+	c0 = *csum & 0xff00;
+	c1 = *csum & 0x00ff;
 
-  /*
+	/*
    * If both are zero return correct
    */
-  if (c0 == 0 && c1 == 0)
-    return 0;
+	if(c0 == 0 && c1 == 0) {
+		return 0;
+	}
 
-  /*
+	/*
    * If either, but not both are zero return incorrect
    */
-  if (c0 == 0 || c1 == 0)
-    return 1;
+	if(c0 == 0 || c1 == 0) {
+		return 1;
+	}
 
-  /* Offset of checksum from the start of the buffer */
-  int offset = (u_char *) csum - buffer;
+	/* Offset of checksum from the start of the buffer */
+	int offset = (u_char *) csum - buffer;
 
-  checksum = fletcher_checksum(buffer, len, offset);
-  if (checksum == *csum)
-    return 0;
-  return 1;
+	checksum = fletcher_checksum(buffer, len, offset);
+	if(checksum == *csum) {
+		return 0;
+	}
+	return 1;
 }

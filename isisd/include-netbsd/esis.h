@@ -64,59 +64,59 @@ SOFTWARE.
 
 #include <machine/endian.h>
 
-#define	SNPAC_AGE		60	/* seconds */
-#define	ESIS_CONFIG		60	/* seconds */
-#define	ESIS_HT			(ESIS_CONFIG * 2)
+#define SNPAC_AGE 60   /* seconds */
+#define ESIS_CONFIG 60 /* seconds */
+#define ESIS_HT (ESIS_CONFIG * 2)
 
 /*
  *	Fixed part of an ESIS header
  */
 struct esis_fixed {
-	u_char          esis_proto_id;	/* network layer protocol identifier */
-	u_char          esis_hdr_len;	/* length indicator (octets) */
-	u_char          esis_vers;	/* version/protocol identifier
+	u_char esis_proto_id;  /* network layer protocol identifier */
+	u_char esis_hdr_len;   /* length indicator (octets) */
+	u_char esis_vers;      /* version/protocol identifier
 					 * extension */
-	u_char          esis_res1;	/* reserved */
-	u_char          esis_type;	/* type code */
-	/* technically, type should be &='d 0x1f */
-#define ESIS_ESH	0x02	/* End System Hello */
-#define ESIS_ISH	0x04	/* Intermediate System Hello */
-#define ESIS_RD		0x06	/* Redirect */
-	u_char          esis_ht_msb;	/* holding time (seconds) high byte */
-	u_char          esis_ht_lsb;	/* holding time (seconds) low byte */
-	u_char          esis_cksum_msb;	/* checksum high byte */
-	u_char          esis_cksum_lsb;	/* checksum low byte */
+	u_char esis_res1;      /* reserved */
+	u_char esis_type;      /* type code */
+			       /* technically, type should be &='d 0x1f */
+#define ESIS_ESH 0x02	       /* End System Hello */
+#define ESIS_ISH 0x04	       /* Intermediate System Hello */
+#define ESIS_RD 0x06	       /* Redirect */
+	u_char esis_ht_msb;    /* holding time (seconds) high byte */
+	u_char esis_ht_lsb;    /* holding time (seconds) low byte */
+	u_char esis_cksum_msb; /* checksum high byte */
+	u_char esis_cksum_lsb; /* checksum low byte */
 } __attribute__((packed));
+
 /*
  * Values for ESIS datagram options
  */
-#define ESISOVAL_NETMASK	0xe1	/* address mask option, RD PDU only */
-#define ESISOVAL_SNPAMASK	0xe2	/* snpa mask option, RD PDU only */
-#define ESISOVAL_ESCT		0xc6	/* end system conf. timer, ISH PDU
+#define ESISOVAL_NETMASK 0xe1  /* address mask option, RD PDU only */
+#define ESISOVAL_SNPAMASK 0xe2 /* snpa mask option, RD PDU only */
+#define ESISOVAL_ESCT \
+	0xc6 /* end system conf. timer, ISH PDU
 					 * only */
 
+#define ESIS_CKSUM_OFF 0x07
+#define ESIS_CKSUM_REQUIRED(pdu) ((pdu->esis_cksum_msb != 0) || (pdu->esis_cksum_lsb != 0))
 
-#define	ESIS_CKSUM_OFF		0x07
-#define ESIS_CKSUM_REQUIRED(pdu)\
-	((pdu->esis_cksum_msb != 0) || (pdu->esis_cksum_lsb != 0))
-
-#define	ESIS_VERSION	1
+#define ESIS_VERSION 1
 
 struct esis_stat {
-	u_short         es_nomem;	/* insufficient memory to send hello */
-	u_short         es_badcsum;	/* incorrect checksum */
-	u_short         es_badvers;	/* incorrect version number */
-	u_short         es_badtype;	/* unknown pdu type field */
-	u_short         es_toosmall;	/* packet too small */
-	u_short         es_eshsent;	/* ESH sent */
-	u_short         es_eshrcvd;	/* ESH rcvd */
-	u_short         es_ishsent;	/* ISH sent */
-	u_short         es_ishrcvd;	/* ISH rcvd */
-	u_short         es_rdsent;	/* RD sent */
-	u_short         es_rdrcvd;	/* RD rcvd */
+	u_short es_nomem;    /* insufficient memory to send hello */
+	u_short es_badcsum;  /* incorrect checksum */
+	u_short es_badvers;  /* incorrect version number */
+	u_short es_badtype;  /* unknown pdu type field */
+	u_short es_toosmall; /* packet too small */
+	u_short es_eshsent;  /* ESH sent */
+	u_short es_eshrcvd;  /* ESH rcvd */
+	u_short es_ishsent;  /* ISH sent */
+	u_short es_ishrcvd;  /* ISH rcvd */
+	u_short es_rdsent;   /* RD sent */
+	u_short es_rdrcvd;   /* RD rcvd */
 };
 
-#ifdef	_KERNEL
+#ifdef _KERNEL
 struct esis_stat esis_stat;
 struct socket;
 struct mbuf;
@@ -126,21 +126,17 @@ struct iso_addr;
 struct rtentry;
 struct sockaddr_dl;
 
-void esis_init __P((void));
-int esis_usrreq __P((struct socket *, int, struct mbuf *, struct mbuf *,
-		     struct mbuf *, struct proc *));
+void esis_init __P((void) );
+int esis_usrreq __P((struct socket *, int, struct mbuf *, struct mbuf *, struct mbuf *, struct proc *) );
 void esis_input __P((struct mbuf *, ...));
-void esis_rdoutput __P((struct snpa_hdr *, struct mbuf *, struct clnp_optidx *,
-			struct iso_addr *, struct rtentry *));
-int esis_insert_addr __P((caddr_t *, int *, struct iso_addr *, struct mbuf *,
-			  int));
-void esis_eshinput __P((struct mbuf *, struct snpa_hdr *));
-void esis_ishinput __P((struct mbuf *, struct snpa_hdr *));
-void esis_rdinput __P((struct mbuf *, struct snpa_hdr *));
-void esis_config __P((void *));
-void esis_shoutput __P((struct ifnet *, int, int, caddr_t, int,
-	               struct iso_addr *));
+void esis_rdoutput __P((struct snpa_hdr *, struct mbuf *, struct clnp_optidx *, struct iso_addr *, struct rtentry *) );
+int esis_insert_addr __P((caddr_t *, int *, struct iso_addr *, struct mbuf *, int) );
+void esis_eshinput __P((struct mbuf *, struct snpa_hdr *) );
+void esis_ishinput __P((struct mbuf *, struct snpa_hdr *) );
+void esis_rdinput __P((struct mbuf *, struct snpa_hdr *) );
+void esis_config __P((void *) );
+void esis_shoutput __P((struct ifnet *, int, int, caddr_t, int, struct iso_addr *) );
 void isis_input __P((struct mbuf *, ...));
 int isis_output __P((struct mbuf *, ...));
-void *esis_ctlinput __P((int, struct sockaddr *, void *));
+void *esis_ctlinput __P((int, struct sockaddr *, void *) );
 #endif /* _KERNEL */

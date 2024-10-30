@@ -30,27 +30,27 @@
 #include "pim_upstream.h"
 
 enum pim_ifmembership {
-  PIM_IFMEMBERSHIP_NOINFO,
-  PIM_IFMEMBERSHIP_INCLUDE
+	PIM_IFMEMBERSHIP_NOINFO,
+	PIM_IFMEMBERSHIP_INCLUDE
 };
 
 enum pim_ifjoin_state {
-  PIM_IFJOIN_NOINFO,
-  PIM_IFJOIN_JOIN,
-  PIM_IFJOIN_PRUNE_PENDING
+	PIM_IFJOIN_NOINFO,
+	PIM_IFJOIN_JOIN,
+	PIM_IFJOIN_PRUNE_PENDING
 };
 
 enum pim_ifassert_state {
-  PIM_IFASSERT_NOINFO,
-  PIM_IFASSERT_I_AM_WINNER,
-  PIM_IFASSERT_I_AM_LOSER
+	PIM_IFASSERT_NOINFO,
+	PIM_IFASSERT_I_AM_WINNER,
+	PIM_IFASSERT_I_AM_LOSER
 };
 
 struct pim_assert_metric {
-  uint32_t       rpt_bit_flag;
-  uint32_t       metric_preference;
-  uint32_t       route_metric;
-  struct in_addr ip_address; /* neighbor router that sourced the Assert message */
+	uint32_t rpt_bit_flag;
+	uint32_t metric_preference;
+	uint32_t route_metric;
+	struct in_addr ip_address; /* neighbor router that sourced the Assert message */
 };
 
 /*
@@ -72,65 +72,44 @@ struct pim_assert_metric {
   Per-interface (S,G) state
 */
 struct pim_ifchannel {
-  struct in_addr            source_addr; /* (S,G) source key */
-  struct in_addr            group_addr;  /* (S,G) group key */
-  struct interface         *interface;   /* backpointer to interface */
-  uint32_t                  flags;
+	struct in_addr source_addr;  /* (S,G) source key */
+	struct in_addr group_addr;   /* (S,G) group key */
+	struct interface *interface; /* backpointer to interface */
+	uint32_t flags;
 
-  /* IGMPv3 determined interface has local members for (S,G) ? */
-  enum pim_ifmembership     local_ifmembership;
+	/* IGMPv3 determined interface has local members for (S,G) ? */
+	enum pim_ifmembership local_ifmembership;
 
-  /* Per-interface (S,G) Join/Prune State (Section 4.1.4 of RFC4601) */
-  enum pim_ifjoin_state     ifjoin_state;
-  struct thread            *t_ifjoin_expiry_timer;
-  struct thread            *t_ifjoin_prune_pending_timer;
-  int64_t                   ifjoin_creation; /* Record uptime of ifjoin state */
+	/* Per-interface (S,G) Join/Prune State (Section 4.1.4 of RFC4601) */
+	enum pim_ifjoin_state ifjoin_state;
+	struct thread *t_ifjoin_expiry_timer;
+	struct thread *t_ifjoin_prune_pending_timer;
+	int64_t ifjoin_creation; /* Record uptime of ifjoin state */
 
-  /* Per-interface (S,G) Assert State (Section 4.6.1 of RFC4601) */
-  enum pim_ifassert_state   ifassert_state;
-  struct thread            *t_ifassert_timer;
-  struct in_addr            ifassert_winner;
-  struct pim_assert_metric  ifassert_winner_metric;
-  int64_t                   ifassert_creation; /* Record uptime of ifassert state */
-  struct pim_assert_metric  ifassert_my_metric;
+	/* Per-interface (S,G) Assert State (Section 4.6.1 of RFC4601) */
+	enum pim_ifassert_state ifassert_state;
+	struct thread *t_ifassert_timer;
+	struct in_addr ifassert_winner;
+	struct pim_assert_metric ifassert_winner_metric;
+	int64_t ifassert_creation; /* Record uptime of ifassert state */
+	struct pim_assert_metric ifassert_my_metric;
 
-  /* Upstream (S,G) state */
-  struct pim_upstream      *upstream;
+	/* Upstream (S,G) state */
+	struct pim_upstream *upstream;
 };
 
 void pim_ifchannel_free(struct pim_ifchannel *ch);
 void pim_ifchannel_delete(struct pim_ifchannel *ch);
 void pim_ifchannel_membership_clear(struct interface *ifp);
 void pim_ifchannel_delete_on_noinfo(struct interface *ifp);
-struct pim_ifchannel *pim_ifchannel_find(struct interface *ifp,
-					 struct in_addr source_addr,
-					 struct in_addr group_addr);
-struct pim_ifchannel *pim_ifchannel_add(struct interface *ifp,
-					struct in_addr source_addr,
-					struct in_addr group_addr);
-void pim_ifchannel_join_add(struct interface *ifp,
-			    struct in_addr neigh_addr,
-			    struct in_addr upstream,
-			    struct in_addr source_addr,
-			    struct in_addr group_addr,
-			    uint8_t source_flags,
-			    uint16_t holdtime);
-void pim_ifchannel_prune(struct interface *ifp,
-			 struct in_addr upstream,
-			 struct in_addr source_addr,
-			 struct in_addr group_addr,
-			 uint8_t source_flags,
-			 uint16_t holdtime);
-void pim_ifchannel_local_membership_add(struct interface *ifp,
-					struct in_addr source_addr,
-					struct in_addr group_addr);
-void pim_ifchannel_local_membership_del(struct interface *ifp,
-					struct in_addr source_addr,
-					struct in_addr group_addr);
+struct pim_ifchannel *pim_ifchannel_find(struct interface *ifp, struct in_addr source_addr, struct in_addr group_addr);
+struct pim_ifchannel *pim_ifchannel_add(struct interface *ifp, struct in_addr source_addr, struct in_addr group_addr);
+void pim_ifchannel_join_add(struct interface *ifp, struct in_addr neigh_addr, struct in_addr upstream, struct in_addr source_addr, struct in_addr group_addr, uint8_t source_flags, uint16_t holdtime);
+void pim_ifchannel_prune(struct interface *ifp, struct in_addr upstream, struct in_addr source_addr, struct in_addr group_addr, uint8_t source_flags, uint16_t holdtime);
+void pim_ifchannel_local_membership_add(struct interface *ifp, struct in_addr source_addr, struct in_addr group_addr);
+void pim_ifchannel_local_membership_del(struct interface *ifp, struct in_addr source_addr, struct in_addr group_addr);
 
-void pim_ifchannel_ifjoin_switch(const char *caller,
-				 struct pim_ifchannel *ch,
-				 enum pim_ifjoin_state new_state);
+void pim_ifchannel_ifjoin_switch(const char *caller, struct pim_ifchannel *ch, enum pim_ifjoin_state new_state);
 const char *pim_ifchannel_ifjoin_name(enum pim_ifjoin_state ifjoin_state);
 const char *pim_ifchannel_ifassert_name(enum pim_ifassert_state ifassert_state);
 

@@ -9,7 +9,7 @@
 
 #include "zbuf.h"
 
-#define ZNL_BUFFER_SIZE		8192
+#define ZNL_BUFFER_SIZE 8192
 
 void *znl_push(struct zbuf *zb, size_t n);
 void *znl_pull(struct zbuf *zb, size_t n);
@@ -26,4 +26,3 @@ void znl_rta_nested_complete(struct zbuf *zb, struct rtattr *rta);
 struct rtattr *znl_rta_pull(struct zbuf *zb, struct zbuf *payload);
 
 int znl_open(int protocol, int groups);
-

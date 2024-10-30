@@ -24,9 +24,7 @@
 
 #include "pimd.h"
 
-void
-pim_route_map_init (void)
-{
-  route_map_init ();
-  route_map_init_vty ();
+void pim_route_map_init(void) {
+	route_map_init();
+	route_map_init_vty();
 }

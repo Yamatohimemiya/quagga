@@ -30,17 +30,16 @@
 
 #include "pim_str.h"
 
-void pim_inet4_dump(const char *onfail, struct in_addr addr, char *buf, int buf_size)
-{
-  int save_errno = errno;
+void pim_inet4_dump(const char *onfail, struct in_addr addr, char *buf, int buf_size) {
+	int save_errno = errno;
 
-  if (!inet_ntop(AF_INET, &addr, buf, buf_size)) {
-    int e = errno;
-    zlog_warn("pim_inet4_dump: inet_ntop(AF_INET,buf_size=%d): errno=%d: %s",
-	      buf_size, e, safe_strerror(e));
-    if (onfail)
-      snprintf(buf, buf_size, "%s", onfail);
-  }
+	if(!inet_ntop(AF_INET, &addr, buf, buf_size)) {
+		int e = errno;
+		zlog_warn("pim_inet4_dump: inet_ntop(AF_INET,buf_size=%d): errno=%d: %s", buf_size, e, safe_strerror(e));
+		if(onfail) {
+			snprintf(buf, buf_size, "%s", onfail);
+		}
+	}
 
-  errno = save_errno;
+	errno = save_errno;
 }

@@ -25,7 +25,7 @@
 /**
  * bgp_parse_nexthop_update() - parse a nexthop update message from Zebra.
  */
-void bgp_parse_nexthop_update (void);
+void bgp_parse_nexthop_update(void);
 
 /**
  * bgp_nexthop_check() - check if the bnc object is valid.
@@ -33,7 +33,7 @@ void bgp_parse_nexthop_update (void);
  *   p - path for which the nexthop object is being looked up
  *   connected - True if NH MUST be a connected route
  */
-int bgp_nexthop_check (struct bgp_info *, int connected);
+int bgp_nexthop_check(struct bgp_info *, int connected);
 
 /**
  * bgp_ensure_nexthop() - Ensure a bgp_nexthop_cache object exists for 
@@ -48,19 +48,19 @@ int bgp_nexthop_check (struct bgp_info *, int connected);
  *     struct peer The BGP peer associated with this NHT
  *   connected - True if NH MUST be a connected route
  */
-int bgp_ensure_nexthop (struct bgp_info *, struct peer *, int connected);
+int bgp_ensure_nexthop(struct bgp_info *, struct peer *, int connected);
 
 /**
  * bgp_unlink_nexthop() - Unlink the nexthop object from the path structure.
  * ARGUMENTS:
  *   struct bgp_info *: path structure.
  */
-void bgp_unlink_nexthop (struct bgp_info *);
+void bgp_unlink_nexthop(struct bgp_info *);
 
 /**
  * bgp_unlink_nexthop() - Unlink the nexthop object for the given peer.
  */
 extern void bgp_unlink_nexthop(struct bgp_info *p);
-void bgp_unlink_nexthop_by_peer (struct peer *);
+void bgp_unlink_nexthop_by_peer(struct peer *);
 
 #endif /* _BGP_NHT_H */

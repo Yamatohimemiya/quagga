@@ -38,9 +38,8 @@
 
   DownstreamJPState(S,G,I) is either Join or Prune-Pending ?
 */
-static int downstream_jpstate_isjoined(const struct pim_ifchannel *ch)
-{
-  return ch->ifjoin_state != PIM_IFJOIN_NOINFO;
+static int downstream_jpstate_isjoined(const struct pim_ifchannel *ch) {
+	return ch->ifjoin_state != PIM_IFJOIN_NOINFO;
 }
 
 /*
@@ -49,10 +48,9 @@ static int downstream_jpstate_isjoined(const struct pim_ifchannel *ch)
   members on interface I desire to receive traffic sent specifically
   by S to G.
 */
-static int local_receiver_include(const struct pim_ifchannel *ch)
-{
-  /* local_receiver_include(S,G,I) ? */
-  return ch->local_ifmembership == PIM_IFMEMBERSHIP_INCLUDE;
+static int local_receiver_include(const struct pim_ifchannel *ch) {
+	/* local_receiver_include(S,G,I) ? */
+	return ch->local_ifmembership == PIM_IFMEMBERSHIP_INCLUDE;
 }
 
 /*
@@ -67,9 +65,8 @@ static int local_receiver_include(const struct pim_ifchannel *ch)
 
   DownstreamJPState(S,G,I) is either Join or Prune-Pending ?
 */
-int pim_macro_chisin_joins(const struct pim_ifchannel *ch)
-{
-  return downstream_jpstate_isjoined(ch);
+int pim_macro_chisin_joins(const struct pim_ifchannel *ch) {
+	return downstream_jpstate_isjoined(ch);
 }
 
 /*
@@ -96,52 +93,48 @@ int pim_macro_chisin_joins(const struct pim_ifchannel *ch)
   AssertWinner(S,G,I) is the IP source address of the Assert(S,G)
   packet that won an Assert.
 */
-int pim_macro_ch_lost_assert(const struct pim_ifchannel *ch)
-{
-  struct interface *ifp;
-  struct pim_interface *pim_ifp;
-  struct pim_assert_metric spt_assert_metric;
+int pim_macro_ch_lost_assert(const struct pim_ifchannel *ch) {
+	struct interface *ifp;
+	struct pim_interface *pim_ifp;
+	struct pim_assert_metric spt_assert_metric;
 
-  ifp = ch->interface;
-  if (!ifp) {
-    char src_str[100];
-    char grp_str[100];
-    pim_inet4_dump("<src?>", ch->source_addr, src_str, sizeof(src_str));
-    pim_inet4_dump("<grp?>", ch->group_addr, grp_str, sizeof(grp_str));
-    zlog_warn("%s: (S,G)=(%s,%s): null interface",
-	      __PRETTY_FUNCTION__,
-	      src_str, grp_str);
-    return 0; /* false */
-  }
+	ifp = ch->interface;
+	if(!ifp) {
+		char src_str[100];
+		char grp_str[100];
+		pim_inet4_dump("<src?>", ch->source_addr, src_str, sizeof(src_str));
+		pim_inet4_dump("<grp?>", ch->group_addr, grp_str, sizeof(grp_str));
+		zlog_warn("%s: (S,G)=(%s,%s): null interface", __PRETTY_FUNCTION__, src_str, grp_str);
+		return 0; /* false */
+	}
 
-  /* RPF_interface(S) == I ? */
-  if (ch->upstream->rpf.source_nexthop.interface == ifp)
-    return 0; /* false */
+	/* RPF_interface(S) == I ? */
+	if(ch->upstream->rpf.source_nexthop.interface == ifp) {
+		return 0; /* false */
+	}
 
-  pim_ifp = ifp->info;
-  if (!pim_ifp) {
-    char src_str[100];
-    char grp_str[100];
-    pim_inet4_dump("<src?>", ch->source_addr, src_str, sizeof(src_str));
-    pim_inet4_dump("<grp?>", ch->group_addr, grp_str, sizeof(grp_str));
-    zlog_warn("%s: (S,G)=(%s,%s): multicast not enabled on interface %s",
-	      __PRETTY_FUNCTION__,
-	      src_str, grp_str, ifp->name);
-    return 0; /* false */
-  }
+	pim_ifp = ifp->info;
+	if(!pim_ifp) {
+		char src_str[100];
+		char grp_str[100];
+		pim_inet4_dump("<src?>", ch->source_addr, src_str, sizeof(src_str));
+		pim_inet4_dump("<grp?>", ch->group_addr, grp_str, sizeof(grp_str));
+		zlog_warn("%s: (S,G)=(%s,%s): multicast not enabled on interface %s", __PRETTY_FUNCTION__, src_str, grp_str, ifp->name);
+		return 0; /* false */
+	}
 
-  if (PIM_INADDR_IS_ANY(ch->ifassert_winner))
-    return 0; /* false */
+	if(PIM_INADDR_IS_ANY(ch->ifassert_winner)) {
+		return 0; /* false */
+	}
 
-  /* AssertWinner(S,G,I) == me ? */
-  if (ch->ifassert_winner.s_addr == pim_ifp->primary_address.s_addr)
-    return 0; /* false */
+	/* AssertWinner(S,G,I) == me ? */
+	if(ch->ifassert_winner.s_addr == pim_ifp->primary_address.s_addr) {
+		return 0; /* false */
+	}
 
-  spt_assert_metric = pim_macro_spt_assert_metric(&ch->upstream->rpf,
-						  pim_ifp->primary_address);
+	spt_assert_metric = pim_macro_spt_assert_metric(&ch->upstream->rpf, pim_ifp->primary_address);
 
-  return pim_assert_metric_better(&ch->ifassert_winner_metric,
-				  &spt_assert_metric);
+	return pim_assert_metric_better(&ch->ifassert_winner_metric, &spt_assert_metric);
 }
 
 /*
@@ -156,44 +149,42 @@ int pim_macro_ch_lost_assert(const struct pim_ifchannel *ch)
    AssertWinner(S,G,I) is the IP source address of the Assert(S,G)
    packet that won an Assert.
 */
-int pim_macro_chisin_pim_include(const struct pim_ifchannel *ch)
-{
-  struct pim_interface *pim_ifp = ch->interface->info;
+int pim_macro_chisin_pim_include(const struct pim_ifchannel *ch) {
+	struct pim_interface *pim_ifp = ch->interface->info;
 
-  if (!pim_ifp) {
-    char src_str[100];
-    char grp_str[100];
-    pim_inet4_dump("<src?>", ch->source_addr, src_str, sizeof(src_str));
-    pim_inet4_dump("<grp?>", ch->group_addr, grp_str, sizeof(grp_str));
-    zlog_warn("%s: (S,G)=(%s,%s): multicast not enabled on interface %s",
-	      __PRETTY_FUNCTION__,
-	      src_str, grp_str, ch->interface->name);
-    return 0; /* false */
-  }
+	if(!pim_ifp) {
+		char src_str[100];
+		char grp_str[100];
+		pim_inet4_dump("<src?>", ch->source_addr, src_str, sizeof(src_str));
+		pim_inet4_dump("<grp?>", ch->group_addr, grp_str, sizeof(grp_str));
+		zlog_warn("%s: (S,G)=(%s,%s): multicast not enabled on interface %s", __PRETTY_FUNCTION__, src_str, grp_str, ch->interface->name);
+		return 0; /* false */
+	}
 
-  /* local_receiver_include(S,G,I) ? */
-  if (!local_receiver_include(ch))
-    return 0; /* false */
-    
-  /* OR AssertWinner(S,G,I) == me ? */
-  if (ch->ifassert_winner.s_addr == pim_ifp->primary_address.s_addr)
-    return 1; /* true */
-    
-  return (
-	  /* I_am_DR( I ) ? */
-	  PIM_IFP_I_am_DR(pim_ifp)
-	  &&
-	  /* lost_assert(S,G,I) == FALSE ? */
-	  (!pim_macro_ch_lost_assert(ch))
-	  );
+	/* local_receiver_include(S,G,I) ? */
+	if(!local_receiver_include(ch)) {
+		return 0; /* false */
+	}
+
+	/* OR AssertWinner(S,G,I) == me ? */
+	if(ch->ifassert_winner.s_addr == pim_ifp->primary_address.s_addr) {
+		return 1; /* true */
+	}
+
+	return (
+		/* I_am_DR( I ) ? */
+		PIM_IFP_I_am_DR(pim_ifp) &&
+		/* lost_assert(S,G,I) == FALSE ? */
+		(!pim_macro_ch_lost_assert(ch))
+	);
 }
 
-int pim_macro_chisin_joins_or_include(const struct pim_ifchannel *ch)
-{
-  if (pim_macro_chisin_joins(ch))
-    return 1; /* true */
+int pim_macro_chisin_joins_or_include(const struct pim_ifchannel *ch) {
+	if(pim_macro_chisin_joins(ch)) {
+		return 1; /* true */
+	}
 
-  return pim_macro_chisin_pim_include(ch);
+	return pim_macro_chisin_pim_include(ch);
 }
 
 /*
@@ -223,30 +214,28 @@ int pim_macro_chisin_joins_or_include(const struct pim_ifchannel *ch)
   ch->upstream->rpf.source_nexthop.mrib_route_metric
   ch->upstream->rpf.source_nexthop.interface
 */
-int pim_macro_ch_could_assert_eval(const struct pim_ifchannel *ch)
-{
-  struct interface *ifp;
+int pim_macro_ch_could_assert_eval(const struct pim_ifchannel *ch) {
+	struct interface *ifp;
 
-  /* SPTbit(S,G) is always true for PIM-SSM-Only Routers */
+	/* SPTbit(S,G) is always true for PIM-SSM-Only Routers */
 
-  ifp = ch->interface;
-  if (!ifp) {
-    char src_str[100];
-    char grp_str[100];
-    pim_inet4_dump("<src?>", ch->source_addr, src_str, sizeof(src_str));
-    pim_inet4_dump("<grp?>", ch->group_addr, grp_str, sizeof(grp_str));
-    zlog_warn("%s: (S,G)=(%s,%s): null interface",
-	      __PRETTY_FUNCTION__,
-	      src_str, grp_str);
-    return 0; /* false */
-  }
+	ifp = ch->interface;
+	if(!ifp) {
+		char src_str[100];
+		char grp_str[100];
+		pim_inet4_dump("<src?>", ch->source_addr, src_str, sizeof(src_str));
+		pim_inet4_dump("<grp?>", ch->group_addr, grp_str, sizeof(grp_str));
+		zlog_warn("%s: (S,G)=(%s,%s): null interface", __PRETTY_FUNCTION__, src_str, grp_str);
+		return 0; /* false */
+	}
 
-  /* RPF_interface(S) != I ? */
-  if (ch->upstream->rpf.source_nexthop.interface == ifp)
-    return 0; /* false */
+	/* RPF_interface(S) != I ? */
+	if(ch->upstream->rpf.source_nexthop.interface == ifp) {
+		return 0; /* false */
+	}
 
-  /* I in joins(S,G) (+) pim_include(S,G) ? */
-  return pim_macro_chisin_joins_or_include(ch);
+	/* I in joins(S,G) (+) pim_include(S,G) ? */
+	return pim_macro_chisin_joins_or_include(ch);
 }
 
 /*
@@ -260,17 +249,15 @@ int pim_macro_ch_could_assert_eval(const struct pim_ifchannel *ch)
       return {0,MRIB.pref(S),MRIB.metric(S),my_ip_address(I)}
     }
 */
-struct pim_assert_metric pim_macro_spt_assert_metric(const struct pim_rpf *rpf,
-						     struct in_addr ifaddr)
-{
-  struct pim_assert_metric metric;
+struct pim_assert_metric pim_macro_spt_assert_metric(const struct pim_rpf *rpf, struct in_addr ifaddr) {
+	struct pim_assert_metric metric;
 
-  metric.rpt_bit_flag      = 0;
-  metric.metric_preference = rpf->source_nexthop.mrib_metric_preference;
-  metric.route_metric      = rpf->source_nexthop.mrib_route_metric;
-  metric.ip_address        = ifaddr;
+	metric.rpt_bit_flag = 0;
+	metric.metric_preference = rpf->source_nexthop.mrib_metric_preference;
+	metric.route_metric = rpf->source_nexthop.mrib_route_metric;
+	metric.ip_address = ifaddr;
 
-  return metric;
+	return metric;
 }
 
 /*
@@ -290,19 +277,18 @@ struct pim_assert_metric pim_macro_spt_assert_metric(const struct pim_rpf *rpf,
     }
   }
 */
-struct pim_assert_metric pim_macro_ch_my_assert_metric_eval(const struct pim_ifchannel *ch)
-{
-  struct pim_interface *pim_ifp;
+struct pim_assert_metric pim_macro_ch_my_assert_metric_eval(const struct pim_ifchannel *ch) {
+	struct pim_interface *pim_ifp;
 
-  pim_ifp = ch->interface->info;
+	pim_ifp = ch->interface->info;
 
-  if (pim_ifp) {
-    if (PIM_IF_FLAG_TEST_COULD_ASSERT(ch->flags)) {
-      return pim_macro_spt_assert_metric(&ch->upstream->rpf, pim_ifp->primary_address);
-    }
-  }
+	if(pim_ifp) {
+		if(PIM_IF_FLAG_TEST_COULD_ASSERT(ch->flags)) {
+			return pim_macro_spt_assert_metric(&ch->upstream->rpf, pim_ifp->primary_address);
+		}
+	}
 
-  return qpim_infinite_assert_metric;
+	return qpim_infinite_assert_metric;
 }
 
 /*
@@ -313,12 +299,12 @@ struct pim_assert_metric pim_macro_ch_my_assert_metric_eval(const struct pim_ifc
   inherited_olist(S,G) =
     joins(S,G) (+) pim_include(S,G) (-) lost_assert(S,G)
 */
-static int pim_macro_chisin_inherited_olist(const struct pim_ifchannel *ch)
-{
-  if (pim_macro_ch_lost_assert(ch))
-    return 0; /* false */
+static int pim_macro_chisin_inherited_olist(const struct pim_ifchannel *ch) {
+	if(pim_macro_ch_lost_assert(ch)) {
+		return 0; /* false */
+	}
 
-  return pim_macro_chisin_joins_or_include(ch);
+	return pim_macro_chisin_joins_or_include(ch);
 }
 
 /*
@@ -350,18 +336,18 @@ static int pim_macro_chisin_inherited_olist(const struct pim_ifchannel *ch)
     }
     See pim_mroute.c mroute_msg().
 */
-int pim_macro_chisin_oiflist(const struct pim_ifchannel *ch)
-{
-  if (ch->upstream->join_state != PIM_UPSTREAM_JOINED) {
-    /* oiflist is NULL */
-    return 0; /* false */
-  }
+int pim_macro_chisin_oiflist(const struct pim_ifchannel *ch) {
+	if(ch->upstream->join_state != PIM_UPSTREAM_JOINED) {
+		/* oiflist is NULL */
+		return 0; /* false */
+	}
 
-  /* oiflist = oiflist (-) iif */
-  if (ch->interface == ch->upstream->rpf.source_nexthop.interface)
-    return 0; /* false */
+	/* oiflist = oiflist (-) iif */
+	if(ch->interface == ch->upstream->rpf.source_nexthop.interface) {
+		return 0; /* false */
+	}
 
-  return pim_macro_chisin_inherited_olist(ch);
+	return pim_macro_chisin_inherited_olist(ch);
 }
 
 /*
@@ -381,57 +367,55 @@ int pim_macro_chisin_oiflist(const struct pim_ifchannel *ch)
   AssertTrackingDesired(S,G,I) is true on any interface in which an
   (S,G) assert might affect our behavior.
 */
-int pim_macro_assert_tracking_desired_eval(const struct pim_ifchannel *ch)
-{
-  struct pim_interface *pim_ifp;
-  struct interface *ifp;
+int pim_macro_assert_tracking_desired_eval(const struct pim_ifchannel *ch) {
+	struct pim_interface *pim_ifp;
+	struct interface *ifp;
 
-  ifp = ch->interface;
-  if (!ifp) {
-    char src_str[100];
-    char grp_str[100];
-    pim_inet4_dump("<src?>", ch->source_addr, src_str, sizeof(src_str));
-    pim_inet4_dump("<grp?>", ch->group_addr, grp_str, sizeof(grp_str));
-    zlog_warn("%s: (S,G)=(%s,%s): null interface",
-	      __PRETTY_FUNCTION__,
-	      src_str, grp_str);
-    return 0; /* false */
-  }
+	ifp = ch->interface;
+	if(!ifp) {
+		char src_str[100];
+		char grp_str[100];
+		pim_inet4_dump("<src?>", ch->source_addr, src_str, sizeof(src_str));
+		pim_inet4_dump("<grp?>", ch->group_addr, grp_str, sizeof(grp_str));
+		zlog_warn("%s: (S,G)=(%s,%s): null interface", __PRETTY_FUNCTION__, src_str, grp_str);
+		return 0; /* false */
+	}
 
-  pim_ifp = ifp->info;
-  if (!pim_ifp) {
-    char src_str[100];
-    char grp_str[100];
-    pim_inet4_dump("<src?>", ch->source_addr, src_str, sizeof(src_str));
-    pim_inet4_dump("<grp?>", ch->group_addr, grp_str, sizeof(grp_str));
-    zlog_warn("%s: (S,G)=(%s,%s): multicast not enabled on interface %s",
-	      __PRETTY_FUNCTION__,
-	      src_str, grp_str, ch->interface->name);
-    return 0; /* false */
-  }
+	pim_ifp = ifp->info;
+	if(!pim_ifp) {
+		char src_str[100];
+		char grp_str[100];
+		pim_inet4_dump("<src?>", ch->source_addr, src_str, sizeof(src_str));
+		pim_inet4_dump("<grp?>", ch->group_addr, grp_str, sizeof(grp_str));
+		zlog_warn("%s: (S,G)=(%s,%s): multicast not enabled on interface %s", __PRETTY_FUNCTION__, src_str, grp_str, ch->interface->name);
+		return 0; /* false */
+	}
 
-  /* I in joins(S,G) ? */
-  if (pim_macro_chisin_joins(ch))
-    return 1; /* true */
+	/* I in joins(S,G) ? */
+	if(pim_macro_chisin_joins(ch)) {
+		return 1; /* true */
+	}
 
-  /* local_receiver_include(S,G,I) ? */
-  if (local_receiver_include(ch)) {
-    /* I_am_DR(I) ? */
-    if (PIM_IFP_I_am_DR(pim_ifp))
-      return 1; /* true */
+	/* local_receiver_include(S,G,I) ? */
+	if(local_receiver_include(ch)) {
+		/* I_am_DR(I) ? */
+		if(PIM_IFP_I_am_DR(pim_ifp)) {
+			return 1; /* true */
+		}
 
-    /* AssertWinner(S,G,I) == me ? */
-    if (ch->ifassert_winner.s_addr == pim_ifp->primary_address.s_addr)
-      return 1; /* true */
-  }
+		/* AssertWinner(S,G,I) == me ? */
+		if(ch->ifassert_winner.s_addr == pim_ifp->primary_address.s_addr) {
+			return 1; /* true */
+		}
+	}
 
-  /* RPF_interface(S) == I ? */
-  if (ch->upstream->rpf.source_nexthop.interface == ifp) {
-    /* JoinDesired(S,G) ? */
-    if (PIM_UPSTREAM_FLAG_TEST_DR_JOIN_DESIRED(ch->upstream->flags))
-      return 1; /* true */
-  }
+	/* RPF_interface(S) == I ? */
+	if(ch->upstream->rpf.source_nexthop.interface == ifp) {
+		/* JoinDesired(S,G) ? */
+		if(PIM_UPSTREAM_FLAG_TEST_DR_JOIN_DESIRED(ch->upstream->flags)) {
+			return 1; /* true */
+		}
+	}
 
-  return 0; /* false */
+	return 0; /* false */
 }
-

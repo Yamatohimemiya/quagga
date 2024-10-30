@@ -23,13 +23,13 @@
 #ifndef _ZEBRA_RT_H
 #define _ZEBRA_RT_H
 
-#include "prefix.h"
 #include "if.h"
+#include "prefix.h"
 #include "zebra/rib.h"
 
-extern int kernel_route_rib (struct prefix *, struct rib *, struct rib *);
-extern int kernel_add_route (struct prefix_ipv4 *, struct in_addr *, int, int);
-extern int kernel_address_add_ipv4 (struct interface *, struct connected *);
-extern int kernel_address_delete_ipv4 (struct interface *, struct connected *);
+extern int kernel_route_rib(struct prefix *, struct rib *, struct rib *);
+extern int kernel_add_route(struct prefix_ipv4 *, struct in_addr *, int, int);
+extern int kernel_address_add_ipv4(struct interface *, struct connected *);
+extern int kernel_address_delete_ipv4(struct interface *, struct connected *);
 
 #endif /* _ZEBRA_RT_H */

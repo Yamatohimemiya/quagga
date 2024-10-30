@@ -23,11 +23,9 @@
 #ifndef PIM_IGMP_JOIN_H
 #define PIM_IGMP_JOIN_H
 
-#include <netinet/in.h>
 #include "if.h"
+#include <netinet/in.h>
 
-int pim_igmp_join_source(int fd, ifindex_t ifindex,
-			 struct in_addr group_addr,
-			 struct in_addr source_addr);
+int pim_igmp_join_source(int fd, ifindex_t ifindex, struct in_addr group_addr, struct in_addr source_addr);
 
 #endif /* PIM_IGMP_JOIN_H */

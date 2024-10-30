@@ -28,8 +28,7 @@
 /*
  * Externs.
  */
-extern int zfpm_init (struct thread_master *master, int enable, uint16_t port,
-		      const char *message_format);
-extern void zfpm_trigger_update (struct route_node *rn, const char *reason);
+extern int zfpm_init(struct thread_master *master, int enable, uint16_t port, const char *message_format);
+extern void zfpm_trigger_update(struct route_node *rn, const char *reason);
 
 #endif /* _ZEBRA_FPM_H */

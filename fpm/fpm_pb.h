@@ -30,8 +30,8 @@
 #ifndef _FPM_PB_H
 #define _FPM_PB_H
 
-#include "route_types.h"
 #include "qpb/qpb.h"
+#include "route_types.h"
 
 #include "fpm/fpm.pb-c.h"
 
@@ -39,25 +39,22 @@
  * fpm__route_key__create
  */
 #define fpm_route_key_create fpm__route_key__create
-static inline Fpm__RouteKey *
-fpm__route_key__create (qpb_allocator_t *allocator, struct prefix *prefix)
-{
-  Fpm__RouteKey *key;
 
-  key = QPB_ALLOC (allocator, typeof (*key));
-  if (!key)
-    {
-      return NULL;
-    }
-  fpm__route_key__init (key);
+static inline Fpm__RouteKey *fpm__route_key__create(qpb_allocator_t *allocator, struct prefix *prefix) {
+	Fpm__RouteKey *key;
 
-  key->prefix = qpb__l3_prefix__create (allocator, prefix);
-  if (!key->prefix)
-    {
-      return NULL;
-    }
+	key = QPB_ALLOC(allocator, typeof(*key));
+	if(!key) {
+		return NULL;
+	}
+	fpm__route_key__init(key);
 
-  return key;
+	key->prefix = qpb__l3_prefix__create(allocator, prefix);
+	if(!key->prefix) {
+		return NULL;
+	}
+
+	return key;
 }
 
 #endif

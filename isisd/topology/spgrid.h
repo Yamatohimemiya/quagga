@@ -27,19 +27,12 @@
 #define _ZEBRA_ISIS_TOPOLOGY_SPGRID_H
 
 struct arc {
-  long from_node;
-  long to_node;
-  long distance;
+	long from_node;
+	long to_node;
+	long distance;
 };
 
-int           gen_spgrid_topology (struct vty *vty, struct list *topology);
-int           spgrid_check_params (struct vty *vty, int argc, const char **argv);
-
+int gen_spgrid_topology(struct vty *vty, struct list *topology);
+int spgrid_check_params(struct vty *vty, int argc, const char **argv);
 
 #endif /* _ZEBRA_ISIS_TOPOLOGY_SPGRID_H */
-
-
-
-
-
-

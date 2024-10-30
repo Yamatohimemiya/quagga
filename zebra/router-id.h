@@ -26,10 +26,10 @@
 
 #include <zebra.h>
 
+#include "if.h"
 #include "memory.h"
 #include "prefix.h"
 #include "zclient.h"
-#include "if.h"
 
 extern void router_id_add_address(struct connected *);
 extern void router_id_del_address(struct connected *);

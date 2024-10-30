@@ -12,14 +12,14 @@
 
 #include "list.h"
 
+#include "debug.h"
 #include "zbuf.h"
 #include "zclient.h"
-#include "debug.h"
 
-#define NHRPD_DEFAULT_HOLDTIME	7200
+#define NHRPD_DEFAULT_HOLDTIME 7200
 
-#define NHRP_VTY_PORT		2612
-#define NHRP_DEFAULT_CONFIG	"nhrpd.conf"
+#define NHRP_VTY_PORT 2612
+#define NHRP_DEFAULT_CONFIG "nhrpd.conf"
 
 extern struct thread_master *master;
 
@@ -50,31 +50,25 @@ struct notifier_list {
 #define NOTIFIER_LIST_INITIALIZER(l) \
 	{ .notifier_head = LIST_INITIALIZER((l)->notifier_head) }
 
-static inline void notifier_init(struct notifier_list *l)
-{
+static inline void notifier_init(struct notifier_list *l) {
 	list_init(&l->notifier_head);
 }
 
-static inline void notifier_add(struct notifier_block *n, struct notifier_list *l, notifier_fn_t action)
-{
+static inline void notifier_add(struct notifier_block *n, struct notifier_list *l, notifier_fn_t action) {
 	n->action = action;
 	list_add_tail(&n->notifier_entry, &l->notifier_head);
 }
 
-static inline void notifier_del(struct notifier_block *n)
-{
+static inline void notifier_del(struct notifier_block *n) {
 	list_del(&n->notifier_entry);
 }
 
-static inline void notifier_call(struct notifier_list *l, int cmd)
-{
+static inline void notifier_call(struct notifier_list *l, int cmd) {
 	struct notifier_block *n, *nn;
-	list_for_each_entry_safe(n, nn, &l->notifier_head, notifier_entry)
-		n->action(n, cmd);
+	list_for_each_entry_safe(n, nn, &l->notifier_head, notifier_entry) n->action(n, cmd);
 }
 
-static inline int notifier_active(struct notifier_list *l)
-{
+static inline int notifier_active(struct notifier_list *l) {
 	return !list_empty(&l->notifier_head);
 }
 
@@ -94,8 +88,8 @@ struct nhrp_cache;
 struct nhrp_nhs;
 struct nhrp_interface;
 
-#define MAX_ID_LENGTH			64
-#define MAX_CERT_LENGTH			2048
+#define MAX_ID_LENGTH 64
+#define MAX_CERT_LENGTH 2048
 
 enum nhrp_notify_type {
 	NOTIFY_INTERFACE_UP,
@@ -193,7 +187,7 @@ enum nhrp_cache_type {
 	NHRP_CACHE_NUM_TYPES
 };
 
-extern const char * const nhrp_cache_type_str[];
+extern const char *const nhrp_cache_type_str[];
 extern unsigned long nhrp_cache_counts[NHRP_CACHE_NUM_TYPES];
 
 struct nhrp_cache {
@@ -244,7 +238,7 @@ struct nhrp_nhs {
 	unsigned hub : 1;
 	afi_t afi;
 	union sockunion proto_addr;
-	const char *nbma_fqdn;			/* IP-address or FQDN */
+	const char *nbma_fqdn; /* IP-address or FQDN */
 
 	struct thread *t_resolve;
 	struct resolver_query dns_resolve;
@@ -263,9 +257,9 @@ struct nhrp_registration {
 	struct notifier_block peer_notifier;
 };
 
-#define NHRP_IFF_SHORTCUT		0x0001
-#define NHRP_IFF_REDIRECT		0x0002
-#define NHRP_IFF_REG_NO_UNIQUE		0x0100
+#define NHRP_IFF_SHORTCUT 0x0001
+#define NHRP_IFF_REDIRECT 0x0002
+#define NHRP_IFF_REG_NO_UNIQUE 0x0100
 
 struct nhrp_interface {
 	struct interface *ifp;
@@ -364,29 +358,14 @@ void evmgr_terminate(void);
 void evmgr_set_socket(const char *socket);
 void evmgr_notify(const char *name, struct nhrp_cache *c, void (*cb)(struct nhrp_reqid *, void *));
 
-struct nhrp_packet_header *nhrp_packet_push(
-	struct zbuf *zb, uint8_t type,
-	const union sockunion *src_nbma,
-	const union sockunion *src_proto,
-	const union sockunion *dst_proto);
+struct nhrp_packet_header *nhrp_packet_push(struct zbuf *zb, uint8_t type, const union sockunion *src_nbma, const union sockunion *src_proto, const union sockunion *dst_proto);
 void nhrp_packet_complete(struct zbuf *zb, struct nhrp_packet_header *hdr);
 uint16_t nhrp_packet_calculate_checksum(const uint8_t *pdu, uint16_t len);
 
-struct nhrp_packet_header *nhrp_packet_pull(
-	struct zbuf *zb,
-	union sockunion *src_nbma,
-	union sockunion *src_proto,
-	union sockunion *dst_proto);
+struct nhrp_packet_header *nhrp_packet_pull(struct zbuf *zb, union sockunion *src_nbma, union sockunion *src_proto, union sockunion *dst_proto);
 
-struct nhrp_cie_header *nhrp_cie_push(
-	struct zbuf *zb, uint8_t code,
-	const union sockunion *nbma,
-	const union sockunion *proto);
-struct nhrp_cie_header *nhrp_cie_pull(
-	struct zbuf *zb,
-	struct nhrp_packet_header *hdr,
-	union sockunion *nbma,
-	union sockunion *proto);
+struct nhrp_cie_header *nhrp_cie_push(struct zbuf *zb, uint8_t code, const union sockunion *nbma, const union sockunion *proto);
+struct nhrp_cie_header *nhrp_cie_pull(struct zbuf *zb, struct nhrp_packet_header *hdr, union sockunion *nbma, union sockunion *proto);
 
 struct nhrp_extension_header *nhrp_ext_push(struct zbuf *zb, struct nhrp_packet_header *hdr, uint16_t type);
 void nhrp_ext_complete(struct zbuf *zb, struct nhrp_extension_header *ext);

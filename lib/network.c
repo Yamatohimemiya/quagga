@@ -25,92 +25,77 @@
 #include "network.h"
 
 /* Read nbytes from fd and store into ptr. */
-int
-readn (int fd, u_char *ptr, int nbytes)
-{
-  int nleft;
-  int nread;
+int readn(int fd, u_char *ptr, int nbytes) {
+	int nleft;
+	int nread;
 
-  nleft = nbytes;
+	nleft = nbytes;
 
-  while (nleft > 0) 
-    {
-      nread = read (fd, ptr, nleft);
+	while(nleft > 0) {
+		nread = read(fd, ptr, nleft);
 
-      if (nread < 0) 
-	return (nread);
-      else
-	if (nread == 0) 
-	  break;
+		if(nread < 0) {
+			return (nread);
+		} else if(nread == 0) {
+			break;
+		}
 
-      nleft -= nread;
-      ptr += nread;
-    }
+		nleft -= nread;
+		ptr += nread;
+	}
 
-  return nbytes - nleft;
-}  
+	return nbytes - nleft;
+}
 
 /* Write nbytes from ptr to fd. */
-int
-writen(int fd, const u_char *ptr, int nbytes)
-{
-  int nleft;
-  int nwritten;
+int writen(int fd, const u_char *ptr, int nbytes) {
+	int nleft;
+	int nwritten;
 
-  nleft = nbytes;
+	nleft = nbytes;
 
-  while (nleft > 0) 
-    {
-      nwritten = write(fd, ptr, nleft);
-      
-      if (nwritten <= 0) 
-	return (nwritten);
+	while(nleft > 0) {
+		nwritten = write(fd, ptr, nleft);
 
-      nleft -= nwritten;
-      ptr += nwritten;
-    }
-  return nbytes - nleft;
+		if(nwritten <= 0) {
+			return (nwritten);
+		}
+
+		nleft -= nwritten;
+		ptr += nwritten;
+	}
+	return nbytes - nleft;
 }
 
-int
-set_nonblocking(int fd)
-{
-  int flags;
+int set_nonblocking(int fd) {
+	int flags;
 
-  /* According to the Single UNIX Spec, the return value for F_GETFL should
+	/* According to the Single UNIX Spec, the return value for F_GETFL should
      never be negative. */
-  if ((flags = fcntl(fd, F_GETFL)) < 0)
-    {
-      zlog_warn("fcntl(F_GETFL) failed for fd %d: %s",
-      		fd, safe_strerror(errno));
-      return -1;
-    }
-  if (fcntl(fd, F_SETFL, (flags | O_NONBLOCK)) < 0)
-    {
-      zlog_warn("fcntl failed setting fd %d non-blocking: %s",
-      		fd, safe_strerror(errno));
-      return -1;
-    }
-  return 0;
+	if((flags = fcntl(fd, F_GETFL)) < 0) {
+		zlog_warn("fcntl(F_GETFL) failed for fd %d: %s", fd, safe_strerror(errno));
+		return -1;
+	}
+	if(fcntl(fd, F_SETFL, (flags | O_NONBLOCK)) < 0) {
+		zlog_warn("fcntl failed setting fd %d non-blocking: %s", fd, safe_strerror(errno));
+		return -1;
+	}
+	return 0;
 }
 
-float
-htonf (float host)
-{
+float htonf(float host) {
 #if !defined(__STDC_IEC_559__) && __GCC_IEC_559 < 0
-#warning "Unknown floating-point format on platform, htonf may break"
+	#warning "Unknown floating-point format on platform, htonf may break"
 #endif
-  u_int32_t lu1, lu2;
-  float convert;
-  
-  memcpy (&lu1, &host, sizeof (u_int32_t));
-  lu2 = htonl (lu1);
-  memcpy (&convert, &lu2, sizeof (u_int32_t));
-  return convert;
+	u_int32_t lu1, lu2;
+	float convert;
+
+	memcpy(&lu1, &host, sizeof(u_int32_t));
+	lu2 = htonl(lu1);
+	memcpy(&convert, &lu2, sizeof(u_int32_t));
+	return convert;
 }
 
-float
-ntohf (float net)
-{
-  return htonf (net);
+float ntohf(float net) {
+	return htonf(net);
 }

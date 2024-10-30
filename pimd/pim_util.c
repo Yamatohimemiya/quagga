@@ -48,27 +48,26 @@
   --------- ---------
   0x4  0x0  0x0  0x0
 */
-uint8_t igmp_msg_encode16to8(uint16_t value)
-{
-  uint8_t code;
+uint8_t igmp_msg_encode16to8(uint16_t value) {
+	uint8_t code;
 
-  if (value < 128) {
-    code = value;
-  }
-  else {
-    uint16_t mask = 0x4000;
-    uint8_t  exp;
-    uint16_t mant;
-    for (exp = 7; exp > 0; --exp) {
-      if (mask & value)
-	break;
-      mask >>= 1;
-    }
-    mant = 0x000F & (value >> (exp + 3));
-    code = ((uint8_t) 1 << 7) | ((uint8_t) exp << 4) | (uint8_t) mant;
-  }
+	if(value < 128) {
+		code = value;
+	} else {
+		uint16_t mask = 0x4000;
+		uint8_t exp;
+		uint16_t mant;
+		for(exp = 7; exp > 0; --exp) {
+			if(mask & value) {
+				break;
+			}
+			mask >>= 1;
+		}
+		mant = 0x000F & (value >> (exp + 3));
+		code = ((uint8_t) 1 << 7) | ((uint8_t) exp << 4) | (uint8_t) mant;
+	}
 
-  return code;
+	return code;
 }
 
 /*
@@ -82,41 +81,35 @@ uint8_t igmp_msg_encode16to8(uint16_t value)
   |1| exp | mant  |
   +-+-+-+-+-+-+-+-+
 */
-uint16_t igmp_msg_decode8to16(uint8_t code)
-{
-  uint16_t value;
+uint16_t igmp_msg_decode8to16(uint8_t code) {
+	uint16_t value;
 
-  if (code < 128) {
-    value = code;
-  }
-  else {
-    uint16_t mant = (code & 0x0F);
-    uint8_t  exp  = (code & 0x70) >> 4;
-    value = (mant | 0x10) << (exp + 3);
-  }
+	if(code < 128) {
+		value = code;
+	} else {
+		uint16_t mant = (code & 0x0F);
+		uint8_t exp = (code & 0x70) >> 4;
+		value = (mant | 0x10) << (exp + 3);
+	}
 
-  return value;
+	return value;
 }
 
-void pim_pkt_dump(const char *label, const uint8_t *buf, int size)
-{
-  char dump_buf[1000];
-  int i = 0;
-  int j = 0;
+void pim_pkt_dump(const char *label, const uint8_t *buf, int size) {
+	char dump_buf[1000];
+	int i = 0;
+	int j = 0;
 
-  for (; i < size; ++i, j += 2) {
-    int left = sizeof(dump_buf) - j;
-    if (left < 4) {
-      if (left > 1) {
-	strcat(dump_buf + j, "!"); /* mark as truncated */
-      }
-      break;
-    }
-    snprintf(dump_buf + j, left, "%02x", buf[i]);
-  }
+	for(; i < size; ++i, j += 2) {
+		int left = sizeof(dump_buf) - j;
+		if(left < 4) {
+			if(left > 1) {
+				strcat(dump_buf + j, "!"); /* mark as truncated */
+			}
+			break;
+		}
+		snprintf(dump_buf + j, left, "%02x", buf[i]);
+	}
 
-  zlog_debug("%s: pkt dump size=%d: %s",
-	     label,
-	     size,
-	     dump_buf);
+	zlog_debug("%s: pkt dump size=%d: %s", label, size, dump_buf);
 }

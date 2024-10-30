@@ -26,45 +26,38 @@
 #define _ZEBRA_ISIS_ROUTE_H
 
 #ifdef HAVE_IPV6
-struct isis_nexthop6
-{
-  ifindex_t ifindex;
-  struct in6_addr ip6;
-  struct in6_addr router_address6;
-  unsigned int lock;
+struct isis_nexthop6 {
+	ifindex_t ifindex;
+	struct in6_addr ip6;
+	struct in6_addr router_address6;
+	unsigned int lock;
 };
 #endif /* HAVE_IPV6 */
 
-struct isis_nexthop
-{
-  ifindex_t ifindex;
-  struct in_addr ip;
-  struct in_addr router_address;
-  unsigned int lock;
+struct isis_nexthop {
+	ifindex_t ifindex;
+	struct in_addr ip;
+	struct in_addr router_address;
+	unsigned int lock;
 };
 
-struct isis_route_info
-{
-#define ISIS_ROUTE_FLAG_ACTIVE       0x01  /* active route for the prefix */
-#define ISIS_ROUTE_FLAG_ZEBRA_SYNCED 0x02  /* set when route synced to zebra */
-#define ISIS_ROUTE_FLAG_ZEBRA_RESYNC 0x04  /* set when route needs to sync */
-  u_char flag;
-  u_int32_t cost;
-  u_int32_t depth;
-  struct list *nexthops;
+struct isis_route_info {
+#define ISIS_ROUTE_FLAG_ACTIVE 0x01	  /* active route for the prefix */
+#define ISIS_ROUTE_FLAG_ZEBRA_SYNCED 0x02 /* set when route synced to zebra */
+#define ISIS_ROUTE_FLAG_ZEBRA_RESYNC 0x04 /* set when route needs to sync */
+	u_char flag;
+	u_int32_t cost;
+	u_int32_t depth;
+	struct list *nexthops;
 #ifdef HAVE_IPV6
-  struct list *nexthops6;
-#endif				/* HAVE_IPV6 */
+	struct list *nexthops6;
+#endif /* HAVE_IPV6 */
 };
 
-struct isis_route_info *isis_route_create (struct prefix *prefix,
-					   u_int32_t cost, u_int32_t depth,
-					   struct list *adjacencies,
-					   struct isis_area *area, int level);
+struct isis_route_info *isis_route_create(struct prefix *prefix, u_int32_t cost, u_int32_t depth, struct list *adjacencies, struct isis_area *area, int level);
 
-void isis_route_validate (struct isis_area *area);
-void isis_route_invalidate_table (struct isis_area *area,
-                                  struct route_table *table);
-void isis_route_invalidate (struct isis_area *area);
+void isis_route_validate(struct isis_area *area);
+void isis_route_invalidate_table(struct isis_area *area, struct route_table *table);
+void isis_route_invalidate(struct isis_area *area);
 
 #endif /* _ZEBRA_ISIS_ROUTE_H */

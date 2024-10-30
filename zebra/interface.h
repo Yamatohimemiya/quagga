@@ -22,243 +22,238 @@
 #ifndef _ZEBRA_INTERFACE_H
 #define _ZEBRA_INTERFACE_H
 
-#include "redistribute.h"
 #include "event_counter.h"
+#include "redistribute.h"
 
 #ifdef HAVE_IRDP
-#include "zebra/irdp.h"
+	#include "zebra/irdp.h"
 #endif
 
 /* For interface multicast configuration. */
 #define IF_ZEBRA_MULTICAST_UNSPEC 0
-#define IF_ZEBRA_MULTICAST_ON     1
-#define IF_ZEBRA_MULTICAST_OFF    2
+#define IF_ZEBRA_MULTICAST_ON 1
+#define IF_ZEBRA_MULTICAST_OFF 2
 
 /* For interface shutdown configuration. */
-#define IF_ZEBRA_SHUTDOWN_OFF    0
-#define IF_ZEBRA_SHUTDOWN_ON     1
+#define IF_ZEBRA_SHUTDOWN_OFF 0
+#define IF_ZEBRA_SHUTDOWN_ON 1
 
 /* Global user-configured default for interface link-detect */
 typedef enum {
-  IF_LINKDETECT_UNSPEC = 0,
-  IF_LINKDETECT_ON,
-  IF_LINKDETECT_OFF,
+	IF_LINKDETECT_UNSPEC = 0,
+	IF_LINKDETECT_ON,
+	IF_LINKDETECT_OFF,
 } zebra_if_linkdetect;
 
 /* Global defaults for interfaces */
 struct zebra_if_defaults {
-  /* Link-detect default configuration */
-  zebra_if_linkdetect linkdetect;
+	/* Link-detect default configuration */
+	zebra_if_linkdetect linkdetect;
 };
 
-#if defined (HAVE_RTADV)
+#if defined(HAVE_RTADV)
 /* Router advertisement parameter.  From RFC4861, RFC6275 and RFC4191. */
-struct rtadvconf
-{
-  /* A flag indicating whether or not the router sends periodic Router
+struct rtadvconf {
+	/* A flag indicating whether or not the router sends periodic Router
      Advertisements and responds to Router Solicitations.
      Default: FALSE */
-  int AdvSendAdvertisements;
+	int AdvSendAdvertisements;
 
-  /* The maximum time allowed between sending unsolicited multicast
+	/* The maximum time allowed between sending unsolicited multicast
      Router Advertisements from the interface, in milliseconds.
      MUST be no less than 70 ms [RFC6275 7.5] and no greater
      than 1800000 ms [RFC4861 6.2.1].
 
      Default: 600000 milliseconds */
-  int MaxRtrAdvInterval;
-#define RTADV_MAX_RTR_ADV_INTERVAL 600000
+	int MaxRtrAdvInterval;
+	#define RTADV_MAX_RTR_ADV_INTERVAL 600000
 
-  /* The minimum time allowed between sending unsolicited multicast
+	/* The minimum time allowed between sending unsolicited multicast
      Router Advertisements from the interface, in milliseconds.
      MUST be no less than 30 ms [RFC6275 7.5].
      MUST be no greater than .75 * MaxRtrAdvInterval.
 
      Default: 0.33 * MaxRtrAdvInterval */
-  int MinRtrAdvInterval; /* This field is currently unused. */
-#define RTADV_MIN_RTR_ADV_INTERVAL (0.33 * RTADV_MAX_RTR_ADV_INTERVAL)
+	int MinRtrAdvInterval; /* This field is currently unused. */
+	#define RTADV_MIN_RTR_ADV_INTERVAL (0.33 * RTADV_MAX_RTR_ADV_INTERVAL)
 
-  /* Unsolicited Router Advertisements' interval timer. */
-  int AdvIntervalTimer;
+	/* Unsolicited Router Advertisements' interval timer. */
+	int AdvIntervalTimer;
 
-  /* The TRUE/FALSE value to be placed in the "Managed address
+	/* The TRUE/FALSE value to be placed in the "Managed address
      configuration" flag field in the Router Advertisement.  See
      [ADDRCONF].
  
      Default: FALSE */
-  int AdvManagedFlag;
+	int AdvManagedFlag;
 
-
-  /* The TRUE/FALSE value to be placed in the "Other stateful
+	/* The TRUE/FALSE value to be placed in the "Other stateful
      configuration" flag field in the Router Advertisement.  See
      [ADDRCONF].
 
      Default: FALSE */
-  int AdvOtherConfigFlag;
+	int AdvOtherConfigFlag;
 
-  /* The value to be placed in MTU options sent by the router.  A
+	/* The value to be placed in MTU options sent by the router.  A
      value of zero indicates that no MTU options are sent.
 
      Default: 0 */
-  int AdvLinkMTU;
+	int AdvLinkMTU;
 
-
-  /* The value to be placed in the Reachable Time field in the Router
+	/* The value to be placed in the Reachable Time field in the Router
      Advertisement messages sent by the router.  The value zero means
      unspecified (by this router).  MUST be no greater than 3,600,000
      milliseconds (1 hour).
 
      Default: 0 */
-  u_int32_t AdvReachableTime;
-#define RTADV_MAX_REACHABLE_TIME 3600000
+	u_int32_t AdvReachableTime;
+	#define RTADV_MAX_REACHABLE_TIME 3600000
 
-
-  /* The value to be placed in the Retrans Timer field in the Router
+	/* The value to be placed in the Retrans Timer field in the Router
      Advertisement messages sent by the router.  The value zero means
      unspecified (by this router).
 
      Default: 0 */
-  int AdvRetransTimer;
+	int AdvRetransTimer;
 
-  /* The default value to be placed in the Cur Hop Limit field in the
+	/* The default value to be placed in the Cur Hop Limit field in the
      Router Advertisement messages sent by the router.  The value
      should be set to that current diameter of the Internet.  The
      value zero means unspecified (by this router).
 
      Default: The value specified in the "Assigned Numbers" RFC
      [ASSIGNED] that was in effect at the time of implementation. */
-  int AdvCurHopLimit;
+	int AdvCurHopLimit;
 
-  /* The value to be placed in the Router Lifetime field of Router
+	/* The value to be placed in the Router Lifetime field of Router
      Advertisements sent from the interface, in seconds.  MUST be
      either zero or between MaxRtrAdvInterval and 9000 seconds.  A
      value of zero indicates that the router is not to be used as a
      default router.
 
      Default: 3 * MaxRtrAdvInterval */
-  int AdvDefaultLifetime;
-#define RTADV_MAX_RTRLIFETIME 9000 /* 2.5 hours */
+	int AdvDefaultLifetime;
+	#define RTADV_MAX_RTRLIFETIME 9000 /* 2.5 hours */
 
-  /* A list of prefixes to be placed in Prefix Information options in
+	/* A list of prefixes to be placed in Prefix Information options in
      Router Advertisement messages sent from the interface.
 
      Default: all prefixes that the router advertises via routing
      protocols as being on-link for the interface from which the
      advertisement is sent. The link-local prefix SHOULD NOT be
      included in the list of advertised prefixes. */
-  struct list *AdvPrefixList;
+	struct list *AdvPrefixList;
 
-  /* The TRUE/FALSE value to be placed in the "Home agent"
+	/* The TRUE/FALSE value to be placed in the "Home agent"
      flag field in the Router Advertisement.  See [RFC6275 7.1].
 
      Default: FALSE */
-  int AdvHomeAgentFlag;
-#ifndef ND_RA_FLAG_HOME_AGENT
-#define ND_RA_FLAG_HOME_AGENT 	0x20
-#endif
+	int AdvHomeAgentFlag;
+	#ifndef ND_RA_FLAG_HOME_AGENT
+		#define ND_RA_FLAG_HOME_AGENT 0x20
+	#endif
 
-  /* The value to be placed in Home Agent Information option if Home 
+	/* The value to be placed in Home Agent Information option if Home 
      Flag is set.
      Default: 0 */
-  int HomeAgentPreference;
+	int HomeAgentPreference;
 
-  /* The value to be placed in Home Agent Information option if Home 
+	/* The value to be placed in Home Agent Information option if Home 
      Flag is set. Lifetime (seconds) MUST not be greater than 18.2 
      hours. 
      The value 0 has special meaning: use of AdvDefaultLifetime value.
      
      Default: 0 */
-  int HomeAgentLifetime;
-#define RTADV_MAX_HALIFETIME 65520 /* 18.2 hours */
+	int HomeAgentLifetime;
+	#define RTADV_MAX_HALIFETIME 65520 /* 18.2 hours */
 
-  /* The TRUE/FALSE value to insert or not an Advertisement Interval
+	/* The TRUE/FALSE value to insert or not an Advertisement Interval
      option. See [RFC 6275 7.3]
 
      Default: FALSE */
-  int AdvIntervalOption;
+	int AdvIntervalOption;
 
-  /* The value to be placed in the Default Router Preference field of
+	/* The value to be placed in the Default Router Preference field of
      a router advertisement. See [RFC 4191 2.1 & 2.2]
 
      Default: 0 (medium) */
-  int DefaultPreference;
-#define RTADV_PREF_MEDIUM 0x0 /* Per RFC4191. */
+	int DefaultPreference;
+	#define RTADV_PREF_MEDIUM 0x0 /* Per RFC4191. */
 };
 
 #endif /* HAVE_RTADV */
 
 /* `zebra' daemon local interface structure. */
-struct zebra_if
-{
-  /* Shutdown configuration. */
-  u_char shutdown;
+struct zebra_if {
+	/* Shutdown configuration. */
+	u_char shutdown;
 
-  /* Multicast configuration. */
-  u_char multicast;
+	/* Multicast configuration. */
+	u_char multicast;
 
-  /* Router advertise configuration. */
-  u_char rtadv_enable;
-  
-  /* Interface specific link-detect configuration state */
-  zebra_if_linkdetect linkdetect;
-  
-  /* Installed addresses chains tree. */
-  struct route_table *ipv4_subnets;
+	/* Router advertise configuration. */
+	u_char rtadv_enable;
 
-  /* Information about up/down changes */
-  struct event_counter up_events;
-  struct event_counter down_events;
+	/* Interface specific link-detect configuration state */
+	zebra_if_linkdetect linkdetect;
+
+	/* Installed addresses chains tree. */
+	struct route_table *ipv4_subnets;
+
+	/* Information about up/down changes */
+	struct event_counter up_events;
+	struct event_counter down_events;
 
 #if defined(HAVE_RTADV)
-  struct rtadvconf rtadv;
+	struct rtadvconf rtadv;
 #endif /* RTADV */
 
 #ifdef HAVE_IRDP
-  struct irdp_interface irdp;
+	struct irdp_interface irdp;
 #endif
 
 #ifdef HAVE_STRUCT_SOCKADDR_DL
-  union {
-    /* note that sdl_storage is never accessed, it only exists to make space.
+	union {
+		/* note that sdl_storage is never accessed, it only exists to make space.
      * all actual uses refer to sdl - but use sizeof(sdl_storage)!  this fits
      * best with C aliasing rules. */
-    struct sockaddr_dl sdl;
-    struct sockaddr_storage sdl_storage;
-  };
+		struct sockaddr_dl sdl;
+		struct sockaddr_storage sdl_storage;
+	};
 #endif
 
 #ifdef SUNOS_5
-  /* the real IFF_UP state of the primary interface.
+	/* the real IFF_UP state of the primary interface.
    * need this to differentiate between all interfaces being
    * down (but primary still plumbed) and primary having gone
    * ~IFF_UP, and all addresses gone.
    */
-  u_char primary_state;
+	u_char primary_state;
 #endif /* SUNOS_5 */
 };
 
-extern void if_delete_update (struct interface *ifp);
-extern void if_add_update (struct interface *ifp);
-extern void if_up (struct interface *);
-extern void if_down (struct interface *);
-extern void if_refresh (struct interface *);
-extern void if_flags_update (struct interface *, uint64_t);
-extern void if_startup_count_up (void);
-extern int if_subnet_add (struct interface *, struct connected *);
-extern int if_subnet_delete (struct interface *, struct connected *);
+extern void if_delete_update(struct interface *ifp);
+extern void if_add_update(struct interface *ifp);
+extern void if_up(struct interface *);
+extern void if_down(struct interface *);
+extern void if_refresh(struct interface *);
+extern void if_flags_update(struct interface *, uint64_t);
+extern void if_startup_count_up(void);
+extern int if_subnet_add(struct interface *, struct connected *);
+extern int if_subnet_delete(struct interface *, struct connected *);
 
 #ifdef HAVE_PROC_NET_DEV
-extern void ifstat_update_proc (void);
+extern void ifstat_update_proc(void);
 #endif /* HAVE_PROC_NET_DEV */
 #ifdef HAVE_NET_RT_IFLIST
-extern void ifstat_update_sysctl (void);
+extern void ifstat_update_sysctl(void);
 
 #endif /* HAVE_NET_RT_IFLIST */
 #ifdef HAVE_PROC_NET_DEV
-extern int interface_list_proc (void);
+extern int interface_list_proc(void);
 #endif /* HAVE_PROC_NET_DEV */
 #ifdef HAVE_PROC_NET_IF_INET6
-extern int ifaddr_proc_ipv6 (void);
+extern int ifaddr_proc_ipv6(void);
 #endif /* HAVE_PROC_NET_IF_INET6 */
 
 #endif /* _ZEBRA_INTERFACE_H */

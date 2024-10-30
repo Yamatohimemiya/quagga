@@ -24,16 +24,16 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 #include "bgp_attr.h"
 
 /* sort of packet direction */
-#define DUMP_ON        1
-#define DUMP_SEND      2
-#define DUMP_RECV      4
+#define DUMP_ON 1
+#define DUMP_SEND 2
+#define DUMP_RECV 4
 
 /* for dump_update */
-#define DUMP_WITHDRAW  8
-#define DUMP_NLRI     16
+#define DUMP_WITHDRAW 8
+#define DUMP_NLRI 16
 
 /* dump detail */
-#define DUMP_DETAIL   32
+#define DUMP_DETAIL 32
 
 extern int dump_open;
 extern int dump_update;
@@ -45,18 +45,18 @@ extern int Debug_Keepalive;
 extern int Debug_Update;
 extern int Debug_Radix;
 
-#define	NLRI	 1
-#define	WITHDRAW 2
-#define	NO_OPT	 3
-#define	SEND	 4
-#define	RECV	 5
-#define	DETAIL	 6
+#define NLRI 1
+#define WITHDRAW 2
+#define NO_OPT 3
+#define SEND 4
+#define RECV 5
+#define DETAIL 6
 
 /* Prototypes. */
-extern void bgp_debug_init (void);
-extern void bgp_packet_dump (struct stream *);
+extern void bgp_debug_init(void);
+extern void bgp_packet_dump(struct stream *);
 
-extern int debug (unsigned int option);
+extern int debug(unsigned int option);
 
 extern unsigned long conf_bgp_debug_as4;
 extern unsigned long conf_bgp_debug_fsm;
@@ -82,51 +82,51 @@ extern unsigned long term_bgp_debug_zebra;
 extern unsigned long term_bgp_debug_allow_martians;
 extern unsigned long term_bgp_debug_nht;
 
-#define BGP_DEBUG_AS4                 0x01
-#define BGP_DEBUG_AS4_SEGMENT         0x02
+#define BGP_DEBUG_AS4 0x01
+#define BGP_DEBUG_AS4_SEGMENT 0x02
 
-#define BGP_DEBUG_FSM                 0x01
-#define BGP_DEBUG_EVENTS              0x01
-#define BGP_DEBUG_PACKET              0x01
-#define BGP_DEBUG_FILTER              0x01
-#define BGP_DEBUG_KEEPALIVE           0x01
-#define BGP_DEBUG_UPDATE_IN           0x01
-#define BGP_DEBUG_UPDATE_OUT          0x02
-#define BGP_DEBUG_NORMAL              0x01
-#define BGP_DEBUG_ZEBRA               0x01
-#define BGP_DEBUG_ALLOW_MARTIANS      0x01
-#define BGP_DEBUG_NHT                 0x01
+#define BGP_DEBUG_FSM 0x01
+#define BGP_DEBUG_EVENTS 0x01
+#define BGP_DEBUG_PACKET 0x01
+#define BGP_DEBUG_FILTER 0x01
+#define BGP_DEBUG_KEEPALIVE 0x01
+#define BGP_DEBUG_UPDATE_IN 0x01
+#define BGP_DEBUG_UPDATE_OUT 0x02
+#define BGP_DEBUG_NORMAL 0x01
+#define BGP_DEBUG_ZEBRA 0x01
+#define BGP_DEBUG_ALLOW_MARTIANS 0x01
+#define BGP_DEBUG_NHT 0x01
 
-#define BGP_DEBUG_PACKET_SEND         0x01
-#define BGP_DEBUG_PACKET_SEND_DETAIL  0x02
+#define BGP_DEBUG_PACKET_SEND 0x01
+#define BGP_DEBUG_PACKET_SEND_DETAIL 0x02
 
-#define BGP_DEBUG_PACKET_RECV         0x01
-#define BGP_DEBUG_PACKET_RECV_DETAIL  0x02
+#define BGP_DEBUG_PACKET_RECV 0x01
+#define BGP_DEBUG_PACKET_RECV_DETAIL 0x02
 
-#define CONF_DEBUG_ON(a, b)	(conf_bgp_debug_ ## a |= (BGP_DEBUG_ ## b))
-#define CONF_DEBUG_OFF(a, b)	(conf_bgp_debug_ ## a &= ~(BGP_DEBUG_ ## b))
+#define CONF_DEBUG_ON(a, b) (conf_bgp_debug_##a |= (BGP_DEBUG_##b))
+#define CONF_DEBUG_OFF(a, b) (conf_bgp_debug_##a &= ~(BGP_DEBUG_##b))
 
-#define TERM_DEBUG_ON(a, b)	(term_bgp_debug_ ## a |= (BGP_DEBUG_ ## b))
-#define TERM_DEBUG_OFF(a, b)	(term_bgp_debug_ ## a &= ~(BGP_DEBUG_ ## b))
+#define TERM_DEBUG_ON(a, b) (term_bgp_debug_##a |= (BGP_DEBUG_##b))
+#define TERM_DEBUG_OFF(a, b) (term_bgp_debug_##a &= ~(BGP_DEBUG_##b))
 
 #define DEBUG_ON(a, b) \
-    do { \
-	CONF_DEBUG_ON(a, b); \
-	TERM_DEBUG_ON(a, b); \
-    } while (0)
+	do { \
+		CONF_DEBUG_ON(a, b); \
+		TERM_DEBUG_ON(a, b); \
+	} while(0)
 #define DEBUG_OFF(a, b) \
-    do { \
-	CONF_DEBUG_OFF(a, b); \
-	TERM_DEBUG_OFF(a, b); \
-    } while (0)
+	do { \
+		CONF_DEBUG_OFF(a, b); \
+		TERM_DEBUG_OFF(a, b); \
+	} while(0)
 
-#define BGP_DEBUG(a, b)		(term_bgp_debug_ ## a & BGP_DEBUG_ ## b)
-#define CONF_BGP_DEBUG(a, b)    (conf_bgp_debug_ ## a & BGP_DEBUG_ ## b)
+#define BGP_DEBUG(a, b) (term_bgp_debug_##a & BGP_DEBUG_##b)
+#define CONF_BGP_DEBUG(a, b) (conf_bgp_debug_##a & BGP_DEBUG_##b)
 
 extern const char *bgp_type_str[];
 
-extern int bgp_dump_attr (struct peer *, struct attr *, char *, size_t);
-extern void bgp_notify_print (struct peer *, struct bgp_notify *, const char *);
+extern int bgp_dump_attr(struct peer *, struct attr *, char *, size_t);
+extern void bgp_notify_print(struct peer *, struct bgp_notify *, const char *);
 
 extern const struct message bgp_status_msg[];
 extern const int bgp_status_msg_max;

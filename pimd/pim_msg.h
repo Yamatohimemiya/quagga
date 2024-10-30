@@ -37,16 +37,9 @@
 */
 #define PIM_MSG_ADDRESS_FAMILY_IPV4 (1)
 
-void pim_msg_build_header(uint8_t *pim_msg, int pim_msg_size,
-			  uint8_t pim_msg_type);
-uint8_t *pim_msg_addr_encode_ipv4_ucast(uint8_t *buf,
-					int buf_size,
-					struct in_addr addr);
-uint8_t *pim_msg_addr_encode_ipv4_group(uint8_t *buf,
-					int buf_size,
-					struct in_addr addr);
-uint8_t *pim_msg_addr_encode_ipv4_source(uint8_t *buf,
-					 int buf_size,
-					 struct in_addr addr);
+void pim_msg_build_header(uint8_t *pim_msg, int pim_msg_size, uint8_t pim_msg_type);
+uint8_t *pim_msg_addr_encode_ipv4_ucast(uint8_t *buf, int buf_size, struct in_addr addr);
+uint8_t *pim_msg_addr_encode_ipv4_group(uint8_t *buf, int buf_size, struct in_addr addr);
+uint8_t *pim_msg_addr_encode_ipv4_source(uint8_t *buf, int buf_size, struct in_addr addr);
 
 #endif /* PIM_MSG_H */

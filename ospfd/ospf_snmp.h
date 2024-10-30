@@ -24,15 +24,15 @@
 #ifndef _ZEBRA_OSPF_SNMP_H
 #define _ZEBRA_OSPF_SNMP_H
 
-extern void ospf_snmp_if_update (struct interface *);
-extern void ospf_snmp_if_delete (struct interface *);
+extern void ospf_snmp_if_update(struct interface *);
+extern void ospf_snmp_if_delete(struct interface *);
 
-extern void ospf_snmp_vl_add (struct ospf_vl_data *);
-extern void ospf_snmp_vl_delete (struct ospf_vl_data *);
+extern void ospf_snmp_vl_add(struct ospf_vl_data *);
+extern void ospf_snmp_vl_delete(struct ospf_vl_data *);
 
-extern void ospfTrapIfStateChange (struct ospf_interface *);
-extern void ospfTrapVirtIfStateChange (struct ospf_interface *);
-extern void ospfTrapNbrStateChange (struct ospf_neighbor *);
-extern void ospfTrapVirtNbrStateChange (struct ospf_neighbor *);
+extern void ospfTrapIfStateChange(struct ospf_interface *);
+extern void ospfTrapVirtIfStateChange(struct ospf_interface *);
+extern void ospfTrapNbrStateChange(struct ospf_neighbor *);
+extern void ospfTrapVirtNbrStateChange(struct ospf_neighbor *);
 
 #endif /* _ZEBRA_OSPF_SNMP_H */

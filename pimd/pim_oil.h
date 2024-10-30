@@ -26,8 +26,8 @@
 #include "pim_mroute.h"
 
 #define PIM_OIF_FLAG_PROTO_IGMP (1 << 0) /* bitmask 1 */
-#define PIM_OIF_FLAG_PROTO_PIM  (1 << 1) /* bitmask 2 */
-#define PIM_OIF_FLAG_PROTO_ANY  (3)      /* bitmask (1 | 2) */
+#define PIM_OIF_FLAG_PROTO_PIM (1 << 1)	 /* bitmask 2 */
+#define PIM_OIF_FLAG_PROTO_ANY (3)	 /* bitmask (1 | 2) */
 
 /*
   qpim_channel_oil_list holds a list of struct channel_oil.
@@ -37,17 +37,15 @@
 */
 
 struct channel_oil {
-  struct mfcctl oil;
-  int           oil_size;
-  int           oil_ref_count;
-  time_t        oif_creation[MAXVIFS];
-  uint32_t      oif_flags[MAXVIFS];
+	struct mfcctl oil;
+	int oil_size;
+	int oil_ref_count;
+	time_t oif_creation[MAXVIFS];
+	uint32_t oif_flags[MAXVIFS];
 };
 
 void pim_channel_oil_free(struct channel_oil *c_oil);
-struct channel_oil *pim_channel_oil_add(struct in_addr group_addr,
-					struct in_addr source_addr,
-					int input_vif_index);
+struct channel_oil *pim_channel_oil_add(struct in_addr group_addr, struct in_addr source_addr, int input_vif_index);
 void pim_channel_oil_del(struct channel_oil *c_oil);
 
 #endif /* PIM_OIL_H */

@@ -30,18 +30,14 @@
 #define PIM_NEXTHOP_LOOKUP_MAX (3) /* max. recursive route lookup */
 
 struct pim_zlookup_nexthop {
-  struct in_addr nexthop_addr;
-  ifindex_t      ifindex;
-  uint32_t       route_metric;
-  uint8_t        protocol_distance;
+	struct in_addr nexthop_addr;
+	ifindex_t ifindex;
+	uint32_t route_metric;
+	uint8_t protocol_distance;
 };
 
 struct zclient *zclient_lookup_new(void);
 
-int zclient_lookup_nexthop(struct zclient *zlookup,
-			   struct pim_zlookup_nexthop nexthop_tab[],
-			   const int tab_size,
-			   struct in_addr addr,
-			   int max_lookup);
+int zclient_lookup_nexthop(struct zclient *zlookup, struct pim_zlookup_nexthop nexthop_tab[], const int tab_size, struct in_addr addr, int max_lookup);
 
 #endif /* PIM_ZLOOKUP_H */

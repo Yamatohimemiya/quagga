@@ -34,61 +34,54 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 
    (^|[,{}() ]|$) */
 
-regex_t *
-bgp_regcomp (const char *regstr)
-{
-  /* Convert _ character to generic regular expression. */
-  int i, j;
-  int len;
-  int magic = 0;
-  char *magic_str;
-  char magic_regexp[] = "(^|[,{}() ]|$)";
-  int ret;
-  regex_t *regex;
+regex_t *bgp_regcomp(const char *regstr) {
+	/* Convert _ character to generic regular expression. */
+	int i, j;
+	int len;
+	int magic = 0;
+	char *magic_str;
+	char magic_regexp[] = "(^|[,{}() ]|$)";
+	int ret;
+	regex_t *regex;
 
-  len = strlen (regstr);
-  for (i = 0; i < len; i++)
-    if (regstr[i] == '_')
-      magic++;
-
-  magic_str = XMALLOC (MTYPE_TMP, len + (14 * magic) + 1);
-  
-  for (i = 0, j = 0; i < len; i++)
-    {
-      if (regstr[i] == '_')
-	{
-	  memcpy (magic_str + j, magic_regexp, strlen (magic_regexp));
-	  j += strlen (magic_regexp);
+	len = strlen(regstr);
+	for(i = 0; i < len; i++) {
+		if(regstr[i] == '_') {
+			magic++;
+		}
 	}
-      else
-	magic_str[j++] = regstr[i];
-    }
-  magic_str[j] = '\0';
 
-  regex = XMALLOC (MTYPE_BGP_REGEXP, sizeof (regex_t));
+	magic_str = XMALLOC(MTYPE_TMP, len + (14 * magic) + 1);
 
-  ret = regcomp (regex, magic_str, REG_EXTENDED|REG_NOSUB);
+	for(i = 0, j = 0; i < len; i++) {
+		if(regstr[i] == '_') {
+			memcpy(magic_str + j, magic_regexp, strlen(magic_regexp));
+			j += strlen(magic_regexp);
+		} else {
+			magic_str[j++] = regstr[i];
+		}
+	}
+	magic_str[j] = '\0';
 
-  XFREE (MTYPE_TMP, magic_str);
+	regex = XMALLOC(MTYPE_BGP_REGEXP, sizeof(regex_t));
 
-  if (ret != 0)
-    {
-      XFREE (MTYPE_BGP_REGEXP, regex);
-      return NULL;
-    }
+	ret = regcomp(regex, magic_str, REG_EXTENDED | REG_NOSUB);
 
-  return regex;
+	XFREE(MTYPE_TMP, magic_str);
+
+	if(ret != 0) {
+		XFREE(MTYPE_BGP_REGEXP, regex);
+		return NULL;
+	}
+
+	return regex;
 }
 
-int
-bgp_regexec (regex_t *regex, struct aspath *aspath)
-{
-  return regexec (regex, aspath->str, 0, NULL, 0);
+int bgp_regexec(regex_t *regex, struct aspath *aspath) {
+	return regexec(regex, aspath->str, 0, NULL, 0);
 }
 
-void
-bgp_regex_free (regex_t *regex)
-{
-  regfree (regex);
-  XFREE (MTYPE_BGP_REGEXP, regex);
+void bgp_regex_free(regex_t *regex) {
+	regfree(regex);
+	XFREE(MTYPE_BGP_REGEXP, regex);
 }

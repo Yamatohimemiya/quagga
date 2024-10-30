@@ -21,13 +21,12 @@ double randg01(void);
 long nrand(long);
 void free_arc(void *);
 
-unsigned long timer ()
-   { struct tms hold;
+unsigned long timer() {
+	struct tms hold;
 
-        times(&hold);
-        return (unsigned long) ((float) (hold.tms_utime) / 60.0);
-   }
-
+	times(&hold);
+	return (unsigned long) ((float) (hold.tms_utime) / 60.0);
+}
 
 /*********************************************************************/
 /*                                                                   */
@@ -56,17 +55,17 @@ unsigned long timer ()
 
 unsigned long internal_seed;
 
-void init_rand ( init_seed )
+void init_rand(init_seed)
 
-long init_seed;
+	long init_seed;
 
-{ internal_seed = ( init_seed > 0 )
-                 ? (unsigned long) init_seed
-                 : (unsigned long) timer(); 
-                
+{
+	internal_seed = (init_seed > 0) ? (unsigned long) init_seed : (unsigned long) timer();
 
-  /* only odd numbers are acceptable */
-  if ( internal_seed % 2 == 0 ) internal_seed --;
+	/* only odd numbers are acceptable */
+	if(internal_seed % 2 == 0) {
+		internal_seed--;
+	}
 }
 
 /*********************************************************************/
@@ -84,15 +83,16 @@ long init_seed;
 /*   rename: irand <---> xrand                                       */
 /*                                                                   */
 /*********************************************************************/
- 
-#define  A   1220703125
-#define  B   2147483647
-#define  BF  2147483647.
 
-static long irand ()
+#define A 1220703125
+#define B 2147483647
+#define BF 2147483647.
 
-{ internal_seed = ( internal_seed * A ) & B;
-  return (long) internal_seed ;
+static long irand()
+
+{
+	internal_seed = (internal_seed * A) & B;
+	return (long) internal_seed;
 }
 
 #if 0 /* Not used. */
@@ -102,11 +102,10 @@ static long irand ()
 /*                                                                   */
 /*********************************************************************/
 
-
-#define T15  32768 
-#define T16  65536
-#define A1   37252
-#define A2   29589
+	#define T15 32768
+	#define T16 65536
+	#define A1 37252
+	#define A2 29589
 
 static long xrand()
 
@@ -122,38 +121,39 @@ static long xrand()
 
 /*********************************************************************/
 
-
 double rand01()
 
-{ return  (double) (irand() / BF) ;
+{
+	return (double) (irand() / BF);
 }
-  
+
 /*********************************************************************/
 
-#define NK  12
+#define NK 12
 
 double randg01()
 
-{ int i;
-  double sum = 0;
+{
+	int i;
+	double sum = 0;
 
-  for ( i = 0; i < NK; i++ ) sum += rand01();
-  return sum - 6.;
+	for(i = 0; i < NK; i++) {
+		sum += rand01();
+	}
+	return sum - 6.;
 
-  /* if   NK != 12  then you must return (12/NK)*sum - (NK/2) */
+	/* if   NK != 12  then you must return (12/NK)*sum - (NK/2) */
 }
 
 #undef NK
-     
-  
+
 /*********************************************************************/
 
-long nrand ( n )
+long nrand(n)
 
 long n;
 
-{ return (long) ( rand01() * (double) n );
-}
+{ return (long) (rand01() * (double) n); }
 
 /*********************************************************************/
 

@@ -25,19 +25,19 @@
 #define _ZEBRA_VERSION_H
 
 #ifdef GIT_VERSION
-#include "gitversion.h"
+	#include "gitversion.h"
 #endif
 
 #ifndef GIT_SUFFIX
-#define GIT_SUFFIX ""
+	#define GIT_SUFFIX ""
 #endif
 #ifndef GIT_INFO
-#define GIT_INFO ""
+	#define GIT_INFO ""
 #endif
 
-#define QUAGGA_PROGNAME   "@PACKAGE_NAME@"
+#define QUAGGA_PROGNAME "@PACKAGE_NAME@"
 
-#define QUAGGA_VERSION     "@PACKAGE_VERSION@" GIT_SUFFIX
+#define QUAGGA_VERSION "@PACKAGE_VERSION@" GIT_SUFFIX
 
 #define ZEBRA_BUG_ADDRESS "@PACKAGE_BUGREPORT@"
 
@@ -47,7 +47,7 @@
 
 #define QUAGGA_CONFIG_ARGS "@CONFIG_ARGS@"
 
-pid_t pid_output (const char *);
+pid_t pid_output(const char *);
 
 #ifndef HAVE_DAEMON
 int daemon(int, int);
