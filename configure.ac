@@ -10,6 +10,9 @@ AC_PREREQ([2.71])
 
 AC_INIT([Quagga],[1.2.5],[https://bugzilla.quagga.net])
 
+# VCS friendly mode
+AM_MAINTAINER_MODE()
+
 CONFIG_ARGS="$*"
 AC_SUBST(CONFIG_ARGS)
 AC_CONFIG_SRCDIR(lib/zebra.h)
