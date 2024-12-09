@@ -137,7 +137,8 @@ static void usage(char *progname, int status) {
 		       "-r, --retain       When program terminates, retain added route "
 		       "by zebra.\n"
 		       "-u, --user         User to run as\n"
-		       "-g, --group	  Group to run as\n",
+		       "-g, --group	   Group to run as\n"
+		       "-S, --skip_runas   Skip user and group run as\n",
 		       progname);
 #ifdef HAVE_NETLINK
 		printf("-s, --nl-bufsize   Set netlink receive buffer size\n");
