@@ -8,7 +8,7 @@
 ##
 AC_PREREQ([2.71])
 
-AC_INIT([Quagga],[1.2.5],[https://bugzilla.quagga.net])
+AC_INIT([Quagga],[1.2.5.1],[https://bugzilla.quagga.net])
 
 # VCS friendly mode
 AM_MAINTAINER_MODE()
