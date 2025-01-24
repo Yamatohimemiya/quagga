@@ -2606,7 +2606,12 @@ DEFUN(config_terminal, config_terminal_cmd, "configure terminal",
 /* Enable command */
 DEFUN(enable, config_enable_cmd, "enable", "Turn on privileged mode command\n") {
 	/* If enable password is NULL, change to ENABLE_NODE */
-	if((host.enable == NULL && host.enable_encrypt == NULL) || vty->type == VTY_SHELL_SERV) {
+	if(host.enable == NULL && host.enable_encrypt == NULL){
+		vty_out(vty, "Permission denied%s", VTY_NEWLINE);
+		return CMD_WARNING;
+	}
+
+	if(vty->type == VTY_SHELL_SERV) {
 		vty->node = ENABLE_NODE;
 	} else {
 		vty->node = AUTH_ENABLE_NODE;
