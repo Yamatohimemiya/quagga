@@ -1566,20 +1566,15 @@ static struct vty *vty_create(int vty_sock, union sockunion *su) {
 		vty->lines = host.lines;
 	}
 
-	if(!no_password_check) {
-		/* Vty is not available if password isn't set. */
-		if(host.password == NULL && host.password_encrypt == NULL) {
-			vty_out(vty, "Vty password is not set.%s", VTY_NEWLINE);
-			vty->status = VTY_CLOSE;
-			vty_close(vty);
-			return NULL;
-		}
-	}
-
 	/* Say hello to the world. */
 	vty_hello(vty);
 	if(!no_password_check) {
-		vty_out(vty, "%sUser Access Verification%s%s", VTY_NEWLINE, VTY_NEWLINE, VTY_NEWLINE);
+		// No login password -> restricted mode
+		if(host.password == NULL && host.password_encrypt == NULL) {
+			vty->node = VIEW_NODE;
+		} else {
+			vty_out(vty, "%sUser Access Verification%s%s", VTY_NEWLINE, VTY_NEWLINE, VTY_NEWLINE);
+		}
 	}
 
 	/* Setting up terminal. */
