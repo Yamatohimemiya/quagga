@@ -151,7 +151,7 @@ foreach (@ARGV) {
 	#*** Patch for new coding format
 	my $r = index($defun_body, '") {');
 	if ($r != -1){
-		printf("\n/* DEBUG: $r\n $defun_body */\n");
+		# printf("\n/* DEBUG: $r\n $defun_body */\n");
 		$defun_body = substr($defun_body, 0, $r + 1); # +1: '"'
 	}
 
