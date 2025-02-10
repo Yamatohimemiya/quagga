@@ -22,6 +22,7 @@
  */
 
 #include <zebra.h>
+#include <sigevent.h>
 
 #include "prefix.h"
 #include "stream.h"
@@ -408,11 +409,9 @@ int zclient_start(struct zclient *zclient) {
    * reconnect.  On startup if zebra is slow we
    * can get into this situation.
    */
-	while(zclient_socket_connect(zclient) < 0 && zclient->fail < 5) {
-		if(zclient_debug) {
-			zlog_debug("zclient connection fail");
-		}
-		zclient->fail++;
+	while(zclient_socket_connect(zclient) < 0) {
+		zlog_warn("W: Waiting zebra...");
+		quagga_sigevent_process();
 		sleep(1);
 	}
 
