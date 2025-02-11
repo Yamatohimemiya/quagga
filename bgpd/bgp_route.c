@@ -301,6 +301,8 @@ static int bgp_info_cmp(struct bgp *bgp, struct bgp_info *new, struct bgp_info *
 	u_int32_t exist_med;
 	u_int32_t new_weight;
 	u_int32_t exist_weight;
+	u_int32_t new_priority;
+	u_int32_t exist_priority;
 	uint32_t newm, existm;
 	struct in_addr new_id;
 	struct in_addr exist_id;
@@ -398,7 +400,24 @@ static int bgp_info_cmp(struct bgp *bgp, struct bgp_info *new, struct bgp_info *
 		}
 	}
 
-	/* 5. Origin check. */
+	/* 5. Priority check. */
+	new_priority = exist_priority = 0;
+
+	if(newattre) {
+		new_priority = newattre->priority;
+	}
+	if(existattre) {
+		exist_priority = existattre->priority;
+	}
+
+	if(new_priority > exist_priority) {
+		return -1;
+	}
+	if(new_priority < exist_priority) {
+		return 1;
+	}
+
+	/* 6. Origin check. */
 	if(newattr->origin < existattr->origin) {
 		return -1;
 	}
@@ -406,7 +425,7 @@ static int bgp_info_cmp(struct bgp *bgp, struct bgp_info *new, struct bgp_info *
 		return 1;
 	}
 
-	/* 6. MED check. */
+	/* 7. MED check. */
 	internal_as_route = (aspath_count_hops(newattr->aspath) == 0 && aspath_count_hops(existattr->aspath) == 0);
 	confed_as_route = (aspath_count_confeds(newattr->aspath) > 0 && aspath_count_confeds(existattr->aspath) > 0 && aspath_count_hops(newattr->aspath) == 0 && aspath_count_hops(existattr->aspath) == 0);
 
@@ -423,7 +442,7 @@ static int bgp_info_cmp(struct bgp *bgp, struct bgp_info *new, struct bgp_info *
 		}
 	}
 
-	/* 7. Peer type check. */
+	/* 8. Peer type check. */
 	new_sort = new->peer->sort;
 	exist_sort = exist->peer->sort;
 
@@ -434,7 +453,7 @@ static int bgp_info_cmp(struct bgp *bgp, struct bgp_info *new, struct bgp_info *
 		return 1;
 	}
 
-	/* 8. IGP metric check. */
+	/* 9. IGP metric check. */
 	newm = existm = 0;
 
 	if(new->extra) {
@@ -451,7 +470,7 @@ static int bgp_info_cmp(struct bgp *bgp, struct bgp_info *new, struct bgp_info *
 		return 1;
 	}
 
-	/* 9. Maximum path check. */
+	/* 10. Maximum path check. */
 	if(bgp_mpath_is_configured(bgp, afi, safi)) {
 		if(bgp_flag_check(bgp, BGP_FLAG_ASPATH_MULTIPATH_RELAX)) {
 			/*
@@ -472,7 +491,7 @@ static int bgp_info_cmp(struct bgp *bgp, struct bgp_info *new, struct bgp_info *
 		}
 	}
 
-	/* 10. If both paths are external, prefer the path that was received
+	/* 11. If both paths are external, prefer the path that was received
      first (the oldest one).  This step minimizes route-flap, since a
      newer path won't displace an older one, even if it was the
      preferred route based on the additional decision criteria below.  */
@@ -485,7 +504,7 @@ static int bgp_info_cmp(struct bgp *bgp, struct bgp_info *new, struct bgp_info *
 		}
 	}
 
-	/* 11. Router-ID comparision. */
+	/* 12. Router-ID comparision. */
 	/* If one of the paths is "stale", the corresponding peer router-id will
    * be 0 and would always win over the other path. If originator id is
    * used for the comparision, it will decide which path is better.
@@ -508,7 +527,7 @@ static int bgp_info_cmp(struct bgp *bgp, struct bgp_info *new, struct bgp_info *
 		return 1;
 	}
 
-	/* 12. Cluster length comparision. */
+	/* 13. Cluster length comparision. */
 	new_cluster = exist_cluster = 0;
 
 	if(newattr->flag & ATTR_FLAG_BIT(BGP_ATTR_CLUSTER_LIST)) {
@@ -525,7 +544,7 @@ static int bgp_info_cmp(struct bgp *bgp, struct bgp_info *new, struct bgp_info *
 		return 1;
 	}
 
-	/* 13. Neighbor address comparision. */
+	/* 14. Neighbor address comparision. */
 	/* Do this only if neither path is "stale" as stale paths do not have
    * valid peer information (as the connection may or may not be up).
    */
@@ -679,6 +698,10 @@ static int bgp_input_modifier(struct peer *peer, struct prefix *p, struct attr *
 	if(peer->weight) {
 		(bgp_attr_extra_get(attr))->weight = peer->weight;
 	}
+	/* Apply default priority value. */
+	if(peer->priority) {
+		(bgp_attr_extra_get(attr))->priority = peer->priority;
+	}
 
 	/* Route map apply. */
 	if(ROUTE_MAP_IN_NAME(filter)) {
@@ -740,6 +763,11 @@ static int bgp_import_modifier(struct peer *rsclient, struct peer *peer, struct 
 	/* Apply default weight value. */
 	if(peer->weight) {
 		(bgp_attr_extra_get(attr))->weight = peer->weight;
+	}
+
+	/* Apply default priority value. */
+	if(peer->priority) {
+		(bgp_attr_extra_get(attr))->priority = peer->priority;
 	}
 
 	/* Route map apply. */
@@ -5270,7 +5298,7 @@ void route_vty_out(struct vty *vty, struct prefix *p, struct bgp_info *binfo, in
 			}
 		} else {
 			if(p->family == AF_INET) {
-				vty_out(vty, "%-16s", inet_ntoa(attr->nexthop));
+				vty_out(vty, "%-15s", inet_ntoa(attr->nexthop));
 			} else if(p->family == AF_INET6) {
 				int len;
 				char buf[BUFSIZ];
@@ -5292,22 +5320,41 @@ void route_vty_out(struct vty *vty, struct prefix *p, struct bgp_info *binfo, in
        */
 
 		if(attr->flag & ATTR_FLAG_BIT(BGP_ATTR_MULTI_EXIT_DISC)) {
-			vty_out(vty, "%10u", attr->med);
+			vty_out(vty, "%6u", attr->med);
 		} else {
-			vty_out(vty, "          ");
+			vty_out(vty, "      ");
 		}
 
 		if(attr->flag & ATTR_FLAG_BIT(BGP_ATTR_LOCAL_PREF)) {
-			vty_out(vty, "%7u", attr->local_pref);
+			vty_out(vty, "%6u", attr->local_pref);
 		} else {
-			vty_out(vty, "       ");
+			vty_out(vty, "      ");
 		}
 
-		vty_out(vty, "%7u ", (attr->extra ? attr->extra->weight : 0));
+		vty_out(vty, "%6u", (attr->extra ? attr->extra->weight : 0));
+
+		if(attr->extra && attr->extra->priority != BGP_ATTR_DEFAULT_PRIORITY) {
+		//if(attr->flag & ATTR_FLAG_BIT(PEER_CONFIG_PRIORITY)) {
+			vty_out(vty, "%6u  ", (attr->extra ? attr->extra->priority : 0));
+		} else {
+			vty_out(vty, "        ");
+		}
 
 		/* Print aspath */
 		if(attr->aspath) {
-			aspath_print_vty(vty, "%s", attr->aspath, " ");
+//			if(attr->aspath->str_len <= 17){
+				aspath_print_vty(vty, "%s", attr->aspath, " ");
+/*
+			} else if(attr->aspath->str_len <= 44) {
+				vty_out(vty, "%s", VTY_NEWLINE);
+				vty_out(vty, "%*s", 36, " ");
+				aspath_print_vty(vty, "%s", attr->aspath, " ");
+			} else {
+				vty_out(vty, "%s", VTY_NEWLINE);
+				vty_out(vty, "%*s", 3, " ");
+				aspath_print_vty(vty, "%s", attr->aspath, " ");
+			}
+*/
 		}
 
 		/* Print origin */
@@ -5362,6 +5409,8 @@ void route_vty_out_tmp(struct vty *vty, struct prefix *p, struct attr *attr, saf
 		}
 
 		vty_out(vty, "%7u ", (attr->extra ? attr->extra->weight : 0));
+
+		vty_out(vty, "%7u ", (attr->extra ? attr->extra->priority : 0));
 
 		/* Print aspath */
 		if(attr->aspath) {
@@ -5618,6 +5667,10 @@ static void route_vty_out_detail(struct vty *vty, struct bgp *bgp, struct prefix
 			vty_out(vty, ", weight %u", attr->extra->weight);
 		}
 
+		if(attr->extra && attr->extra->priority != 0) {
+			vty_out(vty, ", priority %u", attr->extra->priority);
+		}
+
 		if(attr->extra && attr->extra->tag != 0) {
 			vty_out(vty, ", tag %d", attr->extra->tag);
 		}
@@ -5708,7 +5761,7 @@ static void route_vty_out_detail(struct vty *vty, struct bgp *bgp, struct prefix
 	"h history, * valid, > best, = multipath,%s" \
 	"              i internal, r RIB-failure, S Stale, R Removed%s"
 #define BGP_SHOW_OCODE_HEADER "Origin codes: i - IGP, e - EGP, ? - incomplete%s%s"
-#define BGP_SHOW_HEADER "   Network          Next Hop            Metric LocPrf Weight Path%s"
+#define BGP_SHOW_HEADER "   Network          Next Hop          MED LocPr Weigh  Prio  Path%s"
 #define BGP_SHOW_DAMP_HEADER "   Network          From             Reuse    Path%s"
 #define BGP_SHOW_FLAP_HEADER "   Network          From            Flaps Duration Reuse    Path%s"
 

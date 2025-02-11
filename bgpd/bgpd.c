@@ -462,6 +462,26 @@ int bgp_default_local_preference_unset(struct bgp *bgp) {
 
 	return 0;
 }
+/* priority configuration.  */
+int bgp_default_priority_set(struct bgp *bgp, u_int32_t priority) {
+	if(!bgp) {
+		return -1;
+	}
+
+	bgp->default_priority = priority;
+
+	return 0;
+}
+
+int bgp_default_priority_unset(struct bgp *bgp) {
+	if(!bgp) {
+		return -1;
+	}
+
+	bgp->default_priority = BGP_ATTR_DEFAULT_PRIORITY;
+
+	return 0;
+}
 
 /* If peer is RSERVER_CLIENT in at least one address family and is not member
     of a peer_group for that family, return 1.
@@ -562,6 +582,7 @@ static void peer_af_flag_reset(struct peer *peer, afi_t afi, safi_t safi) {
 /* peer global config reset */
 static void peer_global_config_reset(struct peer *peer) {
 	peer->weight = 0;
+	peer->priority = BGP_ATTR_DEFAULT_PRIORITY;
 	peer->change_local_as = 0;
 	peer->ttl = 0;
 	peer->gtsm_hops = 0;
@@ -745,6 +766,7 @@ static struct peer *peer_new(struct bgp *bgp) {
 	peer->status = Idle;
 	peer->ostatus = Idle;
 	peer->weight = 0;
+	peer->priority = bgp->default_priority;
 	peer->password = NULL;
 	peer->bgp = bgp;
 	peer = peer_lock(peer); /* initial reference */
@@ -1346,6 +1368,9 @@ static void peer_group2peer_config_copy(struct peer_group *group, struct peer *p
 
 	/* Weight */
 	peer->weight = conf->weight;
+
+	/* Priority */
+	peer->priority = conf->priority;
 
 	/* peer flags apply */
 	peer->flags = conf->flags;
@@ -2959,6 +2984,51 @@ int peer_weight_unset(struct peer *peer) {
 	group = peer->group;
 	for(ALL_LIST_ELEMENTS(group->peer, node, nnode, peer)) {
 		peer->weight = 0;
+	}
+	return 0;
+}
+
+/* neighbor priority. */
+int peer_priority_set(struct peer *peer, u_int16_t priority) {
+	struct peer_group *group;
+	struct listnode *node, *nnode;
+
+	SET_FLAG(peer->config, PEER_CONFIG_PRIORITY);
+	peer->priority = priority;
+
+	if(!CHECK_FLAG(peer->sflags, PEER_STATUS_GROUP)) {
+		return 0;
+	}
+
+	/* peer-group member updates. */
+	group = peer->group;
+	for(ALL_LIST_ELEMENTS(group->peer, node, nnode, peer)) {
+		peer->priority = group->conf->priority;
+	}
+	return 0;
+}
+
+int peer_priority_unset(struct peer *peer) {
+	struct peer_group *group;
+	struct listnode *node, *nnode;
+
+	/* Set default priority. */
+	if(peer_group_active(peer)) {
+		peer->priority = peer->group->conf->priority;
+	} else {
+		peer->priority = 0;
+	}
+
+	UNSET_FLAG(peer->config, PEER_CONFIG_PRIORITY);
+
+	if(!CHECK_FLAG(peer->sflags, PEER_STATUS_GROUP)) {
+		return 0;
+	}
+
+	/* peer-group member updates. */
+	group = peer->group;
+	for(ALL_LIST_ELEMENTS(group->peer, node, nnode, peer)) {
+		peer->priority = 0;
 	}
 	return 0;
 }
@@ -4605,6 +4675,13 @@ static void bgp_config_write_peer(struct vty *vty, struct bgp *bgp, struct peer 
 			}
 		}
 
+		/* Default priority. */
+		if(CHECK_FLAG(peer->config, PEER_CONFIG_PRIORITY)) {
+			if(!peer_group_active(peer) || g_peer->priority != peer->priority) {
+				vty_out(vty, " neighbor %s priority %d%s", addr, peer->priority, VTY_NEWLINE);
+			}
+		}
+
 		/* Dynamic capability.  */
 		if(CHECK_FLAG(peer->flags, PEER_FLAG_DYNAMIC_CAPABILITY)) {
 			if(!peer_group_active(peer) || !CHECK_FLAG(g_peer->flags, PEER_FLAG_DYNAMIC_CAPABILITY)) {
@@ -4928,6 +5005,11 @@ int bgp_config_write(struct vty *vty) {
 		/* BGP default local-preference. */
 		if(bgp->default_local_pref != BGP_DEFAULT_LOCAL_PREF) {
 			vty_out(vty, " bgp default local-preference %d%s", bgp->default_local_pref, VTY_NEWLINE);
+		}
+
+		/* BGP default priority. */
+		if(bgp->default_priority != BGP_ATTR_DEFAULT_PRIORITY) {
+			vty_out(vty, " bgp default priority %d%s", bgp->default_local_pref, VTY_NEWLINE);
 		}
 
 		/* BGP client-to-client reflection. */

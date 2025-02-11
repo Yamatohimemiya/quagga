@@ -164,6 +164,9 @@ struct bgp {
 	/* BGP default local-preference.  */
 	u_int32_t default_local_pref;
 
+	/* BGP default priority.  */
+	u_int32_t default_priority;
+
 	/* BGP default timer.  */
 	u_int32_t default_holdtime;
 	u_int32_t default_keepalive;
@@ -448,7 +451,9 @@ struct peer {
 #define PEER_CONFIG_TIMER (1 << 1)    /* keepalive & holdtime */
 #define PEER_CONFIG_CONNECT (1 << 2)  /* connect */
 #define PEER_CONFIG_ROUTEADV (1 << 3) /* route advertise */
+#define PEER_CONFIG_PRIORITY (1 << 4)   /* Default priority. */
 	u_int32_t weight;
+	u_int32_t priority;
 	u_int32_t holdtime;
 	u_int32_t keepalive;
 	u_int32_t connect;
@@ -890,6 +895,9 @@ extern int bgp_timers_unset(struct bgp *);
 extern int bgp_default_local_preference_set(struct bgp *, u_int32_t);
 extern int bgp_default_local_preference_unset(struct bgp *);
 
+extern int bgp_default_priority_set(struct bgp *, u_int32_t);
+extern int bgp_default_priority_unset(struct bgp *);
+
 extern int peer_rsclient_active(struct peer *);
 
 extern int peer_remote_as(struct bgp *, union sockunion *, as_t *, afi_t, safi_t);
@@ -930,6 +938,9 @@ extern int peer_port_unset(struct peer *);
 
 extern int peer_weight_set(struct peer *, u_int16_t);
 extern int peer_weight_unset(struct peer *);
+
+extern int peer_priority_set(struct peer *, u_int16_t);
+extern int peer_priority_unset(struct peer *);
 
 extern int peer_timers_set(struct peer *, u_int32_t keepalive, u_int32_t holdtime);
 extern int peer_timers_unset(struct peer *);

@@ -1026,6 +1026,39 @@ struct route_map_rule_cmd route_set_weight_cmd = {
 	route_value_free,
 };
 
+/* `set priority PRIORITY' */
+
+/* Set priority. */
+static route_map_result_t route_set_priority(void *rule, struct prefix *prefix, route_map_object_t type, void *object) {
+	struct rmap_value *rv;
+	struct bgp_info *bgp_info;
+	u_int32_t priority;
+
+	if(type == RMAP_BGP) {
+		/* Fetch routemap's rule information. */
+		rv = rule;
+		bgp_info = object;
+
+		/* Set priority value. */
+		priority = route_value_adjust(rv, 0, bgp_info->peer);
+		if(priority) {
+			(bgp_attr_extra_get(bgp_info->attr))->priority = priority;
+		} else if(bgp_info->attr->extra) {
+			bgp_info->attr->extra->priority = 0;
+		}
+	}
+
+	return RMAP_OKAY;
+}
+
+/* Set 'priority' local preference rule structure. */
+struct route_map_rule_cmd route_set_priority_cmd = {
+	"priority",
+	route_set_priority,
+	route_value_compile,
+	route_value_free,
+};
+
 /* `set metric METRIC' */
 
 /* Set metric to attribute. */
@@ -2748,6 +2781,25 @@ ALIAS(no_set_weight, no_set_weight_val_cmd, "no set weight <0-4294967295>",
       NO_STR SET_STR "BGP weight for routing table\n"
 		     "Weight value\n")
 
+
+DEFUN(set_priority, set_priority_cmd, "set priority <0-4294967295>",
+      SET_STR "BGP priority for routing table\n"
+	      "Priority value\n") {
+	return bgp_route_set_add(vty, vty->index, "priority", argv[0]);
+}
+
+DEFUN(no_set_priority, no_set_priority_cmd, "no set priority", NO_STR SET_STR "BGP priority for routing table\n") {
+	if(argc == 0) {
+		return bgp_route_set_delete(vty, vty->index, "priority", NULL);
+	}
+
+	return bgp_route_set_delete(vty, vty->index, "priority", argv[0]);
+}
+
+ALIAS(no_set_priority, no_set_priority_val_cmd, "no set priority <0-4294967295>",
+      NO_STR SET_STR "BGP priority for routing table\n"
+		     "Priority value\n")
+
 DEFUN(set_aspath_prepend, set_aspath_prepend_cmd, "set as-path prepend ." CMD_AS_RANGE,
       SET_STR "Transform BGP AS_PATH attribute\n"
 	      "Prepend to the as-path\n"
@@ -3380,6 +3432,7 @@ void bgp_route_map_init(void) {
 	route_map_install_set(&route_set_ip_nexthop_cmd);
 	route_map_install_set(&route_set_local_pref_cmd);
 	route_map_install_set(&route_set_weight_cmd);
+	route_map_install_set(&route_set_priority_cmd);
 	route_map_install_set(&route_set_metric_cmd);
 	route_map_install_set(&route_set_aspath_prepend_cmd);
 	route_map_install_set(&route_set_aspath_exclude_cmd);
@@ -3459,6 +3512,9 @@ void bgp_route_map_init(void) {
 	install_element(RMAP_NODE, &set_weight_cmd);
 	install_element(RMAP_NODE, &no_set_weight_cmd);
 	install_element(RMAP_NODE, &no_set_weight_val_cmd);
+	install_element(RMAP_NODE, &set_priority_cmd);
+	install_element(RMAP_NODE, &no_set_priority_cmd);
+	install_element(RMAP_NODE, &no_set_priority_val_cmd);
 	install_element(RMAP_NODE, &set_metric_cmd);
 	install_element(RMAP_NODE, &set_metric_addsub_cmd);
 	install_element(RMAP_NODE, &set_metric_rtt_cmd);

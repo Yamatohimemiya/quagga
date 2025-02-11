@@ -44,6 +44,7 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 /* BGP attribute header must bigger than 2. */
 #define BGP_ATTR_MIN_LEN 3 /* Attribute flag, type length. */
 #define BGP_ATTR_DEFAULT_WEIGHT 32768
+#define BGP_ATTR_DEFAULT_PRIORITY 32768
 
 struct bgp_attr_encap_subtlv {
 	struct bgp_attr_encap_subtlv *next; /* for chaining */
@@ -83,6 +84,9 @@ struct attr_extra {
 
 	/* Local weight, not actually an attribute */
 	u_int32_t weight;
+
+	/* Local priority, not actually an attribute */
+	u_int32_t priority;
 
 	/* Aggregator ASN */
 	as_t aggregator_as;

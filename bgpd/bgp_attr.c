@@ -450,6 +450,7 @@ unsigned int attrhash_key_make(void *p) {
 		MIX(extra->aggregator_as);
 		MIX(extra->aggregator_addr.s_addr);
 		MIX(extra->weight);
+		MIX(extra->priority);
 		MIX(extra->mp_nexthop_global_in.s_addr);
 		MIX(extra->originator_id.s_addr);
 		MIX(extra->tag);
@@ -493,7 +494,7 @@ int attrhash_cmp(const void *p1, const void *p2) {
 		const struct attr_extra *ae1 = attr1->extra;
 		const struct attr_extra *ae2 = attr2->extra;
 
-		if(ae1 && ae2 && ae1->aggregator_as == ae2->aggregator_as && ae1->aggregator_addr.s_addr == ae2->aggregator_addr.s_addr && ae1->weight == ae2->weight && ae1->tag == ae2->tag && ae1->mp_nexthop_len == ae2->mp_nexthop_len
+		if(ae1 && ae2 && ae1->aggregator_as == ae2->aggregator_as && ae1->aggregator_addr.s_addr == ae2->aggregator_addr.s_addr && ae1->weight == ae2->weight && ae1->priority == ae2->priority && ae1->tag == ae2->tag && ae1->mp_nexthop_len == ae2->mp_nexthop_len
 		   && IPV6_ADDR_SAME(&ae1->mp_nexthop_global, &ae2->mp_nexthop_global) && IPV6_ADDR_SAME(&ae1->mp_nexthop_local, &ae2->mp_nexthop_local) && IPV4_ADDR_SAME(&ae1->mp_nexthop_global_in, &ae2->mp_nexthop_global_in)
 		   && ae1->ecommunity == ae2->ecommunity && ae1->lcommunity == ae2->lcommunity && ae1->cluster == ae2->cluster && ae1->transit == ae2->transit && (ae1->encap_tunneltype == ae2->encap_tunneltype)
 		   && encap_same(ae1->encap_subtlvs, ae2->encap_subtlvs) && IPV4_ADDR_SAME(&ae1->originator_id, &ae2->originator_id)) {
@@ -622,6 +623,7 @@ struct attr *bgp_attr_default_set(struct attr *attr, u_char origin) {
 	attr->aspath = aspath_empty();
 	attr->flag |= ATTR_FLAG_BIT(BGP_ATTR_AS_PATH);
 	attr->extra->weight = BGP_ATTR_DEFAULT_WEIGHT;
+	attr->extra->priority = BGP_ATTR_DEFAULT_PRIORITY;
 	attr->extra->tag = 0;
 	attr->flag |= ATTR_FLAG_BIT(BGP_ATTR_NEXT_HOP);
 	attr->extra->mp_nexthop_len = IPV6_MAX_BYTELEN;
@@ -677,6 +679,7 @@ struct attr *bgp_attr_aggregate_intern(struct bgp *bgp, u_char origin, struct as
 	}
 
 	attre.weight = BGP_ATTR_DEFAULT_WEIGHT;
+	attre.priority = bgp->default_priority;
 	attre.mp_nexthop_len = IPV6_MAX_BYTELEN;
 
 	if(!as_set || atomic_aggregate) {

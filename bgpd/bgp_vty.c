@@ -1132,6 +1132,40 @@ ALIAS(no_bgp_default_local_preference, no_bgp_default_local_preference_val_cmd, 
 	     "local preference (higher=more preferred)\n"
 	     "Configure default local preference value\n")
 
+DEFUN(bgp_default_priority, bgp_default_priority_cmd, "bgp default priority <0-65535>",
+      "BGP specific commands\n"
+      "Configure BGP defaults\n"
+      "priority (higher=more preferred)\n"
+      "Configure default priority value\n") {
+	struct bgp *bgp;
+	u_int32_t priority;
+
+	bgp = vty->index;
+
+	VTY_GET_INTEGER("priority", priority, argv[0]);
+
+	bgp_default_priority_set(bgp, priority);
+
+	return CMD_SUCCESS;
+}
+
+DEFUN(no_bgp_default_priority, no_bgp_default_priority_cmd, "no bgp default priority",
+      NO_STR "BGP specific commands\n"
+	     "Configure BGP defaults\n"
+	     "priority (higher=more preferred)\n") {
+	struct bgp *bgp;
+
+	bgp = vty->index;
+	bgp_default_priority_unset(bgp);
+	return CMD_SUCCESS;
+}
+
+ALIAS(no_bgp_default_priority, no_bgp_default_priority_val_cmd, "no bgp default priority <0-4294967295>",
+      NO_STR "BGP specific commands\n"
+	     "Configure BGP defaults\n"
+	     "priority (higher=more preferred)\n"
+	     "Configure default priority value\n")
+
 static void peer_announce_routes_if_rmap_out(struct bgp *bgp) {
 	struct peer *peer;
 	struct listnode *node, *nnode;
@@ -2413,6 +2447,46 @@ DEFUN(no_neighbor_weight, no_neighbor_weight_cmd, NO_NEIGHBOR_CMD2 "weight", NO_
 ALIAS(no_neighbor_weight, no_neighbor_weight_val_cmd, NO_NEIGHBOR_CMD2 "weight <0-65535>",
       NO_STR NEIGHBOR_STR NEIGHBOR_ADDR_STR2 "Set default weight for routes from this neighbor\n"
 					     "default weight\n")
+
+/* neighbor priority. */
+static int peer_priority_set_vty(struct vty *vty, const char *ip_str, const char *priority_str) {
+	struct peer *peer;
+	unsigned long priority;
+
+	peer = peer_and_group_lookup_vty(vty, ip_str);
+	if(!peer) {
+		return CMD_WARNING;
+	}
+
+	VTY_GET_INTEGER_RANGE("priority", priority, priority_str, 0, 65535);
+
+	return bgp_vty_return(vty, peer_priority_set(peer, priority));
+}
+
+static int peer_priority_unset_vty(struct vty *vty, const char *ip_str) {
+	struct peer *peer;
+
+	peer = peer_and_group_lookup_vty(vty, ip_str);
+	if(!peer) {
+		return CMD_WARNING;
+	}
+
+	return bgp_vty_return(vty, peer_priority_unset(peer));
+}
+
+DEFUN(neighbor_priority, neighbor_priority_cmd, NEIGHBOR_CMD2 "priority <0-65535>",
+      NEIGHBOR_STR NEIGHBOR_ADDR_STR2 "Set default priority for routes from this neighbor\n"
+				      "default priority\n") {
+	return peer_priority_set_vty(vty, argv[0], argv[1]);
+}
+
+DEFUN(no_neighbor_priority, no_neighbor_priority_cmd, NO_NEIGHBOR_CMD2 "priority", NO_STR NEIGHBOR_STR NEIGHBOR_ADDR_STR2 "Set default priority for routes from this neighbor\n") {
+	return peer_priority_unset_vty(vty, argv[0]);
+}
+
+ALIAS(no_neighbor_priority, no_neighbor_priority_val_cmd, NO_NEIGHBOR_CMD2 "priority <0-65535>",
+      NO_STR NEIGHBOR_STR NEIGHBOR_ADDR_STR2 "Set default priority for routes from this neighbor\n"
+					     "default priority\n")
 
 /* Override capability negotiation. */
 DEFUN(neighbor_override_capability, neighbor_override_capability_cmd, NEIGHBOR_CMD2 "override-capability", NEIGHBOR_STR NEIGHBOR_ADDR_STR2 "Override capability negotiation result\n") {
@@ -5614,6 +5688,11 @@ static void bgp_show_peer(struct vty *vty, struct peer *p) {
 		vty_out(vty, "  Default weight %d%s", p->weight, VTY_NEWLINE);
 	}
 
+	/* Default priority */
+	if(CHECK_FLAG(p->config, PEER_CONFIG_PRIORITY)) {
+		vty_out(vty, "  Default priority %d%s", p->priority, VTY_NEWLINE);
+	}
+
 	vty_out(vty, "%s", VTY_NEWLINE);
 
 	/* Address Family Information */
@@ -6716,6 +6795,11 @@ void bgp_vty_init(void) {
 	install_element(BGP_NODE, &no_bgp_default_local_preference_cmd);
 	install_element(BGP_NODE, &no_bgp_default_local_preference_val_cmd);
 
+	/* "bgp default priority" commands. */
+	install_element(BGP_NODE, &bgp_default_priority_cmd);
+	install_element(BGP_NODE, &no_bgp_default_priority_cmd);
+	install_element(BGP_NODE, &no_bgp_default_priority_val_cmd);
+
 	/* bgp ibgp-allow-policy-mods command */
 	install_element(BGP_NODE, &bgp_rr_allow_outbound_policy_cmd);
 	install_element(BGP_NODE, &no_bgp_rr_allow_outbound_policy_cmd);
@@ -7221,6 +7305,11 @@ void bgp_vty_init(void) {
 	install_element(BGP_NODE, &neighbor_weight_cmd);
 	install_element(BGP_NODE, &no_neighbor_weight_cmd);
 	install_element(BGP_NODE, &no_neighbor_weight_val_cmd);
+
+	/* "neighbor priority" commands. */
+	install_element(BGP_NODE, &neighbor_priority_cmd);
+	install_element(BGP_NODE, &no_neighbor_priority_cmd);
+	install_element(BGP_NODE, &no_neighbor_priority_val_cmd);
 
 	/* "neighbor override-capability" commands. */
 	install_element(BGP_NODE, &neighbor_override_capability_cmd);
