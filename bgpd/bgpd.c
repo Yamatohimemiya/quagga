@@ -1881,6 +1881,7 @@ static struct bgp *bgp_create(as_t *as, const char *name) {
 	}
 
 	bgp->default_local_pref = BGP_DEFAULT_LOCAL_PREF;
+	bgp->default_priority = BGP_ATTR_DEFAULT_PRIORITY;
 	bgp->default_holdtime = BGP_DEFAULT_HOLDTIME;
 	bgp->default_keepalive = BGP_DEFAULT_KEEPALIVE;
 	bgp->restart_time = BGP_DEFAULT_RESTART_TIME;
