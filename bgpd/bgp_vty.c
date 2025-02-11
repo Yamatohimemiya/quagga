@@ -1160,7 +1160,7 @@ DEFUN(no_bgp_default_priority, no_bgp_default_priority_cmd, "no bgp default prio
 	return CMD_SUCCESS;
 }
 
-ALIAS(no_bgp_default_priority, no_bgp_default_priority_val_cmd, "no bgp default priority <0-4294967295>",
+ALIAS(no_bgp_default_priority, no_bgp_default_priority_val_cmd, "no bgp default priority <0-65535>",
       NO_STR "BGP specific commands\n"
 	     "Configure BGP defaults\n"
 	     "priority (higher=more preferred)\n"

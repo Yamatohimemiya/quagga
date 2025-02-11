@@ -2782,7 +2782,7 @@ ALIAS(no_set_weight, no_set_weight_val_cmd, "no set weight <0-4294967295>",
 		     "Weight value\n")
 
 
-DEFUN(set_priority, set_priority_cmd, "set priority <0-4294967295>",
+DEFUN(set_priority, set_priority_cmd, "set priority <0-65535>",
       SET_STR "BGP priority for routing table\n"
 	      "Priority value\n") {
 	return bgp_route_set_add(vty, vty->index, "priority", argv[0]);
@@ -2796,7 +2796,7 @@ DEFUN(no_set_priority, no_set_priority_cmd, "no set priority", NO_STR SET_STR "B
 	return bgp_route_set_delete(vty, vty->index, "priority", argv[0]);
 }
 
-ALIAS(no_set_priority, no_set_priority_val_cmd, "no set priority <0-4294967295>",
+ALIAS(no_set_priority, no_set_priority_val_cmd, "no set priority <0-65535>",
       NO_STR SET_STR "BGP priority for routing table\n"
 		     "Priority value\n")
 

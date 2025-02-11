@@ -401,20 +401,22 @@ static int bgp_info_cmp(struct bgp *bgp, struct bgp_info *new, struct bgp_info *
 	}
 
 	/* 5. Priority check. */
-	new_priority = exist_priority = 0;
+	if(bm->DESDisableFeatureFlag != 1){
+		new_priority = exist_priority = 0;
 
-	if(newattre) {
-		new_priority = newattre->priority;
-	}
-	if(existattre) {
-		exist_priority = existattre->priority;
-	}
+		if(newattre) {
+			new_priority = newattre->priority;
+		}
+		if(existattre) {
+			exist_priority = existattre->priority;
+		}
 
-	if(new_priority > exist_priority) {
-		return -1;
-	}
-	if(new_priority < exist_priority) {
-		return 1;
+		if(new_priority > exist_priority) {
+			return -1;
+		}
+		if(new_priority < exist_priority) {
+			return 1;
+		}
 	}
 
 	/* 6. Origin check. */
@@ -5261,6 +5263,9 @@ static void route_vty_short_status_out(struct vty *vty, struct bgp_info *binfo) 
 void route_vty_out(struct vty *vty, struct prefix *p, struct bgp_info *binfo, int display, safi_t safi) {
 	struct attr *attr;
 
+	const char *FormatStr;
+	const char *BlankStr;
+
 	/* short status lead text */
 	route_vty_short_status_out(vty, binfo);
 
@@ -5298,7 +5303,12 @@ void route_vty_out(struct vty *vty, struct prefix *p, struct bgp_info *binfo, in
 			}
 		} else {
 			if(p->family == AF_INET) {
-				vty_out(vty, "%-15s", inet_ntoa(attr->nexthop));
+				if(bm->DESDisableFeatureFlag != 1){
+					FormatStr = "%-15s";
+				} else {
+					FormatStr = "%-16s";
+				}
+				vty_out(vty, FormatStr, inet_ntoa(attr->nexthop));
 			} else if(p->family == AF_INET6) {
 				int len;
 				char buf[BUFSIZ];
@@ -5319,42 +5329,54 @@ void route_vty_out(struct vty *vty, struct prefix *p, struct bgp_info *binfo, in
        * NEXTHOP end
        */
 
-		if(attr->flag & ATTR_FLAG_BIT(BGP_ATTR_MULTI_EXIT_DISC)) {
-			vty_out(vty, "%6u", attr->med);
+		if(bm->DESDisableFeatureFlag != 1){
+			FormatStr = "%6u";
+			BlankStr = "      ";
 		} else {
-			vty_out(vty, "      ");
+			FormatStr = "%10u";
+			BlankStr = "          ";
+		}
+
+		if(attr->flag & ATTR_FLAG_BIT(BGP_ATTR_MULTI_EXIT_DISC)) {
+			vty_out(vty, FormatStr, attr->med);
+		} else {
+			vty_out(vty, BlankStr);
+		}
+
+		if(bm->DESDisableFeatureFlag != 1){
+			FormatStr = "%6u";
+			BlankStr = "      ";
+		} else {
+			FormatStr = "%7u";
+			BlankStr = "       ";
 		}
 
 		if(attr->flag & ATTR_FLAG_BIT(BGP_ATTR_LOCAL_PREF)) {
-			vty_out(vty, "%6u", attr->local_pref);
+			vty_out(vty, FormatStr, attr->local_pref);
 		} else {
-			vty_out(vty, "      ");
+			vty_out(vty, BlankStr);
 		}
 
-		vty_out(vty, "%6u", (attr->extra ? attr->extra->weight : 0));
-
-		if(attr->extra && attr->extra->priority != BGP_ATTR_DEFAULT_PRIORITY) {
-		//if(attr->flag & ATTR_FLAG_BIT(PEER_CONFIG_PRIORITY)) {
-			vty_out(vty, "%6u  ", (attr->extra ? attr->extra->priority : 0));
+		if(bm->DESDisableFeatureFlag != 1){
+			FormatStr = "%6u";
 		} else {
-			vty_out(vty, "        ");
+			FormatStr = "%7u ";
+		}
+
+		vty_out(vty, FormatStr, (attr->extra ? attr->extra->weight : 0));
+
+		if(bm->DESDisableFeatureFlag != 1){
+			if(attr->extra && attr->extra->priority != BGP_ATTR_DEFAULT_PRIORITY) {
+			//if(attr->flag & ATTR_FLAG_BIT(PEER_CONFIG_PRIORITY)) {
+				vty_out(vty, "%6u  ", (attr->extra ? attr->extra->priority : 0));
+			} else {
+				vty_out(vty, "        ");
+			}
 		}
 
 		/* Print aspath */
 		if(attr->aspath) {
-//			if(attr->aspath->str_len <= 17){
-				aspath_print_vty(vty, "%s", attr->aspath, " ");
-/*
-			} else if(attr->aspath->str_len <= 44) {
-				vty_out(vty, "%s", VTY_NEWLINE);
-				vty_out(vty, "%*s", 36, " ");
-				aspath_print_vty(vty, "%s", attr->aspath, " ");
-			} else {
-				vty_out(vty, "%s", VTY_NEWLINE);
-				vty_out(vty, "%*s", 3, " ");
-				aspath_print_vty(vty, "%s", attr->aspath, " ");
-			}
-*/
+			aspath_print_vty(vty, "%s", attr->aspath, " ");
 		}
 
 		/* Print origin */
@@ -5410,7 +5432,9 @@ void route_vty_out_tmp(struct vty *vty, struct prefix *p, struct attr *attr, saf
 
 		vty_out(vty, "%7u ", (attr->extra ? attr->extra->weight : 0));
 
-		vty_out(vty, "%7u ", (attr->extra ? attr->extra->priority : 0));
+		if(bm->DESDisableFeatureFlag != 1){
+			vty_out(vty, "%7u ", (attr->extra ? attr->extra->priority : 0));
+		}
 
 		/* Print aspath */
 		if(attr->aspath) {
@@ -5667,8 +5691,10 @@ static void route_vty_out_detail(struct vty *vty, struct bgp *bgp, struct prefix
 			vty_out(vty, ", weight %u", attr->extra->weight);
 		}
 
-		if(attr->extra && attr->extra->priority != 0) {
-			vty_out(vty, ", priority %u", attr->extra->priority);
+		if(bm->DESDisableFeatureFlag != 1){
+			if(attr->extra && attr->extra->priority != 0) {
+				vty_out(vty, ", priority %u", attr->extra->priority);
+			}
 		}
 
 		if(attr->extra && attr->extra->tag != 0) {
@@ -5762,6 +5788,7 @@ static void route_vty_out_detail(struct vty *vty, struct bgp *bgp, struct prefix
 	"              i internal, r RIB-failure, S Stale, R Removed%s"
 #define BGP_SHOW_OCODE_HEADER "Origin codes: i - IGP, e - EGP, ? - incomplete%s%s"
 #define BGP_SHOW_HEADER "   Network          Next Hop          MED LocPr Weigh  Prio  Path%s"
+#define BGP_SHOW_HEADER_COMPATIBLE "   Network          Next Hop            Metric LocPrf Weight Path%s"
 #define BGP_SHOW_DAMP_HEADER "   Network          From             Reuse    Path%s"
 #define BGP_SHOW_FLAP_HEADER "   Network          From            Flaps Duration Reuse    Path%s"
 
@@ -5974,7 +6001,11 @@ static int bgp_show_table(struct vty *vty, struct bgp_table *table, struct in_ad
 					} else if(type == bgp_show_type_flap_statistics || type == bgp_show_type_flap_address || type == bgp_show_type_flap_prefix || type == bgp_show_type_flap_cidr_only || type == bgp_show_type_flap_regexp || type == bgp_show_type_flap_filter_list || type == bgp_show_type_flap_prefix_list || type == bgp_show_type_flap_prefix_longer || type == bgp_show_type_flap_route_map || type == bgp_show_type_flap_neighbor) {
 						vty_out(vty, BGP_SHOW_FLAP_HEADER, VTY_NEWLINE);
 					} else {
-						vty_out(vty, BGP_SHOW_HEADER, VTY_NEWLINE);
+						if(bm->DESDisableFeatureFlag != 1){
+							vty_out(vty, BGP_SHOW_HEADER, VTY_NEWLINE);
+						} else {
+							vty_out(vty, BGP_SHOW_HEADER_COMPATIBLE, VTY_NEWLINE);
+						}
 					}
 					header = 0;
 				}
@@ -10796,7 +10827,7 @@ static void show_adj_route(struct vty *vty, struct peer *peer, afi_t afi, safi_t
 						header1 = 0;
 					}
 					if(header2) {
-						vty_out(vty, BGP_SHOW_HEADER, VTY_NEWLINE);
+						vty_out(vty, BGP_SHOW_HEADER_COMPATIBLE, VTY_NEWLINE);
 						header2 = 0;
 					}
 					if(ain->attr) {
@@ -10815,7 +10846,7 @@ static void show_adj_route(struct vty *vty, struct peer *peer, afi_t afi, safi_t
 						header1 = 0;
 					}
 					if(header2) {
-						vty_out(vty, BGP_SHOW_HEADER, VTY_NEWLINE);
+						vty_out(vty, BGP_SHOW_HEADER_COMPATIBLE, VTY_NEWLINE);
 						header2 = 0;
 					}
 					if(adj->attr) {

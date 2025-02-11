@@ -57,6 +57,7 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 static const struct option longopts[] = {
 	{ "daemon", no_argument, NULL, 'd' },
 	{ "config_file", required_argument, NULL, 'f' },
+	{ "no_extend", no_argument, NULL, 'X' },
 	{ "pid_file", required_argument, NULL, 'i' },
 	{ "socket", required_argument, NULL, 'z' },
 	{ "bgp_port", required_argument, NULL, 'p' },
@@ -145,6 +146,7 @@ static void usage(char *progname, int status) {
 Daemon which manages kernel routing table management and \
 redistribution between different routing protocols.\n\n\
 -d, --daemon       Runs in daemon mode\n\
+-X, --no_extend    Disable DES extensions\n\
 -f, --config_file  Set configuration file name\n\
 -i, --pid_file     Set process identifier file name\n\
 -z, --socket       Set path of zebra socket\n\
@@ -352,7 +354,7 @@ int main(int argc, char **argv) {
 
 	/* Command line argument treatment. */
 	while(1) {
-		opt = getopt_long(argc, argv, "df:i:z:hp:l:A:P:rnu:g:vCS", longopts, 0);
+		opt = getopt_long(argc, argv, "df:Xi:z:hp:l:A:P:rnu:g:vCS", longopts, 0);
 
 		if(opt == EOF) {
 			break;
@@ -362,6 +364,7 @@ int main(int argc, char **argv) {
 			case 0: break;
 			case 'd': daemon_mode = 1; break;
 			case 'f': config_file = optarg; break;
+			case 'X': bm->DESDisableFeatureFlag = 1; break;
 			case 'i': pid_file = optarg; break;
 			case 'z': zclient_serv_path_set(optarg); break;
 			case 'p':
