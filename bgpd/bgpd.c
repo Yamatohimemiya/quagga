@@ -123,6 +123,21 @@ int bgp_flag_check(struct bgp *bgp, int flag) {
 	return CHECK_FLAG(bgp->flags, flag);
 }
 
+/* BGP default flag manipulation.  */
+int bgp_defaultflag_set(struct bgp *bgp, int flag) {
+	SET_FLAG(bgp->defaultflags, flag);
+	return 0;
+}
+
+int bgp_defaultflag_unset(struct bgp *bgp, int flag) {
+	UNSET_FLAG(bgp->defaultflags, flag);
+	return 0;
+}
+
+int bgp_defaultflag_check(struct bgp *bgp, int flag) {
+	return CHECK_FLAG(bgp->defaultflags, flag);
+}
+
 /* Internal function to set BGP structure configureation flag.  */
 static void bgp_config_set(struct bgp *bgp, int config) {
 	SET_FLAG(bgp->config, config);
@@ -967,11 +982,36 @@ int peer_remote_as(struct bgp *bgp, union sockunion *su, as_t *as, afi_t afi, sa
 		/* If this is IPv4 unicast configuration and "no bgp default
          ipv4-unicast" is specified. */
 
-		if(bgp_flag_check(bgp, BGP_FLAG_NO_DEFAULT_IPV4) && afi == AFI_IP && safi == SAFI_UNICAST) {
-			peer_create(su, bgp, local_as, *as, 0, 0);
+		if( !bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV4_UNICAST) && afi == AFI_IP && safi == SAFI_UNICAST) {
+			peer = peer_create(su, bgp, local_as, *as, 0, 0);
 		} else {
-			peer_create(su, bgp, local_as, *as, afi, safi);
+			peer = peer_create(su, bgp, local_as, *as, afi, safi);
 		}
+
+		//AFI_IP4, SAFI_UNICAST: Already created or disabled in 'no' config
+		if(bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV4_MULTICAST)){
+			peer_activate(peer, AFI_IP, SAFI_MULTICAST);
+		}
+		if(bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV4_MPLS_VPN)){
+			peer_activate(peer, AFI_IP, SAFI_MPLS_VPN);
+		}
+		if(bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV4_ENCAP)){
+			peer_activate(peer, AFI_IP, SAFI_ENCAP);
+		}
+
+		if(bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV6_UNICAST)){
+			peer_activate(peer, AFI_IP6, SAFI_UNICAST);
+		}
+		if(bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV6_MULTICAST)){
+			peer_activate(peer, AFI_IP6, SAFI_MULTICAST);
+		}
+		if(bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV6_MPLS_VPN)){
+			peer_activate(peer, AFI_IP6, SAFI_MULTICAST);
+		}
+		if(bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV6_ENCAP)){
+			peer_activate(peer, AFI_IP6, SAFI_MULTICAST);
+		}
+
 	}
 
 	return 0;
@@ -1319,7 +1359,7 @@ struct peer_group *peer_group_get(struct bgp *bgp, const char *name) {
 	group->name = strdup(name);
 	group->peer = list_new();
 	group->conf = peer_new(bgp);
-	if(!bgp_flag_check(bgp, BGP_FLAG_NO_DEFAULT_IPV4)) {
+	if(bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV4_UNICAST)) {
 		group->conf->afc[AFI_IP][SAFI_UNICAST] = 1;
 	}
 	group->conf->host = XSTRDUP(MTYPE_BGP_PEER_HOST, name);
@@ -1886,7 +1926,9 @@ static struct bgp *bgp_create(as_t *as, const char *name) {
 	bgp->default_keepalive = BGP_DEFAULT_KEEPALIVE;
 	bgp->restart_time = BGP_DEFAULT_RESTART_TIME;
 	bgp->stalepath_time = BGP_DEFAULT_STALEPATH_TIME;
+
 	bgp_flag_set(bgp, BGP_FLAG_LOG_NEIGHBOR_CHANGES);
+	bgp_defaultflag_set(bgp, BGP_DEFAULTFLAG_IPV4_UNICAST);
 
 	bgp->as = *as;
 
@@ -4712,7 +4754,7 @@ static void bgp_config_write_peer(struct vty *vty, struct bgp *bgp, struct peer 
 		}
 
 		if(!peer->af_group[AFI_IP][SAFI_UNICAST]) {
-			if(bgp_flag_check(bgp, BGP_FLAG_NO_DEFAULT_IPV4)) {
+			if(!bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV4_UNICAST)) {
 				if(peer->afc[AFI_IP][SAFI_UNICAST]) {
 					vty_out(vty, " neighbor %s activate%s", addr, VTY_NEWLINE);
 				}
@@ -4999,8 +5041,43 @@ int bgp_config_write(struct vty *vty) {
 		}
 
 		/* BGP default ipv4-unicast. */
-		if(bgp_flag_check(bgp, BGP_FLAG_NO_DEFAULT_IPV4)) {
+		if(!bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV4_UNICAST)) {
 			vty_out(vty, " no bgp default ipv4-unicast%s", VTY_NEWLINE);
+		}
+
+		/* BGP default ipv4-multicast. */
+		if(bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV4_MULTICAST)) {
+			vty_out(vty, " bgp default ipv4-multicast%s", VTY_NEWLINE);
+		}
+
+		/* BGP default ipv4-vpn. */
+		if(bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV4_MPLS_VPN)) {
+			vty_out(vty, " bgp default ipv4-vpn%s", VTY_NEWLINE);
+		}
+
+		/* BGP default ipv4-encap. */
+		if(bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV4_ENCAP)) {
+			vty_out(vty, " bgp default ipv4-encap%s", VTY_NEWLINE);
+		}
+
+		/* BGP default ipv6-unicast. */
+		if(bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV6_UNICAST)) {
+			vty_out(vty, " bgp default ipv6-unicast%s", VTY_NEWLINE);
+		}
+
+		/* BGP default ipv6-multicast. */
+		if(bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV6_MULTICAST)) {
+			vty_out(vty, " bgp default ipv6-multicast%s", VTY_NEWLINE);
+		}
+
+		/* BGP default ipv6-vpn. */
+		if(bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV6_MPLS_VPN)) {
+			vty_out(vty, " bgp default ipv6-vpn%s", VTY_NEWLINE);
+		}
+
+		/* BGP default ipv6-encap. */
+		if(bgp_defaultflag_check(bgp, BGP_DEFAULTFLAG_IPV6_ENCAP)) {
+			vty_out(vty, " bgp default ipv6-encap%s", VTY_NEWLINE);
 		}
 
 		/* BGP default local-preference. */

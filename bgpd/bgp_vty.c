@@ -1060,7 +1060,7 @@ DEFUN(no_bgp_default_ipv4_unicast, no_bgp_default_ipv4_unicast_cmd, "no bgp defa
 	struct bgp *bgp;
 
 	bgp = vty->index;
-	bgp_flag_set(bgp, BGP_FLAG_NO_DEFAULT_IPV4);
+	bgp_defaultflag_unset(bgp, BGP_DEFAULTFLAG_IPV4_UNICAST);
 	return CMD_SUCCESS;
 }
 
@@ -1071,7 +1071,174 @@ DEFUN(bgp_default_ipv4_unicast, bgp_default_ipv4_unicast_cmd, "bgp default ipv4-
 	struct bgp *bgp;
 
 	bgp = vty->index;
-	bgp_flag_unset(bgp, BGP_FLAG_NO_DEFAULT_IPV4);
+	bgp_defaultflag_set(bgp, BGP_DEFAULTFLAG_IPV4_UNICAST);
+	return CMD_SUCCESS;
+}
+
+/* "no bgp default ipv4-multicast". */
+DEFUN(no_bgp_default_ipv4_multicast, no_bgp_default_ipv4_multicast_cmd, "no bgp default ipv4-multicast",
+      NO_STR "BGP specific commands\n"
+	     "Configure BGP defaults\n"
+	     "Activate ipv4-multicast for a peer by default\n") {
+	struct bgp *bgp;
+
+	bgp = vty->index;
+	bgp_defaultflag_unset(bgp, BGP_DEFAULTFLAG_IPV4_MULTICAST);
+	return CMD_SUCCESS;
+}
+
+DEFUN(bgp_default_ipv4_multicast, bgp_default_ipv4_multicast_cmd, "bgp default ipv4-multicast",
+      "BGP specific commands\n"
+      "Configure BGP defaults\n"
+      "Activate ipv4-multicast for a peer by default\n") {
+	struct bgp *bgp;
+
+	bgp = vty->index;
+	bgp_defaultflag_set(bgp, BGP_DEFAULTFLAG_IPV4_MULTICAST);
+	return CMD_SUCCESS;
+}
+
+
+/* "no bgp default ipv4-vpn". */
+DEFUN(no_bgp_default_ipv4_vpn, no_bgp_default_ipv4_vpn_cmd, "no bgp default ipv4-vpn",
+      NO_STR "BGP specific commands\n"
+	     "Configure BGP defaults\n"
+	     "Activate ipv4-vpn for a peer by default\n") {
+	struct bgp *bgp;
+
+	bgp = vty->index;
+	bgp_defaultflag_unset(bgp, BGP_DEFAULTFLAG_IPV4_MPLS_VPN);
+	return CMD_SUCCESS;
+}
+
+DEFUN(bgp_default_ipv4_vpn, bgp_default_ipv4_vpn_cmd, "bgp default ipv4-vpn",
+      "BGP specific commands\n"
+      "Configure BGP defaults\n"
+      "Activate ipv4-vpn for a peer by default\n") {
+	struct bgp *bgp;
+
+	bgp = vty->index;
+	bgp_defaultflag_set(bgp, BGP_DEFAULTFLAG_IPV4_MPLS_VPN);
+	return CMD_SUCCESS;
+}
+
+
+/* "no bgp default ipv4-encap". */
+DEFUN(no_bgp_default_ipv4_encap, no_bgp_default_ipv4_encap_cmd, "no bgp default ipv4-encap",
+      NO_STR "BGP specific commands\n"
+	     "Configure BGP defaults\n"
+	     "Activate ipv4-encap for a peer by default\n") {
+	struct bgp *bgp;
+
+	bgp = vty->index;
+	bgp_defaultflag_unset(bgp, BGP_DEFAULTFLAG_IPV4_ENCAP);
+	return CMD_SUCCESS;
+}
+
+DEFUN(bgp_default_ipv4_encap, bgp_default_ipv4_encap_cmd, "bgp default ipv4-encap",
+      "BGP specific commands\n"
+      "Configure BGP defaults\n"
+      "Activate ipv4-encap for a peer by default\n") {
+	struct bgp *bgp;
+
+	bgp = vty->index;
+	bgp_defaultflag_set(bgp, BGP_DEFAULTFLAG_IPV4_ENCAP);
+	return CMD_SUCCESS;
+}
+
+
+/* "no bgp default ipv6-unicast". */
+DEFUN(no_bgp_default_ipv6_unicast, no_bgp_default_ipv6_unicast_cmd, "no bgp default ipv6-unicast",
+      NO_STR "BGP specific commands\n"
+	     "Configure BGP defaults\n"
+	     "Activate ipv6-unicast for a peer by default\n") {
+	struct bgp *bgp;
+
+	bgp = vty->index;
+	bgp_defaultflag_unset(bgp, BGP_DEFAULTFLAG_IPV6_UNICAST);
+	return CMD_SUCCESS;
+}
+
+DEFUN(bgp_default_ipv6_unicast, bgp_default_ipv6_unicast_cmd, "bgp default ipv6-unicast",
+      "BGP specific commands\n"
+      "Configure BGP defaults\n"
+      "Activate ipv6-unicast for a peer by default\n") {
+	struct bgp *bgp;
+
+	bgp = vty->index;
+	bgp_defaultflag_set(bgp, BGP_DEFAULTFLAG_IPV6_UNICAST);
+	return CMD_SUCCESS;
+}
+
+
+/* "no bgp default ipv6-multicast". */
+DEFUN(no_bgp_default_ipv6_multicast, no_bgp_default_ipv6_multicast_cmd, "no bgp default ipv6-multicast",
+      NO_STR "BGP specific commands\n"
+	     "Configure BGP defaults\n"
+	     "Activate ipv6-multicast for a peer by default\n") {
+	struct bgp *bgp;
+
+	bgp = vty->index;
+	bgp_defaultflag_unset(bgp, BGP_DEFAULTFLAG_IPV6_MULTICAST);
+	return CMD_SUCCESS;
+}
+
+DEFUN(bgp_default_ipv6_multicast, bgp_default_ipv6_multicast_cmd, "bgp default ipv6-multicast",
+      "BGP specific commands\n"
+      "Configure BGP defaults\n"
+      "Activate ipv6-multicast for a peer by default\n") {
+	struct bgp *bgp;
+
+	bgp = vty->index;
+	bgp_defaultflag_set(bgp, BGP_DEFAULTFLAG_IPV6_MULTICAST);
+	return CMD_SUCCESS;
+}
+
+
+/* "no bgp default ipv6-vpn". */
+DEFUN(no_bgp_default_ipv6_vpn, no_bgp_default_ipv6_vpn_cmd, "no bgp default ipv6-vpn",
+      NO_STR "BGP specific commands\n"
+	     "Configure BGP defaults\n"
+	     "Activate ipv6-vpn for a peer by default\n") {
+	struct bgp *bgp;
+
+	bgp = vty->index;
+	bgp_defaultflag_unset(bgp, BGP_DEFAULTFLAG_IPV6_MPLS_VPN);
+	return CMD_SUCCESS;
+}
+
+DEFUN(bgp_default_ipv6_vpn, bgp_default_ipv6_vpn_cmd, "bgp default ipv6-vpn",
+      "BGP specific commands\n"
+      "Configure BGP defaults\n"
+      "Activate ipv6-vpn for a peer by default\n") {
+	struct bgp *bgp;
+
+	bgp = vty->index;
+	bgp_defaultflag_set(bgp, BGP_DEFAULTFLAG_IPV6_MPLS_VPN);
+	return CMD_SUCCESS;
+}
+
+
+/* "no bgp default ipv6-encap". */
+DEFUN(no_bgp_default_ipv6_encap, no_bgp_default_ipv6_encap_cmd, "no bgp default ipv6-encap",
+      NO_STR "BGP specific commands\n"
+	     "Configure BGP defaults\n"
+	     "Activate ipv6-encap for a peer by default\n") {
+	struct bgp *bgp;
+
+	bgp = vty->index;
+	bgp_defaultflag_unset(bgp, BGP_DEFAULTFLAG_IPV6_ENCAP);
+	return CMD_SUCCESS;
+}
+
+DEFUN(bgp_default_ipv6_encap, bgp_default_ipv6_encap_cmd, "bgp default ipv6-encap",
+      "BGP specific commands\n"
+      "Configure BGP defaults\n"
+      "Activate ipv6-encap for a peer by default\n") {
+	struct bgp *bgp;
+
+	bgp = vty->index;
+	bgp_defaultflag_set(bgp, BGP_DEFAULTFLAG_IPV6_ENCAP);
 	return CMD_SUCCESS;
 }
 
@@ -3163,15 +3330,17 @@ DEFUN(address_family_ipv4, address_family_ipv4_cmd, "address-family ipv4",
 	return CMD_SUCCESS;
 }
 
-DEFUN(address_family_ipv4_safi, address_family_ipv4_safi_cmd, "address-family ipv4 (unicast|multicast)",
+DEFUN(address_family_ipv4_safi, address_family_ipv4_safi_cmd, "address-family ipv4 (unicast|multicast|vpn|encap)",
       "Enter Address Family command mode\n"
       "Address family\n"
       "Address Family modifier\n"
       "Address Family modifier\n") {
-	if(strncmp(argv[0], "m", 1) == 0) {
-		vty->node = BGP_IPV4M_NODE;
-	} else {
-		vty->node = BGP_IPV4_NODE;
+
+	switch(argv[0][0]){
+		case 'u': vty->node = BGP_IPV4_NODE; break;
+		case 'm': vty->node = BGP_IPV4M_NODE; break;
+		case 'v': vty->node = BGP_VPNV4_NODE; break;
+		case 'e': vty->node = BGP_ENCAP_NODE; break;
 	}
 
 	return CMD_SUCCESS;
@@ -3184,15 +3353,17 @@ DEFUN(address_family_ipv6, address_family_ipv6_cmd, "address-family ipv6",
 	return CMD_SUCCESS;
 }
 
-DEFUN(address_family_ipv6_safi, address_family_ipv6_safi_cmd, "address-family ipv6 (unicast|multicast)",
+DEFUN(address_family_ipv6_safi, address_family_ipv6_safi_cmd, "address-family ipv6 (unicast|multicast|vpn|encap)",
       "Enter Address Family command mode\n"
       "Address family\n"
       "Address Family modifier\n"
       "Address Family modifier\n") {
-	if(strncmp(argv[0], "m", 1) == 0) {
-		vty->node = BGP_IPV6M_NODE;
-	} else {
-		vty->node = BGP_IPV6_NODE;
+
+	switch(argv[0][0]){
+		case 'u': vty->node = BGP_IPV6_NODE; break;
+		case 'm': vty->node = BGP_IPV6M_NODE; break;
+		case 'v': vty->node = BGP_VPNV6_NODE; break;
+		case 'e': vty->node = BGP_ENCAPV6_NODE; break;
 	}
 
 	return CMD_SUCCESS;
@@ -3222,16 +3393,12 @@ ALIAS(address_family_vpnv6, address_family_vpnv6_unicast_cmd, "address-family vp
       "Address family\n"
       "Address Family Modifier\n")
 
-DEFUN(address_family_encap, address_family_encap_cmd, "address-family encap",
+DEFUN(address_family_encap, address_family_encapv4_cmd, "address-family (encap|encapv4)",
       "Enter Address Family command mode\n"
       "Address family\n") {
 	vty->node = BGP_ENCAP_NODE;
 	return CMD_SUCCESS;
 }
-
-ALIAS(address_family_encap, address_family_encapv4_cmd, "address-family encapv4",
-      "Enter Address Family command mode\n"
-      "Address family\n")
 
 DEFUN(address_family_encapv6, address_family_encapv6_cmd, "address-family encapv6",
       "Enter Address Family command mode\n"
@@ -6786,6 +6953,35 @@ void bgp_vty_init(void) {
 	install_element(BGP_NODE, &no_bgp_default_ipv4_unicast_cmd);
 	install_element(BGP_NODE, &bgp_default_ipv4_unicast_cmd);
 
+	/* "bgp default ipv4-multicast" commands. */
+	install_element(BGP_NODE, &no_bgp_default_ipv4_multicast_cmd);
+	install_element(BGP_NODE, &bgp_default_ipv4_multicast_cmd);
+
+	/* "bgp default ipv4-vpn" commands. */
+	install_element(BGP_NODE, &no_bgp_default_ipv4_vpn_cmd);
+	install_element(BGP_NODE, &bgp_default_ipv4_vpn_cmd);
+
+	/* "bgp default ipv4-encap" commands. */
+	install_element(BGP_NODE, &no_bgp_default_ipv4_encap_cmd);
+	install_element(BGP_NODE, &bgp_default_ipv4_encap_cmd);
+
+	/* "bgp default ipv6-unicast" commands. */
+	install_element(BGP_NODE, &no_bgp_default_ipv6_unicast_cmd);
+	install_element(BGP_NODE, &bgp_default_ipv6_unicast_cmd);
+
+	/* "bgp default ipv6-multicast" commands. */
+	install_element(BGP_NODE, &no_bgp_default_ipv6_multicast_cmd);
+	install_element(BGP_NODE, &bgp_default_ipv6_multicast_cmd);
+
+	/* "bgp default ipv6-vpn" commands. */
+	install_element(BGP_NODE, &no_bgp_default_ipv6_vpn_cmd);
+	install_element(BGP_NODE, &bgp_default_ipv6_vpn_cmd);
+
+	/* "bgp default ipv6-encap" commands. */
+	install_element(BGP_NODE, &no_bgp_default_ipv6_encap_cmd);
+	install_element(BGP_NODE, &bgp_default_ipv6_encap_cmd);
+
+
 	/* "bgp network import-check" commands. */
 	install_element(BGP_NODE, &bgp_network_import_check_cmd);
 	install_element(BGP_NODE, &no_bgp_network_import_check_cmd);
@@ -7598,11 +7794,9 @@ void bgp_vty_init(void) {
 	install_element(BGP_NODE, &address_family_ipv6_safi_cmd);
 	install_element(BGP_NODE, &address_family_vpnv4_cmd);
 	install_element(BGP_NODE, &address_family_vpnv4_unicast_cmd);
-
 	install_element(BGP_NODE, &address_family_vpnv6_cmd);
 	install_element(BGP_NODE, &address_family_vpnv6_unicast_cmd);
 
-	install_element(BGP_NODE, &address_family_encap_cmd);
 	install_element(BGP_NODE, &address_family_encapv4_cmd);
 	install_element(BGP_NODE, &address_family_encapv6_cmd);
 

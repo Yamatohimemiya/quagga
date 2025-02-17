@@ -114,7 +114,7 @@ struct bgp {
 #define BGP_FLAG_DETERMINISTIC_MED (1 << 1)
 #define BGP_FLAG_MED_MISSING_AS_WORST (1 << 2)
 #define BGP_FLAG_MED_CONFED (1 << 3)
-#define BGP_FLAG_NO_DEFAULT_IPV4 (1 << 4)
+#define BGP_FLAG_NO_DEFAULT_IPV4_OBSOLETED (1 << 4)
 #define BGP_FLAG_NO_CLIENT_TO_CLIENT (1 << 5)
 #define BGP_FLAG_ENFORCE_FIRST_AS (1 << 6)
 #define BGP_FLAG_COMPARE_ROUTER_ID (1 << 7)
@@ -127,6 +127,18 @@ struct bgp {
 #define BGP_FLAG_ASPATH_MULTIPATH_RELAX (1 << 14)
 #define BGP_FLAG_DELETING (1 << 15)
 #define BGP_FLAG_RR_ALLOW_OUTBOUND_POLICY (1 << 16)
+
+	/* BGP default flags. */
+	u_int32_t defaultflags;
+#define BGP_DEFAULTFLAG_IPV4_UNICAST (1 << 0)
+#define BGP_DEFAULTFLAG_IPV4_MULTICAST (1 << 1)
+#define BGP_DEFAULTFLAG_IPV4_MPLS_VPN (1 << 2)
+#define BGP_DEFAULTFLAG_IPV4_ENCAP (1 << 3)
+#define BGP_DEFAULTFLAG_IPV6_UNICAST (1 << 4)
+#define BGP_DEFAULTFLAG_IPV6_MULTICAST (1 << 5)
+#define BGP_DEFAULTFLAG_IPV6_MPLS_VPN (1 << 6)
+#define BGP_DEFAULTFLAG_IPV6_ENCAP (1 << 7)
+
 
 	/* BGP Per AF flags */
 	u_int16_t af_flags[AFI_MAX][SAFI_MAX];
@@ -875,6 +887,10 @@ extern int bgp_delete(struct bgp *);
 extern int bgp_flag_set(struct bgp *, int);
 extern int bgp_flag_unset(struct bgp *, int);
 extern int bgp_flag_check(struct bgp *, int);
+
+extern int bgp_defaultflag_set(struct bgp *, int);
+extern int bgp_defaultflag_unset(struct bgp *, int);
+extern int bgp_defaultflag_check(struct bgp *, int);
 
 extern void bgp_lock(struct bgp *);
 extern void bgp_unlock(struct bgp *);

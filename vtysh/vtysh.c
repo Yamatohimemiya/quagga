@@ -683,6 +683,21 @@ ALIAS_SH(
 				  "view name\n"
 )
 
+DEFUNSH(VTYSH_BGPD, address_family_ipv4_vpn, address_family_ipv4_vpn_cmd, "address-family ipv4 vpn",
+	"Enter Address Family command mode\n"
+	"Address family\n") {
+	vty->node = BGP_VPNV4_NODE;
+	return CMD_SUCCESS;
+}
+
+DEFUNSH(VTYSH_BGPD, address_family_ipv4_vpn_unicast, address_family_ipv4_vpn_unicast_cmd, "address-family ipv4 vpn unicast",
+	"Enter Address Family command mode\n"
+	"Address family\n"
+	"Address Family Modifier\n") {
+	vty->node = BGP_VPNV4_NODE;
+	return CMD_SUCCESS;
+}
+
 DEFUNSH(VTYSH_BGPD, address_family_vpnv4, address_family_vpnv4_cmd, "address-family vpnv4",
 	"Enter Address Family command mode\n"
 	"Address family\n") {
@@ -698,6 +713,21 @@ DEFUNSH(VTYSH_BGPD, address_family_vpnv4_unicast, address_family_vpnv4_unicast_c
 	return CMD_SUCCESS;
 }
 
+DEFUNSH(VTYSH_BGPD, address_family_ipv6_vpn, address_family_ipv6_vpn_cmd, "address-family ipv6 vpn",
+	"Enter Address Family command mode\n"
+	"Address family\n") {
+	vty->node = BGP_VPNV6_NODE;
+	return CMD_SUCCESS;
+}
+
+DEFUNSH(VTYSH_BGPD, address_family_ipv6_vpn_unicast, address_family_ipv6_vpn_unicast_cmd, "address-family ipv6 vpn unicast",
+	"Enter Address Family command mode\n"
+	"Address family\n"
+	"Address Family Modifier\n") {
+	vty->node = BGP_VPNV6_NODE;
+	return CMD_SUCCESS;
+}
+
 DEFUNSH(VTYSH_BGPD, address_family_vpnv6, address_family_vpnv6_cmd, "address-family vpnv6",
 	"Enter Address Family command mode\n"
 	"Address family\n") {
@@ -710,6 +740,20 @@ DEFUNSH(VTYSH_BGPD, address_family_vpnv6_unicast, address_family_vpnv6_unicast_c
 	"Address family\n"
 	"Address Family Modifier\n") {
 	vty->node = BGP_VPNV6_NODE;
+	return CMD_SUCCESS;
+}
+
+DEFUNSH(VTYSH_BGPD, address_family_ipv4_encap, address_family_ipv4_encap_cmd, "address-family ipv4 encap",
+	"Enter Address Family command mode\n"
+	"Address family\n") {
+	vty->node = BGP_ENCAP_NODE;
+	return CMD_SUCCESS;
+}
+
+DEFUNSH(VTYSH_BGPD, address_family_ipv6_encap, address_family_ipv6_encap_cmd, "address-family ipv6 encap",
+	"Enter Address Family command mode\n"
+	"Address family\n") {
+	vty->node = BGP_ENCAPV6_NODE;
 	return CMD_SUCCESS;
 }
 
@@ -2012,10 +2056,16 @@ void vtysh_init_vty(void) {
 	install_element(CONFIG_NODE, &router_isis_cmd);
 	install_element(CONFIG_NODE, &router_bgp_cmd);
 	install_element(CONFIG_NODE, &router_bgp_view_cmd);
+	install_element(BGP_NODE, &address_family_ipv4_vpn_cmd);
+	install_element(BGP_NODE, &address_family_ipv4_vpn_unicast_cmd);
 	install_element(BGP_NODE, &address_family_vpnv4_cmd);
 	install_element(BGP_NODE, &address_family_vpnv4_unicast_cmd);
+	install_element(BGP_NODE, &address_family_ipv6_vpn_cmd);
+	install_element(BGP_NODE, &address_family_ipv6_vpn_unicast_cmd);
 	install_element(BGP_NODE, &address_family_vpnv6_cmd);
 	install_element(BGP_NODE, &address_family_vpnv6_unicast_cmd);
+	install_element(BGP_NODE, &address_family_ipv4_encap_cmd);
+	install_element(BGP_NODE, &address_family_ipv6_encap_cmd);
 	install_element(BGP_NODE, &address_family_encap_cmd);
 	install_element(BGP_NODE, &address_family_encapv6_cmd);
 	install_element(BGP_NODE, &address_family_ipv4_unicast_cmd);
