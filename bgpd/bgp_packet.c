@@ -590,6 +590,10 @@ static struct stream *bgp_write_packet(struct peer *peer) {
 					   && safi != SAFI_MPLS_VPN) {
 						if(CHECK_FLAG(adv->binfo->peer->af_sflags[afi][safi], PEER_STATUS_EOR_RECEIVED)) {
 							s = bgp_update_packet(peer, afi, safi);
+//						} else {
+//							if(bm->DESDisableFeatureFlag != 1){
+//								s = bgp_update_packet(peer, afi, safi);
+//							}
 						}
 					} else {
 						s = bgp_update_packet(peer, afi, safi);
@@ -1779,7 +1783,11 @@ static int bgp_update_receive(struct peer *peer, bgp_size_t size) {
 		/* otherwise MP AFI/SAFI is an empty update, other than an empty
        * MP_UNREACH_NLRI attr (with an AFI/SAFI we recognise).
        */
-		else if(attr.flag == BGP_ATTR_MP_UNREACH_NLRI && nlris[NLRI_MP_WITHDRAW].length == 0 && bgp_afi_safi_valid_indices(nlris[NLRI_MP_WITHDRAW].afi, &nlris[NLRI_MP_WITHDRAW].safi)) {
+		else if(
+			attr.flag == ATTR_FLAG_BIT(BGP_ATTR_MP_UNREACH_NLRI)
+			&& nlris[NLRI_MP_WITHDRAW].length == 0
+			&& bgp_afi_safi_valid_indices(nlris[NLRI_MP_WITHDRAW].afi, &nlris[NLRI_MP_WITHDRAW].safi)
+		) {
 			afi = nlris[NLRI_MP_WITHDRAW].afi;
 			safi = nlris[NLRI_MP_WITHDRAW].safi;
 		}
