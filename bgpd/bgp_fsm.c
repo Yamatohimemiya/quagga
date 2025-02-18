@@ -589,7 +589,11 @@ static int bgp_connect_success(struct peer *peer) {
 	BGP_READ_ON(peer->t_read, bgp_read, peer->fd);
 
 	if(!CHECK_FLAG(peer->sflags, PEER_STATUS_ACCEPT_PEER)) {
-		bgp_getsockname(peer);
+		if(bgp_getsockname(peer) == -1){
+			zlog_err("Failed to detect local address for %s. Resetting conenction...\n", peer->host);
+			peer_clear(peer);
+			return -1;
+		}
 	}
 
 	if(BGP_DEBUG(normal, NORMAL)) {

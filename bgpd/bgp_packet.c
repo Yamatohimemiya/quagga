@@ -1528,7 +1528,11 @@ static int bgp_open_receive(struct peer *peer, bgp_size_t size) {
 	}
 
 	/* Get sockname. */
-	bgp_getsockname(peer);
+	if(bgp_getsockname(peer) == -1){
+		zlog_err("Failed to detect local address for %s. Resetting conenction...\n", peer->host);
+		peer_clear(peer);
+		return -1;
+	}
 	peer->rtt = sockopt_tcp_rtt(peer->fd);
 
 	BGP_EVENT_ADD(peer, Receive_OPEN_message);
