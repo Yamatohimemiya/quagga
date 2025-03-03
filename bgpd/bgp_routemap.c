@@ -1148,6 +1148,40 @@ struct route_map_rule_cmd route_set_aspath_prepend_cmd = {
 	route_set_aspath_prepend_free,
 };
 
+static route_map_result_t route_set_aspath_prepend_by(void *rule, struct prefix *prefix, route_map_object_t type, void *object) {
+	struct aspath *aspath;
+	struct aspath *new;
+	struct bgp_info *binfo;
+
+	if(type == RMAP_BGP) {
+		binfo = object;
+
+		if(binfo->attr->aspath->refcnt) {
+			new = aspath_dup(binfo->attr->aspath);
+		} else {
+			new = binfo->attr->aspath;
+		}
+
+		aspath = rule;
+
+		// Prepend by 'metric' times
+		for(int i=0; i < (binfo->attr->med); i++){
+			aspath_prepend(aspath, new);
+		}
+		binfo->attr->aspath = new;
+	}
+
+	return RMAP_OKAY;
+}
+
+/* Set as-path prepend by rule structure. */
+struct route_map_rule_cmd route_set_aspath_prepend_by_cmd = {
+	"as-path prepend by",
+	route_set_aspath_prepend_by,
+	route_set_aspath_prepend_compile,
+	route_set_aspath_prepend_free,
+};
+
 /* `set as-path exclude ASn' */
 
 /* For ASN exclude mechanism.
@@ -2820,6 +2854,21 @@ ALIAS(set_aspath_prepend, set_aspath_prepend_lastas_cmd, "set as-path prepend (l
 	      "Use the peer's AS-number\n"
 	      "Number of times to insert")
 
+DEFUN(set_aspath_prepend_by_metric, set_aspath_prepend_by_metric_cmd, "set as-path prepend by metric ." CMD_AS_RANGE,
+      SET_STR "Transform BGP AS_PATH attribute\n"
+	      "Prepend the as-path as many times as metric\n"
+	      "AS number\n") {
+	int ret;
+	char *str;
+
+	str = argv_concat(argv, argc, 0);
+	printf("prepend by metric: %s\n", str);
+	ret = bgp_route_set_add(vty, vty->index, "as-path prepend by", str);
+	XFREE(MTYPE_TMP, str);
+
+	return ret;
+}
+
 DEFUN(no_set_aspath_prepend, no_set_aspath_prepend_cmd, "no set as-path prepend",
       NO_STR SET_STR "Transform BGP AS_PATH attribute\n"
 		     "Prepend to the as-path\n") {
@@ -3435,6 +3484,7 @@ void bgp_route_map_init(void) {
 	route_map_install_set(&route_set_priority_cmd);
 	route_map_install_set(&route_set_metric_cmd);
 	route_map_install_set(&route_set_aspath_prepend_cmd);
+	route_map_install_set(&route_set_aspath_prepend_by_cmd);
 	route_map_install_set(&route_set_aspath_exclude_cmd);
 	route_map_install_set(&route_set_origin_cmd);
 	route_map_install_set(&route_set_atomic_aggregate_cmd);
@@ -3522,6 +3572,7 @@ void bgp_route_map_init(void) {
 	install_element(RMAP_NODE, &no_set_metric_val_cmd);
 	install_element(RMAP_NODE, &set_aspath_prepend_cmd);
 	install_element(RMAP_NODE, &set_aspath_prepend_lastas_cmd);
+	install_element(RMAP_NODE, &set_aspath_prepend_by_metric_cmd);
 	install_element(RMAP_NODE, &set_aspath_exclude_cmd);
 	install_element(RMAP_NODE, &no_set_aspath_prepend_cmd);
 	install_element(RMAP_NODE, &no_set_aspath_prepend_val_cmd);
