@@ -46,7 +46,7 @@ PLATFORMS
 
 REQUIREMENTS
 
-	qpimd requires Quagga (0.99.11 or higher from http://www.quagga.net)
+	qpimd requires Quagga (0.99.11 or higher from http://oss.xprj.org/quagga)
 
 	The GNU Build System (Autotools) is required to build from
 	source code repository.
@@ -58,7 +58,7 @@ BUILDING FROM QUAGGA GIT REPOSITORY
 
 	1) Get the latest quagga source tree
 
-	# git clone git://code.quagga.net/quagga.git quagga
+	# git clone git://git.xprj.org/OSS/quagga quagga
 
 	2) Apply qpimd patch into quagga source tree
 
@@ -76,7 +76,7 @@ BUILDING FROM QUAGGA TARBALL
 
 	1) Get the latest quagga tarball
 
-	# wget http://www.quagga.net/download/quagga-0.99.13.tar.gz
+	# wget http://download.oss.xprj.org/quagga/quagga-0.99.13.tar.gz
 
 	2) Unpack the quagga tarball
 
