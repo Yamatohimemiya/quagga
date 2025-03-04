@@ -826,7 +826,7 @@ static void ripng_route_process(struct rte *rte, struct sockaddr_in6 *from, stru
 }
 
 /* Add redistributed route to RIPng table. */
-void ripng_redistribute_add(int type, int sub_type, struct prefix_ipv6 *p, ifindex_t ifindex, struct in6_addr *nexthop, route_tag_t tag) {
+void ripng_redistribute_add_ex(int type, int sub_type, struct prefix_ipv6 *p, ifindex_t ifindex, struct in6_addr *nexthop, route_tag_t tag, unsigned int metric) {
 	struct route_node *rp;
 	struct ripng_info *rinfo = NULL, newinfo;
 	struct list *list = NULL;
@@ -839,13 +839,17 @@ void ripng_redistribute_add(int type, int sub_type, struct prefix_ipv6 *p, ifind
 		return;
 	}
 
+	if(!metric){
+		metric = 1;
+	}
+
 	rp = route_node_get(ripng->table, (struct prefix *) p);
 
 	memset(&newinfo, 0, sizeof(struct ripng_info));
 	newinfo.type = type;
 	newinfo.sub_type = sub_type;
 	newinfo.ifindex = ifindex;
-	newinfo.metric = 1;
+	newinfo.metric = metric;
 	if(tag <= UINT16_MAX) { /* RIPng only supports 16 bit tags */
 		newinfo.tag = tag;
 	}
@@ -889,6 +893,9 @@ void ripng_redistribute_add(int type, int sub_type, struct prefix_ipv6 *p, ifind
 	ripng_event(RIPNG_TRIGGERED_UPDATE, 0);
 }
 
+void ripng_redistribute_add(int type, int sub_type, struct prefix_ipv6 *p, ifindex_t ifindex, struct in6_addr *nexthop, route_tag_t tag) {
+	ripng_redistribute_add_ex(type, sub_type, p, ifindex, nexthop, tag, 1);
+}
 /* Delete redistributed route to RIPng table. */
 void ripng_redistribute_delete(int type, int sub_type, struct prefix_ipv6 *p, ifindex_t ifindex) {
 	struct route_node *rp;
@@ -1768,6 +1775,36 @@ static char *ripng_route_subtype_print(struct ripng_info *rinfo) {
 	return str;
 }
 
+static int ripng_route_add(struct vty *vty, const char* prefix_str, const char* metric_str){
+	int ret;
+	int metric = 1;
+	struct prefix_ipv6 p;
+	struct route_node *rp;
+
+	ret = str2prefix_ipv6(prefix_str, (struct prefix_ipv6 *) &p);
+	if(ret <= 0) {
+		vty_out(vty, "Malformed address%s", VTY_NEWLINE);
+		return CMD_WARNING;
+	}
+	apply_mask_ipv6(&p);
+
+	rp = route_node_get(ripng->route, (struct prefix *) &p);
+	if(rp->info) {
+		vty_out(vty, "There is already same static route.%s", VTY_NEWLINE);
+		route_unlock_node(rp);
+		return CMD_WARNING;
+	}
+	rp->info = (void *) 1;
+
+	if(metric_str){
+		metric = atoi(metric_str);
+	}
+
+	ripng_redistribute_add_ex(ZEBRA_ROUTE_RIPNG, RIPNG_ROUTE_STATIC, &p, 0, NULL, 0, metric);
+
+	return CMD_SUCCESS;
+}
+
 DEFUN(show_ipv6_ripng, show_ipv6_ripng_cmd, "show ipv6 ripng", SHOW_STR IPV6_STR "Show RIPng routes\n") {
 	struct route_node *rp;
 	struct ripng_info *rinfo;
@@ -1941,28 +1978,13 @@ DEFUN(no_router_ripng, no_router_ripng_cmd, "no router ripng",
 DEFUN(ripng_route, ripng_route_cmd, "route IPV6ADDR",
       "Static route setup\n"
       "Set static RIPng route announcement\n") {
-	int ret;
-	struct prefix_ipv6 p;
-	struct route_node *rp;
+	return ripng_route_add(vty, argv[0], NULL);
+}
 
-	ret = str2prefix_ipv6(argv[0], (struct prefix_ipv6 *) &p);
-	if(ret <= 0) {
-		vty_out(vty, "Malformed address%s", VTY_NEWLINE);
-		return CMD_WARNING;
-	}
-	apply_mask_ipv6(&p);
-
-	rp = route_node_get(ripng->route, (struct prefix *) &p);
-	if(rp->info) {
-		vty_out(vty, "There is already same static route.%s", VTY_NEWLINE);
-		route_unlock_node(rp);
-		return CMD_WARNING;
-	}
-	rp->info = (void *) 1;
-
-	ripng_redistribute_add(ZEBRA_ROUTE_RIPNG, RIPNG_ROUTE_STATIC, &p, 0, NULL, 0);
-
-	return CMD_SUCCESS;
+DEFUN(ripng_route_metric, ripng_route_metric_cmd, "route IPV6ADDR metric <1-16>",
+      "Static route setup\n"
+      "Set static RIPng route announcement\n") {
+	return ripng_route_add(vty, argv[0], argv[1]);
 }
 
 DEFUN(no_ripng_route, no_ripng_route_cmd, "no route IPV6ADDR",
@@ -2686,6 +2708,7 @@ void ripng_init() {
 
 	install_default(RIPNG_NODE);
 	install_element(RIPNG_NODE, &ripng_route_cmd);
+	install_element(RIPNG_NODE, &ripng_route_metric_cmd);
 	install_element(RIPNG_NODE, &no_ripng_route_cmd);
 	install_element(RIPNG_NODE, &ripng_aggregate_address_cmd);
 	install_element(RIPNG_NODE, &no_ripng_aggregate_address_cmd);

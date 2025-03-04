@@ -1364,7 +1364,7 @@ static int rip_send_packet(u_char *buf, int size, struct sockaddr_in *to, struct
 }
 
 /* Add redistributed route to RIP table. */
-void rip_redistribute_add(int type, int sub_type, struct prefix_ipv4 *p, ifindex_t ifindex, struct in_addr *nexthop, unsigned int metric, unsigned char distance, route_tag_t tag) {
+void rip_redistribute_add_ex(int type, int sub_type, struct prefix_ipv4 *p, ifindex_t ifindex, struct in_addr *nexthop, unsigned int ext_metric, unsigned char distance, route_tag_t tag, unsigned int metric) {
 	int ret;
 	struct route_node *rp = NULL;
 	struct rip_info *rinfo = NULL, newinfo;
@@ -1376,14 +1376,18 @@ void rip_redistribute_add(int type, int sub_type, struct prefix_ipv4 *p, ifindex
 		return;
 	}
 
+	if(!metric){
+		metric = 1;
+	}
+
 	rp = route_node_get(rip->table, (struct prefix *) p);
 
 	memset(&newinfo, 0, sizeof(struct rip_info));
 	newinfo.type = type;
 	newinfo.sub_type = sub_type;
 	newinfo.ifindex = ifindex;
-	newinfo.metric = 1;
-	newinfo.external_metric = metric;
+	newinfo.metric = metric;
+	newinfo.external_metric = ext_metric;
 	newinfo.distance = distance;
 	if(tag <= UINT16_MAX) { /* RIP only supports 16 bit tags */
 		newinfo.tag = tag;
@@ -1424,6 +1428,10 @@ void rip_redistribute_add(int type, int sub_type, struct prefix_ipv4 *p, ifindex
 	}
 
 	rip_event(RIP_TRIGGERED_UPDATE, 0);
+}
+
+void rip_redistribute_add(int type, int sub_type, struct prefix_ipv4 *p, ifindex_t ifindex, struct in_addr *nexthop, unsigned int ext_metric, unsigned char distance, route_tag_t tag) {
+	rip_redistribute_add_ex(type, sub_type, p, ifindex, nexthop, ext_metric, distance, tag, 1);
 }
 
 /* Delete redistributed route from RIP table. */
@@ -2561,6 +2569,38 @@ void rip_event(enum rip_event event, int sock) {
 	}
 }
 
+static int rip_route_add(struct vty *vty, const char* prefix_str, const char* metric_str){
+	int ret;
+	int metric = 1;
+	struct prefix_ipv4 p;
+	struct route_node *node;
+
+	ret = str2prefix_ipv4(prefix_str, &p);
+	if(ret < 0) {
+		vty_out(vty, "Malformed address%s", VTY_NEWLINE);
+		return CMD_WARNING;
+	}
+	apply_mask_ipv4(&p);
+
+	/* For router rip configuration. */
+	node = route_node_get(rip->route, (struct prefix *) &p);
+
+	if(node->info) {
+		vty_out(vty, "There is already same static route.%s", VTY_NEWLINE);
+		route_unlock_node(node);
+		return CMD_WARNING;
+	}
+
+	node->info = (char *) "static";
+
+	if(metric_str){
+		metric = atoi(metric_str);
+	}
+
+	rip_redistribute_add_ex(ZEBRA_ROUTE_RIP, RIP_ROUTE_STATIC, &p, 0, NULL, 0, 0, 0, metric);
+	return CMD_SUCCESS;
+}
+
 DEFUN(router_rip, router_rip_cmd, "router rip",
       "Enable a routing process\n"
       "Routing Information Protocol (RIP)\n") {
@@ -2620,31 +2660,13 @@ ALIAS(no_rip_version, no_rip_version_val_cmd, "no version <1-2>",
 DEFUN(rip_route, rip_route_cmd, "route A.B.C.D/M",
       "RIP static route configuration\n"
       "IP prefix <network>/<length>\n") {
-	int ret;
-	struct prefix_ipv4 p;
-	struct route_node *node;
+	return rip_route_add(vty, argv[0], NULL);
+}
 
-	ret = str2prefix_ipv4(argv[0], &p);
-	if(ret < 0) {
-		vty_out(vty, "Malformed address%s", VTY_NEWLINE);
-		return CMD_WARNING;
-	}
-	apply_mask_ipv4(&p);
-
-	/* For router rip configuration. */
-	node = route_node_get(rip->route, (struct prefix *) &p);
-
-	if(node->info) {
-		vty_out(vty, "There is already same static route.%s", VTY_NEWLINE);
-		route_unlock_node(node);
-		return CMD_WARNING;
-	}
-
-	node->info = (char *) "static";
-
-	rip_redistribute_add(ZEBRA_ROUTE_RIP, RIP_ROUTE_STATIC, &p, 0, NULL, 0, 0, 0);
-
-	return CMD_SUCCESS;
+DEFUN(rip_route_metric, rip_route_metric_cmd, "route A.B.C.D/M metric <0-16>",
+      "RIP static route configuration\n"
+      "IP prefix <network>/<length>\n") {
+	return rip_route_add(vty, argv[0], argv[1]);
 }
 
 DEFUN(no_rip_route, no_rip_route_cmd, "no route A.B.C.D/M",
@@ -3628,6 +3650,7 @@ void rip_init(void) {
 	install_element(RIP_NODE, &no_rip_timers_cmd);
 	install_element(RIP_NODE, &no_rip_timers_val_cmd);
 	install_element(RIP_NODE, &rip_route_cmd);
+	install_element(RIP_NODE, &rip_route_metric_cmd);
 	install_element(RIP_NODE, &no_rip_route_cmd);
 	install_element(RIP_NODE, &rip_distance_cmd);
 	install_element(RIP_NODE, &no_rip_distance_cmd);
