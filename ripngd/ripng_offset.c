@@ -104,7 +104,7 @@ static struct ripng_offset_list *ripng_offset_list_get(const char *ifname) {
 	return offset;
 }
 
-static int ripng_offset_list_set(struct vty *vty, const char *alist, const char *direct_str, const char *metric_str, const char *ifname) {
+static int ripng_offset_list_set(struct vty *vty, const char *alist, const char *direct_str, const char *metric_str, const char *ifname, const char *xxcrease) {
 	int direct;
 	int metric;
 	struct ripng_offset_list *offset;
@@ -124,6 +124,13 @@ static int ripng_offset_list_set(struct vty *vty, const char *alist, const char 
 	if(metric < 0 || metric > 16) {
 		vty_out(vty, "Invalid metric: %s%s", metric_str, VTY_NEWLINE);
 		return CMD_WARNING;
+	}
+
+	/* Check increase or decrease, NULL = increase */
+	if(xxcrease){
+		if(strncmp(xxcrease, "d", 1) == 0) {
+			metric *= -1;
+		}
 	}
 
 	/* Get offset-list structure with interface name. */
@@ -256,7 +263,7 @@ DEFUN(ripng_offset_list, ripng_offset_list_cmd, "offset-list WORD (in|out) <0-16
       "For incoming updates\n"
       "For outgoing updates\n"
       "Metric value\n") {
-	return ripng_offset_list_set(vty, argv[0], argv[1], argv[2], NULL);
+	return ripng_offset_list_set(vty, argv[0], argv[1], argv[2], NULL, NULL);
 }
 
 DEFUN(ripng_offset_list_ifname, ripng_offset_list_ifname_cmd, "offset-list WORD (in|out) <0-16> IFNAME",
@@ -266,7 +273,26 @@ DEFUN(ripng_offset_list_ifname, ripng_offset_list_ifname_cmd, "offset-list WORD 
       "For outgoing updates\n"
       "Metric value\n"
       "Interface to match\n") {
-	return ripng_offset_list_set(vty, argv[0], argv[1], argv[2], argv[3]);
+	return ripng_offset_list_set(vty, argv[0], argv[1], argv[2], argv[3], NULL);
+}
+
+DEFUN(ripng_offset_list_xxcrease, ripng_offset_list_xxcrease_cmd, "offset-list WORD (in|out) (increase|decrease) <0-16>",
+      "Modify RIPng metric\n"
+      "Access-list name\n"
+      "For incoming updates\n"
+      "For outgoing updates\n"
+      "Metric value\n") {
+	return ripng_offset_list_set(vty, argv[0], argv[1], argv[3], NULL, argv[2]);
+}
+
+DEFUN(ripng_offset_list_xxcrease_ifname, ripng_offset_list_xxcrease_ifname_cmd, "offset-list WORD (in|out) (increase|decrease) <0-16> IFNAME",
+      "Modify RIPng metric\n"
+      "Access-list name\n"
+      "For incoming updates\n"
+      "For outgoing updates\n"
+      "Metric value\n"
+      "Interface to match\n") {
+	return ripng_offset_list_set(vty, argv[0], argv[1], argv[3], argv[4], argv[2]);
 }
 
 DEFUN(no_ripng_offset_list, no_ripng_offset_list_cmd, "no offset-list WORD (in|out) <0-16>",
@@ -312,6 +338,9 @@ void ripng_offset_init(void) {
 
 	install_element(RIPNG_NODE, &ripng_offset_list_cmd);
 	install_element(RIPNG_NODE, &ripng_offset_list_ifname_cmd);
+	install_element(RIPNG_NODE, &ripng_offset_list_xxcrease_cmd);
+	install_element(RIPNG_NODE, &ripng_offset_list_xxcrease_ifname_cmd);
+
 	install_element(RIPNG_NODE, &no_ripng_offset_list_cmd);
 	install_element(RIPNG_NODE, &no_ripng_offset_list_ifname_cmd);
 }

@@ -97,7 +97,7 @@ static struct rip_offset_list *rip_offset_list_get(const char *ifname) {
 	return offset;
 }
 
-static int rip_offset_list_set(struct vty *vty, const char *alist, const char *direct_str, const char *metric_str, const char *ifname) {
+static int rip_offset_list_set(struct vty *vty, const char *alist, const char *direct_str, const char *metric_str, const char *ifname, const char *xxcrease) {
 	int direct;
 	int metric;
 	struct rip_offset_list *offset;
@@ -117,6 +117,13 @@ static int rip_offset_list_set(struct vty *vty, const char *alist, const char *d
 	if(metric < 0 || metric > 16) {
 		vty_out(vty, "Invalid metric: %s%s", metric_str, VTY_NEWLINE);
 		return CMD_WARNING;
+	}
+
+	/* Check increase or decrease, NULL = increase */
+	if(xxcrease){
+		if(strncmp(xxcrease, "d", 1) == 0) {
+			metric *= -1;
+		}
 	}
 
 	/* Get offset-list structure with interface name. */
@@ -249,7 +256,7 @@ DEFUN(rip_offset_list, rip_offset_list_cmd, "offset-list WORD (in|out) <0-16>",
       "For incoming updates\n"
       "For outgoing updates\n"
       "Metric value\n") {
-	return rip_offset_list_set(vty, argv[0], argv[1], argv[2], NULL);
+	return rip_offset_list_set(vty, argv[0], argv[1], argv[2], NULL, NULL);
 }
 
 DEFUN(rip_offset_list_ifname, rip_offset_list_ifname_cmd, "offset-list WORD (in|out) <0-16> IFNAME",
@@ -259,7 +266,26 @@ DEFUN(rip_offset_list_ifname, rip_offset_list_ifname_cmd, "offset-list WORD (in|
       "For outgoing updates\n"
       "Metric value\n"
       "Interface to match\n") {
-	return rip_offset_list_set(vty, argv[0], argv[1], argv[2], argv[3]);
+	return rip_offset_list_set(vty, argv[0], argv[1], argv[2], argv[3], NULL);
+}
+
+DEFUN(rip_offset_list_xxcrease, rip_offset_list_xxcrease_cmd, "offset-list WORD (in|out) (increase|decrease) <0-16>",
+      "Modify RIP metric\n"
+      "Access-list name\n"
+      "For incoming updates\n"
+      "For outgoing updates\n"
+      "Metric value\n") {
+	return rip_offset_list_set(vty, argv[0], argv[1], argv[3], NULL, argv[2]);
+}
+
+DEFUN(rip_offset_list_xxcrease_ifname, rip_offset_list_xxcrease_ifname_cmd, "offset-list WORD (in|out) (increase|decrease) <0-16> IFNAME",
+      "Modify RIP metric\n"
+      "Access-list name\n"
+      "For incoming updates\n"
+      "For outgoing updates\n"
+      "Metric value\n"
+      "Interface to match\n") {
+	return rip_offset_list_set(vty, argv[0], argv[1], argv[3], argv[4], argv[2]);
 }
 
 DEFUN(no_rip_offset_list, no_rip_offset_list_cmd, "no offset-list WORD (in|out) <0-16>",
@@ -305,6 +331,8 @@ void rip_offset_init() {
 
 	install_element(RIP_NODE, &rip_offset_list_cmd);
 	install_element(RIP_NODE, &rip_offset_list_ifname_cmd);
+	install_element(RIP_NODE, &rip_offset_list_xxcrease_cmd);
+	install_element(RIP_NODE, &rip_offset_list_xxcrease_ifname_cmd);
 	install_element(RIP_NODE, &no_rip_offset_list_cmd);
 	install_element(RIP_NODE, &no_rip_offset_list_ifname_cmd);
 }
