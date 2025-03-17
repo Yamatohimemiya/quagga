@@ -206,7 +206,7 @@ static void route_match_interface_free(void *rule) {
 }
 
 /* Route map commands for interface matching. */
-struct route_map_rule_cmd route_match_interface_cmd = { "interface", route_match_interface, route_match_interface_compile, route_match_interface_free };
+struct route_map_rule_cmd route_match_interface_cmd = { "match-interface", route_match_interface, route_match_interface_compile, route_match_interface_free };
 
 /* `match ip next-hop IP_ACCESS_LIST' */
 
@@ -535,12 +535,12 @@ DEFUN(match_metric, match_metric_cmd, "match metric <0-4294967295>",
 }
 
 DEFUN(no_match_metric, no_match_metric_cmd, "no match metric", NO_STR MATCH_STR "Match metric of route\n") {
-	if(argc == 0) {
-		return rip_route_match_delete(vty, vty->index, "metric", NULL);
-	}
+		if(argc == 0) {
+			return rip_route_match_delete(vty, vty->index, "metric", NULL);
+		}
 
-	return rip_route_match_delete(vty, vty->index, "metric", argv[0]);
-}
+		return rip_route_match_delete(vty, vty->index, "metric", argv[0]);
+	}
 
 ALIAS(no_match_metric, no_match_metric_val_cmd, "no match metric <0-4294967295>",
       NO_STR MATCH_STR "Match metric of route\n"

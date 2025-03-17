@@ -242,7 +242,7 @@ struct rip_info *rip_ecmp_delete(struct rip_info *rinfo) {
 	struct route_node *rp = rinfo->rp;
 	struct list *list = (struct list *) rp->info;
 
-	RIP_TIMER_OFF(rinfo->t_timeout);
+	//RIP_TIMER_OFF(rinfo->t_timeout);
 
 	if(listcount(list) > 1) {
 		/* Some other ECMP entries still exist. Just delete this entry. */
@@ -408,6 +408,7 @@ static void rip_rte_process(struct rte *rte, struct sockaddr_in *from, struct in
 	newinfo.metric = rte->metric;
 	newinfo.metric_out = rte->metric; /* XXX */
 	newinfo.tag = ntohs(rte->tag);	  /* XXX */
+	newinfo.priority = ri->priority;
 
 	/* Modify entry according to the interface routemap. */
 	if(ri->routemap[RIP_FILTER_IN]) {
@@ -499,6 +500,12 @@ static void rip_rte_process(struct rte *rte, struct sockaddr_in *from, struct in
 					break;
 				}
 
+				if(ri->priority > rinfo->priority) {
+					/* New route has a bigger priority. Replace the ECMP list
+               * with the new one in below. */
+					break;
+				}
+
 				/* Metrics are same. We compare the distances. */
 				old_dist = rinfo->distance ? rinfo->distance : ZEBRA_RIP_DISTANCE_DEFAULT;
 
@@ -576,7 +583,14 @@ static void rip_rte_process(struct rte *rte, struct sockaddr_in *from, struct in
          one, or if the tag has been changed; or if there is a route
          with a lower administrave distance; or an update of the
          distance on the actual route; do the following actions: */
-		if((same && rinfo->metric != rte->metric) || (rte->metric < rinfo->metric) || ((same) && (rinfo->metric == rte->metric) && (newinfo.tag != rinfo->tag)) || (old_dist > new_dist) || ((old_dist != new_dist) && same)) {
+
+		if(
+			(same && rinfo->metric != rte->metric)
+			|| (rte->metric < rinfo->metric)
+			|| ((rte->metric <= rinfo->metric) && (ri->priority > rinfo->priority))
+			|| ((same) && (rinfo->metric == rte->metric) && (newinfo.tag != rinfo->tag))
+			|| (old_dist > new_dist) || ((old_dist != new_dist) && same)
+		) {
 			if(listcount(list) == 1) {
 				if(newinfo.metric != RIP_METRIC_INFINITY) {
 					rip_ecmp_replace(&newinfo);
@@ -584,7 +598,11 @@ static void rip_rte_process(struct rte *rte, struct sockaddr_in *from, struct in
 					rip_ecmp_delete(rinfo);
 				}
 			} else {
-				if(newinfo.metric < rinfo->metric) {
+				if(newinfo.priority < rinfo->priority) {
+					rip_ecmp_replace(&newinfo);
+				} else if(newinfo.priority > rinfo->priority) {
+					rip_ecmp_delete(rinfo);
+				} else if(newinfo.metric < rinfo->metric) {
 					rip_ecmp_replace(&newinfo);
 				} else if(newinfo.metric > rinfo->metric) {
 					rip_ecmp_delete(rinfo);
@@ -1064,8 +1082,8 @@ static void rip_response_process(struct rip_packet *packet, int size, struct soc
 		rte->metric = ntohl(rte->metric);
 
 		/* - is the metric valid (i.e., between 1 and 16, inclusive) */
-		if(!(rte->metric >= 1 && rte->metric <= 16)) {
-			zlog_info("Route's metric is not in the 1-16 range.");
+		if(!(rte->metric >= 1 && rte->metric <= (rip->limit_hop))) {
+			zlog_info("Route's metric is not in the 1-%d range.", (rip->limit_hop));
 			rip_peer_bad_route(from);
 			continue;
 		}
@@ -2479,6 +2497,12 @@ static int rip_create(void) {
 	rip_event(RIP_READ, rip->sock);
 	rip_event(RIP_UPDATE_EVENT, 1);
 
+	/* Default limits */
+	rip->limit_hop = RIP_METRIC_INFINITY;
+
+	/* per interface settings */
+	rip->interface = list_new();
+
 	return 0;
 }
 
@@ -3275,6 +3299,15 @@ DEFUN(show_ip_rip_status, show_ip_rip_status_cmd, "show ip rip status",
 	return CMD_SUCCESS;
 }
 
+DEFUN(rip_limit_hop, rip_limit_hop_cmd, "limit hop <1-16>",
+      "Set a maximum metric\n"
+      "Maximum metric\n") {
+	if(rip) {
+		rip->limit_hop = atoi(argv[0]);
+	}
+	return CMD_SUCCESS;
+}
+
 /* RIP configuration write function. */
 static int config_write_rip(struct vty *vty) {
 	int write = 0;
@@ -3518,9 +3551,6 @@ void rip_clean(void) {
 		XFREE(MTYPE_ROUTE_TABLE, rip->table);
 		XFREE(MTYPE_ROUTE_TABLE, rip->route);
 		XFREE(MTYPE_ROUTE_TABLE, rip->neighbor);
-
-		XFREE(MTYPE_RIP, rip);
-		rip = NULL;
 	}
 
 	rip_clean_network();
@@ -3529,6 +3559,21 @@ void rip_clean(void) {
 	rip_interfaces_clean();
 	rip_distance_reset();
 	rip_redistribute_clean();
+
+	if(rip->interface){
+		struct rip_config_interface *RCI = 0;
+		struct listnode *node, *nnode;
+		for(ALL_LIST_ELEMENTS(rip->interface, node, nnode, RCI)) {
+			if(RCI){
+				XFREE(MTYPE_RIP_INTERFACE, RCI->ifname);
+				XFREE(MTYPE_RIP_INTERFACE, RCI);
+			}
+		}
+		list_free(rip->interface);
+	}
+
+	XFREE(MTYPE_RIP, rip);
+	rip = NULL;
 }
 
 /* Reset all values to the default settings. */

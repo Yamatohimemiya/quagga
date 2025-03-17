@@ -94,6 +94,8 @@
 #define RIP_AUTH_MD5_SIZE 16
 #define RIP_AUTH_MD5_COMPAT_SIZE RIP_RTE_SIZE
 
+#define RIP_DEFAULT_PRIORITY 32768
+
 /* RIP structure. */
 struct rip {
 	/* RIP socket. */
@@ -152,6 +154,24 @@ struct rip {
 		int metric_config;
 		u_int32_t metric;
 	} route_map[ZEBRA_ROUTE_MAX];
+
+	/* Limit of hop count */
+	u_int32_t limit_hop;
+
+	/* interface list */
+	struct list *interface;
+
+};
+
+struct rip_config_interface {
+	char *ifname;
+
+	u_int32_t flags;
+#define RIP_FLAG_INTERFACE_ENABLED (1 << 0)
+#define RIP_FLAG_INTERFACE_PASSIVE (1 << 1)
+#define RIP_FLAG_INTERFACE_IGNORE_ADDRESS (1 << 2)
+
+	u_int32_t priority;
 };
 
 /* RIP routing table entry which belong to rip_packet. */
@@ -224,10 +244,14 @@ struct rip_info {
 
 	u_char distance;
 
+	/* Priority from input interface */
+	unsigned int priority;
+
 #ifdef NEW_RIP_TABLE
 	struct rip_info *next;
 	struct rip_info *prev;
 #endif /* NEW_RIP_TABLE */
+
 };
 
 typedef enum {
@@ -289,6 +313,9 @@ struct rip_interface {
 
 	/* Passive interface. */
 	int passive;
+
+	/* Interface priority */
+	unsigned int priority;
 };
 
 /* RIP peer information. */

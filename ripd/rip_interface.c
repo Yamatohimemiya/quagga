@@ -59,15 +59,40 @@ const struct message ri_version_msg[] = {
 
 extern struct zebra_privs_t ripd_privs;
 
-/* RIP enabled network vector. */
-vector rip_enable_interface;
-
 /* RIP enabled interface table. */
 struct route_table *rip_enable_network;
 
 /* Vector to store passive-interface name. */
 static int passive_default; /* are we in passive-interface default mode? */
-vector Vrip_passive_nondefault;
+
+/* RIP interface priority. */
+static struct rip_config_interface* GetRIPConfigInterface(const char* ifname){
+	struct rip_config_interface *icfg = 0;
+	struct listnode *node, *nnode;
+
+	for(ALL_LIST_ELEMENTS(rip->interface, node, nnode, icfg)) {
+		if(icfg){
+			if(strcmp(icfg->ifname, ifname) == 0){
+				return icfg;
+			}
+		}
+	}
+
+	//If not exist, create it
+	icfg = XCALLOC(MTYPE_RIP_INTERFACE, sizeof(struct rip_config_interface));
+	if(icfg == 0){
+		return 0;
+	}
+
+	int l = strlen(ifname);
+
+	icfg->ifname = XCALLOC(MTYPE_RIP_INTERFACE, l);
+	icfg->priority = RIP_DEFAULT_PRIORITY;
+
+	memcpy(icfg->ifname, ifname, l);
+	listnode_add(rip->interface, icfg);
+	return icfg;
+}
 
 /* Join to the RIP version 2 multicast group. */
 static int ipv4_multicast_join(int sock, struct in_addr group, struct in_addr ifa, ifindex_t ifindex) {
@@ -498,6 +523,8 @@ static void rip_interface_reset(struct rip_interface *ri) {
 
 	ri->passive = 0;
 
+	ri->priority = RIP_DEFAULT_PRIORITY;
+
 	rip_interface_clean(ri);
 }
 
@@ -566,6 +593,11 @@ static void rip_apply_address_add(struct connected *ifc) {
 		return;
 	}
 
+	struct rip_config_interface *RCI = GetRIPConfigInterface(ifc->ifp->name);
+	if(CHECK_FLAG(RCI->flags, RIP_FLAG_INTERFACE_IGNORE_ADDRESS)){
+		return;
+	}
+
 	p = ifc->address;
 
 	memset(&address, 0, sizeof(address));
@@ -619,6 +651,11 @@ static void rip_apply_address_del(struct connected *ifc) {
 	}
 
 	if(!if_is_up(ifc->ifp)) {
+		return;
+	}
+
+	struct rip_config_interface *RCI = GetRIPConfigInterface(ifc->ifp->name);
+	if(CHECK_FLAG(RCI->flags, RIP_FLAG_INTERFACE_IGNORE_ADDRESS)){
 		return;
 	}
 
@@ -758,15 +795,10 @@ static int rip_enable_network_delete(struct prefix *p) {
 
 /* Check interface is enabled by ifname statement. */
 static int rip_enable_if_lookup(const char *ifname) {
-	unsigned int i;
-	char *str;
 
-	for(i = 0; i < vector_active(rip_enable_interface); i++) {
-		if((str = vector_slot(rip_enable_interface, i)) != NULL) {
-			if(strcmp(str, ifname) == 0) {
-				return i;
-			}
-		}
+	struct rip_config_interface *RCI = GetRIPConfigInterface(ifname);
+	if(CHECK_FLAG(RCI->flags, RIP_FLAG_INTERFACE_ENABLED)){
+		return 1;
 	}
 	return -1;
 }
@@ -780,7 +812,8 @@ static int rip_enable_if_add(const char *ifname) {
 		return -1;
 	}
 
-	vector_set(rip_enable_interface, strdup(ifname));
+	struct rip_config_interface *RCI = GetRIPConfigInterface(ifname);
+	SET_FLAG(RCI->flags, RIP_FLAG_INTERFACE_ENABLED);
 
 	rip_enable_apply_all(); /* TODOVJ */
 
@@ -797,9 +830,8 @@ static int rip_enable_if_delete(const char *ifname) {
 		return -1;
 	}
 
-	str = vector_slot(rip_enable_interface, index);
-	free(str);
-	vector_unset(rip_enable_interface, index);
+	struct rip_config_interface *RCI = GetRIPConfigInterface(ifname);
+	UNSET_FLAG(RCI->flags, RIP_FLAG_INTERFACE_ENABLED);
 
 	rip_enable_apply_all(); /* TODOVJ */
 
@@ -845,6 +877,11 @@ static void rip_connect_set(struct interface *ifp, int set) {
 			continue;
 		}
 
+		struct rip_config_interface *RCI = GetRIPConfigInterface(ifp->name);
+		if(CHECK_FLAG(RCI->flags, RIP_FLAG_INTERFACE_IGNORE_ADDRESS)){
+			continue;
+		}
+
 		address.family = AF_INET;
 		address.prefix = p->u.prefix4;
 		address.prefixlen = p->prefixlen;
@@ -868,6 +905,7 @@ static void rip_connect_set(struct interface *ifp, int set) {
 void rip_enable_apply(struct interface *ifp) {
 	int ret;
 	struct rip_interface *ri = NULL;
+	struct rip_config_interface *RCI = NULL;
 
 	/* Check interface. */
 	if(!if_is_operative(ifp)) {
@@ -875,6 +913,10 @@ void rip_enable_apply(struct interface *ifp) {
 	}
 
 	ri = ifp->info;
+
+	/* per interfafce configuration */
+	RCI = GetRIPConfigInterface(ifp->name);
+	ri->priority = RCI->priority;
 
 	/* Check network configuration. */
 	ret = rip_enable_network_lookup_if(ifp);
@@ -1004,26 +1046,23 @@ void rip_clean_network() {
 	}
 
 	/* rip_enable_interface. */
-	for(i = 0; i < vector_active(rip_enable_interface); i++) {
-		if((str = vector_slot(rip_enable_interface, i)) != NULL) {
-			free(str);
-			vector_slot(rip_enable_interface, i) = NULL;
+	struct rip_config_interface *icfg = 0;
+	struct listnode *node, *nnode;
+	for(ALL_LIST_ELEMENTS(rip->interface, node, nnode, icfg)) {
+		if(icfg){
+			UNSET_FLAG(icfg->flags, RIP_FLAG_INTERFACE_ENABLED);
 		}
 	}
 }
 
 /* Utility function for looking up passive interface settings. */
 static int rip_passive_nondefault_lookup(const char *ifname) {
-	unsigned int i;
-	char *str;
 
-	for(i = 0; i < vector_active(Vrip_passive_nondefault); i++) {
-		if((str = vector_slot(Vrip_passive_nondefault, i)) != NULL) {
-			if(strcmp(str, ifname) == 0) {
-				return i;
-			}
-		}
+	struct rip_config_interface *RCI = GetRIPConfigInterface(ifname);
+	if(CHECK_FLAG(RCI->flags, RIP_FLAG_INTERFACE_PASSIVE)){
+		return 1;
 	}
+
 	return -1;
 }
 
@@ -1054,7 +1093,8 @@ static int rip_passive_nondefault_set(struct vty *vty, const char *ifname) {
 		return CMD_WARNING;
 	}
 
-	vector_set(Vrip_passive_nondefault, strdup(ifname));
+	struct rip_config_interface *RCI = GetRIPConfigInterface(ifname);
+	SET_FLAG(RCI->flags, RIP_FLAG_INTERFACE_PASSIVE);
 
 	rip_passive_interface_apply_all();
 
@@ -1070,9 +1110,8 @@ static int rip_passive_nondefault_unset(struct vty *vty, const char *ifname) {
 		return CMD_WARNING;
 	}
 
-	str = vector_slot(Vrip_passive_nondefault, i);
-	free(str);
-	vector_unset(Vrip_passive_nondefault, i);
+	struct rip_config_interface *RCI = GetRIPConfigInterface(ifname);
+	UNSET_FLAG(RCI->flags, RIP_FLAG_INTERFACE_PASSIVE);
 
 	rip_passive_interface_apply_all();
 
@@ -1084,17 +1123,19 @@ void rip_passive_nondefault_clean(void) {
 	unsigned int i;
 	char *str;
 
-	for(i = 0; i < vector_active(Vrip_passive_nondefault); i++) {
-		if((str = vector_slot(Vrip_passive_nondefault, i)) != NULL) {
-			free(str);
-			vector_slot(Vrip_passive_nondefault, i) = NULL;
+	struct rip_config_interface *icfg = 0;
+	struct listnode *node, *nnode;
+	for(ALL_LIST_ELEMENTS(rip->interface, node, nnode, icfg)) {
+		if(icfg){
+			UNSET_FLAG(icfg->flags, RIP_FLAG_INTERFACE_PASSIVE);
 		}
 	}
+
 	rip_passive_interface_apply_all();
 }
 
 /* RIP enable network or interface configuration. */
-DEFUN(rip_network, rip_network_cmd, "network (A.B.C.D/M|WORD)",
+DEFUN_WITH_NO(rip_network, rip_network_cmd, "network (A.B.C.D/M|WORD)",
       "Enable routing on an IP network\n"
       "IP prefix <network>/<length>, e.g., 35.0.0.0/8\n"
       "Interface name\n") {
@@ -1103,39 +1144,58 @@ DEFUN(rip_network, rip_network_cmd, "network (A.B.C.D/M|WORD)",
 
 	ret = str2prefix_ipv4(argv[0], &p);
 
-	if(ret) {
-		ret = rip_enable_network_add((struct prefix *) &p);
+	if(IS_NO){
+			if(ret) {
+			ret = rip_enable_network_delete((struct prefix *) &p);
+		} else {
+			ret = rip_enable_if_delete(argv[0]);
+		}
 	} else {
-		ret = rip_enable_if_add(argv[0]);
+		if(ret) {
+			ret = rip_enable_network_add((struct prefix *) &p);
+		} else {
+			ret = rip_enable_if_add(argv[0]);
+		}
 	}
 
 	if(ret < 0) {
-		vty_out(vty, "There is a same network configuration %s%s", argv[0], VTY_NEWLINE);
+		vty_out(vty, "Can't change network configuration %s%s", argv[0], VTY_NEWLINE);
 		return CMD_WARNING;
 	}
 
 	return CMD_SUCCESS;
 }
 
-/* RIP enable network or interface configuration. */
-DEFUN(no_rip_network, no_rip_network_cmd, "no network (A.B.C.D/M|WORD)",
-      NO_STR "Enable routing on an IP network\n"
-	     "IP prefix <network>/<length>, e.g., 35.0.0.0/8\n"
-	     "Interface name\n") {
-	int ret;
-	struct prefix_ipv4 p;
+/* RIP interface */
+DEFUN_WITH_NO(rip_interface, rip_interface_cmd, "interface WORD",
+      "Do not add route by interface address\n"
+      "Interface name\n") {
 
-	ret = str2prefix_ipv4(argv[0], &p);
+	struct rip_config_interface *RCI = GetRIPConfigInterface(argv[0]);
 
-	if(ret) {
-		ret = rip_enable_network_delete((struct prefix *) &p);
+	if(IS_NO){
+		UNSET_FLAG(RCI->flags, RIP_FLAG_INTERFACE_IGNORE_ADDRESS);
+		rip_enable_if_delete(argv[0]);
 	} else {
-		ret = rip_enable_if_delete(argv[0]);
+		SET_FLAG(RCI->flags, RIP_FLAG_INTERFACE_IGNORE_ADDRESS);
+		rip_enable_if_add(argv[0]);
 	}
 
-	if(ret < 0) {
-		vty_out(vty, "Can't find network configuration %s%s", argv[0], VTY_NEWLINE);
-		return CMD_WARNING;
+	return CMD_SUCCESS;
+}
+
+/* RIP interface priority. */
+DEFUN_WITH_NO(rip_interface_priority, rip_interface_priority_cmd, "interface WORD priority <0-65535>",
+      "Set interface priorirty in routes have same metric\n"
+      "Interface name\n"
+      "Priority") {
+
+	struct rip_config_interface *RCI = GetRIPConfigInterface(argv[0]);
+
+	if(IS_NO){
+		RCI->priority = RIP_DEFAULT_PRIORITY;
+	} else {
+		RCI->priority = atoi(argv[1]);
 	}
 
 	return CMD_SUCCESS;
@@ -1721,11 +1781,11 @@ int config_write_rip_network(struct vty *vty, int config_mode) {
 	}
 
 	/* Interface name RIP enable statement. */
-	for(i = 0; i < vector_active(rip_enable_interface); i++) {
-		if((ifname = vector_slot(rip_enable_interface, i)) != NULL) {
-			vty_out(vty, "%s%s%s", config_mode ? " network " : "    ", ifname, VTY_NEWLINE);
-		}
-	}
+//	for(i = 0; i < vector_active(rip_enable_interface); i++) {
+//		if((ifname = vector_slot(rip_enable_interface, i)) != NULL) {
+//			vty_out(vty, "%s%s%s", config_mode ? " network " : "    ", ifname, VTY_NEWLINE);
+//		}
+//	}
 
 	/* RIP neighbors listing. */
 	for(node = route_top(rip->neighbor); node; node = route_next(node)) {
@@ -1739,11 +1799,11 @@ int config_write_rip_network(struct vty *vty, int config_mode) {
 		if(passive_default) {
 			vty_out(vty, " passive-interface default%s", VTY_NEWLINE);
 		}
-		for(i = 0; i < vector_active(Vrip_passive_nondefault); i++) {
-			if((ifname = vector_slot(Vrip_passive_nondefault, i)) != NULL) {
-				vty_out(vty, " %spassive-interface %s%s", (passive_default ? "no " : ""), ifname, VTY_NEWLINE);
-			}
-		}
+//		for(i = 0; i < vector_active(Vrip_passive_nondefault); i++) {
+//			if((ifname = vector_slot(Vrip_passive_nondefault, i)) != NULL) {
+//				vty_out(vty, " %spassive-interface %s%s", (passive_default ? "no " : ""), ifname, VTY_NEWLINE);
+//			}
+//		}
 	}
 
 	return 0;
@@ -1775,11 +1835,7 @@ void rip_if_init(void) {
 	if_add_hook(IF_DELETE_HOOK, rip_interface_delete_hook);
 
 	/* RIP network init. */
-	rip_enable_interface = vector_init(1);
 	rip_enable_network = route_table_init();
-
-	/* RIP passive interface. */
-	Vrip_passive_nondefault = vector_init(1);
 
 	/* Install interface node. */
 	install_node(&interface_node, rip_interface_config_write);
@@ -1790,10 +1846,12 @@ void rip_if_init(void) {
 	install_default(INTERFACE_NODE);
 	install_element(INTERFACE_NODE, &interface_desc_cmd);
 	install_element(INTERFACE_NODE, &no_interface_desc_cmd);
-	install_element(RIP_NODE, &rip_network_cmd);
-	install_element(RIP_NODE, &no_rip_network_cmd);
+	install_element_with_no(RIP_NODE, &rip_network_cmd);
 	install_element(RIP_NODE, &rip_neighbor_cmd);
 	install_element(RIP_NODE, &no_rip_neighbor_cmd);
+
+	install_element_with_no(RIP_NODE, &rip_interface_priority_cmd);
+	install_element_with_no(RIP_NODE, &rip_interface_cmd);
 
 	install_element(RIP_NODE, &rip_passive_interface_cmd);
 	install_element(RIP_NODE, &no_rip_passive_interface_cmd);
