@@ -89,6 +89,8 @@
 	#define IFMINMTU 576
 #endif /* IFMINMTU */
 
+#define RIPNG_DEFAULT_PRIORITY 32768
+
 /* RIPng structure. */
 struct ripng {
 	/* RIPng socket. */
@@ -139,7 +141,26 @@ struct ripng {
 		int metric_config;
 		u_int32_t metric;
 	} route_map[ZEBRA_ROUTE_MAX];
+
+	/* Limit of hop count */
+	u_int32_t limit_hop;
+
+	/* interface list */
+	struct list *interface;
+
 };
+
+struct ripng_config_interface {
+	char *ifname;
+
+	u_int32_t flags;
+#define RIPNG_FLAG_INTERFACE_ENABLED (1 << 0)
+#define RIPNG_FLAG_INTERFACE_PASSIVE (1 << 1)
+#define RIPNG_FLAG_INTERFACE_IGNORE_ADDRESS (1 << 2)
+
+	u_int32_t priority;
+};
+
 
 /* Routing table entry. */
 struct rte {
@@ -199,6 +220,9 @@ struct ripng_info {
 	u_int16_t tag_out;
 
 	struct route_node *rp;
+
+	/* Priority from input interface */
+	unsigned int priority;
 };
 
 #ifdef notyet
@@ -281,6 +305,9 @@ struct ripng_interface {
 
 	/* Passive interface. */
 	int passive;
+
+	/* Interface priority */
+	unsigned int priority;
 };
 
 /* RIPng peer information. */

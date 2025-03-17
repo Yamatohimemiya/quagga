@@ -58,6 +58,35 @@ static int ripng_enable_if_lookup(const char *);
 static int ripng_enable_network_lookup2(struct connected *);
 static void ripng_enable_apply_all(void);
 
+/* RIPng interface priority. */
+static struct ripng_config_interface* GetRIPngConfigInterface(const char* ifname){
+	struct ripng_config_interface *icfg = 0;
+	struct listnode *node, *nnode;
+
+	for(ALL_LIST_ELEMENTS(ripng->interface, node, nnode, icfg)) {
+		if(icfg){
+			if(strcmp(icfg->ifname, ifname) == 0){
+				return icfg;
+			}
+		}
+	}
+
+	//If not exist, create it
+	icfg = XCALLOC(MTYPE_RIP_INTERFACE, sizeof(struct ripng_config_interface));
+	if(icfg == 0){
+		return 0;
+	}
+
+	int l = strlen(ifname);
+
+	icfg->ifname = XCALLOC(MTYPE_RIP_INTERFACE, l);
+	icfg->priority = RIPNG_DEFAULT_PRIORITY;
+
+	memcpy(icfg->ifname, ifname, l);
+	listnode_add(ripng->interface, icfg);
+	return icfg;
+}
+
 /* Join to the all rip routers multicast group. */
 static int ripng_multicast_join(struct interface *ifp) {
 	int ret;
@@ -334,6 +363,8 @@ void ripng_interface_reset(void) {
 		}
 
 		ri->passive = 0;
+
+		ri->priority = RIPNG_DEFAULT_PRIORITY;
 	}
 }
 
@@ -346,6 +377,11 @@ static void ripng_apply_address_add(struct connected *ifc) {
 	}
 
 	if(!if_is_up(ifc->ifp)) {
+		return;
+	}
+
+	struct ripng_config_interface *RCI = GetRIPngConfigInterface(ifc->ifp->name);
+	if(CHECK_FLAG(RCI->flags, RIPNG_FLAG_INTERFACE_IGNORE_ADDRESS)){
 		return;
 	}
 
@@ -414,6 +450,11 @@ static void ripng_apply_address_del(struct connected *ifc) {
 		return;
 	}
 
+	struct ripng_config_interface *RCI = GetRIPngConfigInterface(ifc->ifp->name);
+	if(CHECK_FLAG(RCI->flags, RIPNG_FLAG_INTERFACE_IGNORE_ADDRESS)){
+		return;
+	}
+
 	p = ifc->address;
 
 	memset(&address, 0, sizeof(address));
@@ -448,9 +489,6 @@ int ripng_interface_address_delete(int command, struct zclient *zclient, zebra_s
 
 	return 0;
 }
-
-/* RIPng enable interface vector. */
-vector ripng_enable_if;
 
 /* RIPng enable network table. */
 struct route_table *ripng_enable_network;
@@ -550,29 +588,17 @@ static int ripng_enable_network_delete(struct prefix *p) {
 
 /* Lookup function. */
 static int ripng_enable_if_lookup(const char *ifname) {
-	unsigned int i;
-	char *str;
-
-	for(i = 0; i < vector_active(ripng_enable_if); i++) {
-		if((str = vector_slot(ripng_enable_if, i)) != NULL) {
-			if(strcmp(str, ifname) == 0) {
-				return i;
-			}
-		}
+	struct ripng_config_interface *RCI = GetRIPngConfigInterface(ifname);
+	if(CHECK_FLAG(RCI->flags, RIPNG_FLAG_INTERFACE_ENABLED)){
+		return 1;
 	}
 	return -1;
 }
 
 /* Add interface to ripng_enable_if. */
 static int ripng_enable_if_add(const char *ifname) {
-	int ret;
-
-	ret = ripng_enable_if_lookup(ifname);
-	if(ret >= 0) {
-		return -1;
-	}
-
-	vector_set(ripng_enable_if, strdup(ifname));
+	struct ripng_config_interface *RCI = GetRIPngConfigInterface(ifname);
+	SET_FLAG(RCI->flags, RIPNG_FLAG_INTERFACE_ENABLED);
 
 	ripng_enable_apply_all();
 
@@ -589,9 +615,8 @@ static int ripng_enable_if_delete(const char *ifname) {
 		return -1;
 	}
 
-	str = vector_slot(ripng_enable_if, index);
-	free(str);
-	vector_unset(ripng_enable_if, index);
+	struct ripng_config_interface *RCI = GetRIPngConfigInterface(ifname);
+	UNSET_FLAG(RCI->flags, RIPNG_FLAG_INTERFACE_ENABLED);
 
 	ripng_enable_apply_all();
 
@@ -637,6 +662,11 @@ static void ripng_connect_set(struct interface *ifp, int set) {
 			continue;
 		}
 
+		struct ripng_config_interface *RCI = GetRIPngConfigInterface(ifp->name);
+		if(CHECK_FLAG(RCI->flags, RIPNG_FLAG_INTERFACE_IGNORE_ADDRESS)){
+			continue;
+		}
+
 		address.family = AF_INET6;
 		address.prefix = p->u.prefix6;
 		address.prefixlen = p->prefixlen;
@@ -660,6 +690,7 @@ static void ripng_connect_set(struct interface *ifp, int set) {
 void ripng_enable_apply(struct interface *ifp) {
 	int ret;
 	struct ripng_interface *ri = NULL;
+	struct ripng_config_interface *RCI = NULL;
 
 	/* Check interface. */
 	if(!if_is_up(ifp)) {
@@ -667,6 +698,10 @@ void ripng_enable_apply(struct interface *ifp) {
 	}
 
 	ri = ifp->info;
+
+	/* per interfafce configuration */
+	RCI = GetRIPngConfigInterface(ifp->name);
+	ri->priority = RCI->priority;
 
 	/* Is this interface a candidate for RIPng ? */
 	ret = ripng_enable_network_lookup_if(ifp);
@@ -744,29 +779,26 @@ void ripng_clean_network() {
 	}
 
 	/* ripng_enable_if */
-	for(i = 0; i < vector_active(ripng_enable_if); i++) {
-		if((str = vector_slot(ripng_enable_if, i)) != NULL) {
-			free(str);
-			vector_slot(ripng_enable_if, i) = NULL;
-		}
-	}
+	struct ripng_config_interface *icfg = 0;
+	struct listnode *node, *nnode;
+	for(ALL_LIST_ELEMENTS(ripng->interface, node, nnode, icfg)) {
+		if(icfg){
+			UNSET_FLAG(icfg->flags, RIPNG_FLAG_INTERFACE_ENABLED);
+ 		}
+ 	}
 }
 
-/* Vector to store passive-interface name. */
-vector Vripng_passive_interface;
 
 /* Utility function for looking up passive interface settings. */
 static int ripng_passive_interface_lookup(const char *ifname) {
 	unsigned int i;
 	char *str;
 
-	for(i = 0; i < vector_active(Vripng_passive_interface); i++) {
-		if((str = vector_slot(Vripng_passive_interface, i)) != NULL) {
-			if(strcmp(str, ifname) == 0) {
-				return i;
-			}
-		}
-	}
+	struct ripng_config_interface *RCI = GetRIPngConfigInterface(ifname);
+	if(CHECK_FLAG(RCI->flags, RIPNG_FLAG_INTERFACE_PASSIVE)){
+		return 1;
+ 	}
+
 	return -1;
 }
 
@@ -799,7 +831,8 @@ static int ripng_passive_interface_set(struct vty *vty, const char *ifname) {
 		return CMD_WARNING;
 	}
 
-	vector_set(Vripng_passive_interface, strdup(ifname));
+	struct ripng_config_interface *RCI = GetRIPngConfigInterface(ifname);
+	SET_FLAG(RCI->flags, RIPNG_FLAG_INTERFACE_PASSIVE);
 
 	ripng_passive_interface_apply_all();
 
@@ -815,9 +848,8 @@ static int ripng_passive_interface_unset(struct vty *vty, const char *ifname) {
 		return CMD_WARNING;
 	}
 
-	str = vector_slot(Vripng_passive_interface, i);
-	free(str);
-	vector_unset(Vripng_passive_interface, i);
+	struct ripng_config_interface *RCI = GetRIPngConfigInterface(ifname);
+	UNSET_FLAG(RCI->flags, RIPNG_FLAG_INTERFACE_PASSIVE);
 
 	ripng_passive_interface_apply_all();
 
@@ -829,12 +861,14 @@ void ripng_passive_interface_clean(void) {
 	unsigned int i;
 	char *str;
 
-	for(i = 0; i < vector_active(Vripng_passive_interface); i++) {
-		if((str = vector_slot(Vripng_passive_interface, i)) != NULL) {
-			free(str);
-			vector_slot(Vripng_passive_interface, i) = NULL;
-		}
-	}
+	struct ripng_config_interface *icfg = 0;
+	struct listnode *node, *nnode;
+	for(ALL_LIST_ELEMENTS(ripng->interface, node, nnode, icfg)) {
+		if(icfg){
+			UNSET_FLAG(icfg->flags, RIPNG_FLAG_INTERFACE_PASSIVE);
+ 		}
+ 	}
+
 	ripng_passive_interface_apply_all();
 }
 
@@ -854,26 +888,60 @@ int ripng_network_write(struct vty *vty, int config_mode) {
 	}
 
 	/* Write enable interface. */
-	for(i = 0; i < vector_active(ripng_enable_if); i++) {
-		if((ifname = vector_slot(ripng_enable_if, i)) != NULL) {
-			vty_out(vty, "%s%s%s", config_mode ? " network " : "    ", ifname, VTY_NEWLINE);
-		}
-	}
+//	for(i = 0; i < vector_active(ripng_enable_if); i++) {
+//		if((ifname = vector_slot(ripng_enable_if, i)) != NULL) {
+//			vty_out(vty, "%s%s%s", config_mode ? " network " : "    ", ifname, VTY_NEWLINE);
+//		}
+//	}
 
 	/* Write passive interface. */
-	if(config_mode) {
-		for(i = 0; i < vector_active(Vripng_passive_interface); i++) {
-			if((ifname = vector_slot(Vripng_passive_interface, i)) != NULL) {
-				vty_out(vty, " passive-interface %s%s", ifname, VTY_NEWLINE);
-			}
-		}
-	}
+//	if(config_mode) {
+//		for(i = 0; i < vector_active(Vripng_passive_interface); i++) {
+//			if((ifname = vector_slot(Vripng_passive_interface, i)) != NULL) {
+//				vty_out(vty, " passive-interface %s%s", ifname, VTY_NEWLINE);
+//			}
+//		}
+//	}
 
 	return 0;
 }
 
+/* RIPng interface */
+DEFUN_WITH_NO(ripng_interface, ripng_interface_cmd, "interface WORD",
+      "Do not add route by interface address\n"
+      "Interface name\n") {
+
+	struct ripng_config_interface *RCI = GetRIPngConfigInterface(argv[0]);
+	if(IS_NO){
+		UNSET_FLAG(RCI->flags, RIPNG_FLAG_INTERFACE_IGNORE_ADDRESS);
+		ripng_enable_if_delete(argv[0]);
+	} else {
+		SET_FLAG(RCI->flags, RIPNG_FLAG_INTERFACE_IGNORE_ADDRESS);
+		ripng_enable_if_add(argv[0]);
+	}
+
+	return CMD_SUCCESS;
+}
+
+/* RIPng interface priority. */
+DEFUN_WITH_NO(ripng_interface_priority, ripng_interface_priority_cmd, "interface WORD priority <0-65535>",
+      "Set interface priorirty in routes have same metric\n"
+      "Interface name\n"
+      "Priority") {
+
+	struct ripng_config_interface *RCI = GetRIPngConfigInterface(argv[0]);
+
+	if(IS_NO){
+		RCI->priority = RIPNG_DEFAULT_PRIORITY;
+	} else {
+		RCI->priority = atoi(argv[1]);
+ 	}
+
+ 	return CMD_SUCCESS;
+}
+
 /* RIPng enable on specified interface or matched network. */
-DEFUN(ripng_network, ripng_network_cmd, "network IF_OR_ADDR",
+DEFUN_WITH_NO(ripng_network, ripng_network_cmd, "network IF_OR_ADDR",
       "RIPng enable on specified interface or network.\n"
       "Interface or address") {
 	int ret;
@@ -882,38 +950,22 @@ DEFUN(ripng_network, ripng_network_cmd, "network IF_OR_ADDR",
 	ret = str2prefix(argv[0], &p);
 
 	/* Given string is IPv6 network or interface name. */
-	if(ret) {
-		ret = ripng_enable_network_add(&p);
+	if(IS_NO){
+		if(ret) {
+			ret = ripng_enable_network_delete(&p);
+		} else {
+			ret = ripng_enable_if_delete(argv[0]);
+		}
 	} else {
-		ret = ripng_enable_if_add(argv[0]);
+		if(ret) {
+			ret = ripng_enable_network_add(&p);
+		} else {
+			ret = ripng_enable_if_add(argv[0]);
+		}
 	}
 
 	if(ret < 0) {
-		vty_out(vty, "There is same network configuration %s%s", argv[0], VTY_NEWLINE);
-		return CMD_WARNING;
-	}
-
-	return CMD_SUCCESS;
-}
-
-/* RIPng enable on specified interface or matched network. */
-DEFUN(no_ripng_network, no_ripng_network_cmd, "no network IF_OR_ADDR",
-      NO_STR "RIPng enable on specified interface or network.\n"
-	     "Interface or address") {
-	int ret;
-	struct prefix p;
-
-	ret = str2prefix(argv[0], &p);
-
-	/* Given string is interface name. */
-	if(ret) {
-		ret = ripng_enable_network_delete(&p);
-	} else {
-		ret = ripng_enable_if_delete(argv[0]);
-	}
-
-	if(ret < 0) {
-		vty_out(vty, "can't find network %s%s", argv[0], VTY_NEWLINE);
+		vty_out(vty, "Can't change network configuration %s%s", argv[0], VTY_NEWLINE);
 		return CMD_WARNING;
 	}
 
@@ -1056,12 +1108,6 @@ void ripng_if_init() {
 	/* RIPng enable network init. */
 	ripng_enable_network = route_table_init();
 
-	/* RIPng enable interface init. */
-	ripng_enable_if = vector_init(1);
-
-	/* RIPng passive interface. */
-	Vripng_passive_interface = vector_init(1);
-
 	/* Install interface node. */
 	install_node(&interface_node, interface_config_write);
 
@@ -1072,8 +1118,10 @@ void ripng_if_init() {
 	install_element(INTERFACE_NODE, &interface_desc_cmd);
 	install_element(INTERFACE_NODE, &no_interface_desc_cmd);
 
-	install_element(RIPNG_NODE, &ripng_network_cmd);
-	install_element(RIPNG_NODE, &no_ripng_network_cmd);
+	install_element_with_no(RIPNG_NODE, &ripng_interface_priority_cmd);
+	install_element_with_no(RIPNG_NODE, &ripng_interface_cmd);
+
+	install_element_with_no(RIPNG_NODE, &ripng_network_cmd);
 	install_element(RIPNG_NODE, &ripng_passive_interface_cmd);
 	install_element(RIPNG_NODE, &no_ripng_passive_interface_cmd);
 

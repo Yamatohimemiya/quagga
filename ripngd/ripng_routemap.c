@@ -170,7 +170,7 @@ static void route_match_interface_free(void *rule) {
 	XFREE(MTYPE_ROUTE_MAP_COMPILED, rule);
 }
 
-static struct route_map_rule_cmd route_match_interface_cmd = { "interface", route_match_interface, route_match_interface_compile, route_match_interface_free };
+static struct route_map_rule_cmd route_match_interface_cmd = { "match-interface", route_match_interface, route_match_interface_compile, route_match_interface_free };
 
 /* `match tag TAG' */
 /* Match function return 1 if match is success else return zero. */

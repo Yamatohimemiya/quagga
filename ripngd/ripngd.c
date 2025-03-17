@@ -510,7 +510,7 @@ struct ripng_info *ripng_ecmp_delete(struct ripng_info *rinfo) {
 	struct route_node *rp = rinfo->rp;
 	struct list *list = (struct list *) rp->info;
 
-	RIPNG_TIMER_OFF(rinfo->t_timeout);
+	//RIPNG_TIMER_OFF(rinfo->t_timeout);
 
 	if(rinfo->metric != RIPNG_METRIC_INFINITY) {
 		ripng_aggregate_decrement(rp, rinfo);
@@ -664,6 +664,7 @@ static void ripng_route_process(struct rte *rte, struct sockaddr_in6 *from, stru
 	newinfo.metric = rte->metric;
 	newinfo.metric_out = rte->metric; /* XXX */
 	newinfo.tag = ntohs(rte->tag);	  /* XXX */
+	newinfo.priority = ri->priority;
 
 	/* Modify entry. */
 	if(ri->routemap[RIPNG_FILTER_IN]) {
@@ -762,6 +763,12 @@ static void ripng_route_process(struct rte *rte, struct sockaddr_in6 *from, stru
 					break;
 				}
 
+				if(ri->priority > rinfo->priority) {
+					/* New route has a bigger priority. Replace the ECMP list
+               * with the new one in below. */
+					break;
+				}
+
 				/* Metrics are same. Keep "rinfo" null and the new route
              * is added in the ECMP list in below. */
 			}
@@ -802,7 +809,11 @@ static void ripng_route_process(struct rte *rte, struct sockaddr_in6 *from, stru
 	 router as the existing route, and the new metric is different
 	 than the old one; or, if the new metric is lower than the old
 	 one; do the following actions: */
-		if((same && rinfo->metric != rte->metric) || rte->metric < rinfo->metric) {
+		if(
+			(same && rinfo->metric != rte->metric)
+			|| rte->metric < rinfo->metric
+			|| ((rte->metric <= rinfo->metric) && (ri->priority > rinfo->priority))
+		) {
 			if(listcount(list) == 1) {
 				if(newinfo.metric != RIPNG_METRIC_INFINITY) {
 					ripng_ecmp_replace(&newinfo);
@@ -810,7 +821,11 @@ static void ripng_route_process(struct rte *rte, struct sockaddr_in6 *from, stru
 					ripng_ecmp_delete(rinfo);
 				}
 			} else {
-				if(newinfo.metric < rinfo->metric) {
+				if(newinfo.priority < rinfo->priority) {
+					ripng_ecmp_replace(&newinfo);
+				} else if(newinfo.priority > rinfo->priority) {
+					ripng_ecmp_delete(rinfo);
+				} else if(newinfo.metric < rinfo->metric) {
 					ripng_ecmp_replace(&newinfo);
 				} else { /* newinfo.metric > rinfo->metric */
 					ripng_ecmp_delete(rinfo);
@@ -1070,8 +1085,8 @@ static void ripng_response_process(struct ripng_packet *packet, int size, struct
 		}
 
 		/* - is the metric valid (i.e., between 1 and 16, inclusive) */
-		if(!(rte->metric >= 1 && rte->metric <= 16)) {
-			zlog_warn("Invalid metric %d from %s%%%s", rte->metric, inet6_ntoa(from->sin6_addr), ifp->name);
+		if(!(rte->metric >= 1 && rte->metric <= (ripng->limit_hop))) {
+			zlog_warn("Invalid metric %d (max: %d) from %s%%%s", rte->metric, ripng->limit_hop, inet6_ntoa(from->sin6_addr), ifp->name);
 			ripng_peer_bad_route(from);
 			continue;
 		}
@@ -1669,6 +1684,11 @@ static int ripng_create(void) {
 	ripng_event(RIPNG_READ, ripng->sock);
 	ripng_event(RIPNG_UPDATE_EVENT, 1);
 
+	/* Default limits */
+	ripng->limit_hop = RIPNG_METRIC_INFINITY;
+
+	/* per interface settings */
+	ripng->interface = list_new();
 	return 0;
 }
 
@@ -1802,6 +1822,15 @@ static int ripng_route_add(struct vty *vty, const char* prefix_str, const char* 
 
 	ripng_redistribute_add_ex(ZEBRA_ROUTE_RIPNG, RIPNG_ROUTE_STATIC, &p, 0, NULL, 0, metric);
 
+	return CMD_SUCCESS;
+}
+
+DEFUN(rip_limit_hop, rip_limit_hop_cmd, "limit hop <1-16>",
+      "Set a maximum metric\n"
+      "Maximum metric\n") {
+	if(ripng) {
+		ripng->limit_hop = atoi(argv[0]);
+	}
 	return CMD_SUCCESS;
 }
 
@@ -2595,8 +2624,6 @@ void ripng_clean() {
 		XFREE(MTYPE_ROUTE_TABLE, ripng->route);
 		XFREE(MTYPE_ROUTE_TABLE, ripng->aggregate);
 
-		XFREE(MTYPE_RIPNG, ripng);
-		ripng = NULL;
 	} /* if (ripng) */
 
 	ripng_clean_network();
@@ -2604,6 +2631,21 @@ void ripng_clean() {
 	ripng_offset_clean();
 	ripng_interface_clean();
 	ripng_redistribute_clean();
+
+	if(ripng->interface){
+		struct ripng_config_interface *RCI = 0;
+		struct listnode *node, *nnode;
+		for(ALL_LIST_ELEMENTS(ripng->interface, node, nnode, RCI)) {
+			if(RCI){
+				XFREE(MTYPE_RIP_INTERFACE, RCI->ifname);
+				XFREE(MTYPE_RIP_INTERFACE, RCI);
+			}
+		}
+		list_free(ripng->interface);
+	}
+
+	XFREE(MTYPE_RIP, ripng);
+	ripng = NULL;
 }
 
 /* Reset all values to the default settings. */
@@ -2707,6 +2749,8 @@ void ripng_init() {
 	install_element(CONFIG_NODE, &no_router_ripng_cmd);
 
 	install_default(RIPNG_NODE);
+	install_element(RIPNG_NODE, &rip_limit_hop_cmd);
+
 	install_element(RIPNG_NODE, &ripng_route_cmd);
 	install_element(RIPNG_NODE, &ripng_route_metric_cmd);
 	install_element(RIPNG_NODE, &no_ripng_route_cmd);
