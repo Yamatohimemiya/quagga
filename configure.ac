@@ -16,7 +16,6 @@ AM_MAINTAINER_MODE()
 CONFIG_ARGS="$*"
 AC_SUBST(CONFIG_ARGS)
 AC_CONFIG_SRCDIR(lib/zebra.h)
-AC_CONFIG_MACRO_DIR([m4])
 
 dnl -----------------------------------
 dnl Get hostname and other information.
@@ -33,14 +32,6 @@ m4_ifndef([AM_SILENT_RULES], [m4_define([AM_SILENT_RULES],[])])
 AM_SILENT_RULES([yes])
 AC_CONFIG_HEADERS(config.h)
 
-AC_PATH_PROG(PERL, perl)
-AC_CHECK_PROG([GAWK],[gawk],[gawk],[not-in-PATH])
-if test "x$GAWK" = "xnot-in-PATH" ; then
-	AC_MSG_ERROR([GNU awk is required for lib/memtype.h made by memtypes.awk.
-BSD awk complains: awk: gensub doesn't support backreferences (subst "\1") ])
-fi
-AC_ARG_VAR([GAWK],[GNU AWK])
-
 dnl default is to match previous behavior
 exampledir=${sysconfdir}
 AC_ARG_ENABLE([exampledir],
@@ -49,17 +40,6 @@ AC_ARG_ENABLE([exampledir],
 			 exampledir="$enableval",)
 dnl XXX add --exampledir to autoconf standard directory list somehow
 AC_SUBST(exampledir)
-
-dnl default is to match previous behavior
-pkgsrcrcdir=""
-pkgsrcdir=""
-AC_ARG_ENABLE([pkgsrcrcdir],
-	  AS_HELP_STRING([--enable-pkgsrcrcdir],
-			 [specify directory for rc.d scripts]),
-			 pkgsrcrcdir="$enableval"; pkgsrcdir="pkgsrc",)
-dnl XXX add --pkgsrcrcdir to autoconf standard directory list somehow
-AC_SUBST(pkgsrcdir)
-AC_SUBST(pkgsrcrcdir)
 
 dnl ------------
 dnl Check CFLAGS
@@ -264,8 +244,6 @@ AC_ARG_WITH(pkg-extra-version,
 AC_ARG_WITH(pkg-git-version,
 	AS_HELP_STRING([--with-pkg-git-version], [add git information to MOTD and build version string]),
 	[ test "x$withval" != "xno" && with_pkg_git_version="yes" ])
-AC_ARG_ENABLE(vtysh,
-  AS_HELP_STRING([--disable-vtysh], [do not build integrated vty shell for Quagga]))
 AC_ARG_ENABLE(zebra,
   AS_HELP_STRING([--disable-zebra], [do not build zebra daemon]))
 AC_ARG_ENABLE(bgpd,
@@ -278,10 +256,6 @@ AC_ARG_ENABLE(ospfd,
   AS_HELP_STRING([--disable-ospfd], [do not build ospfd]))
 AC_ARG_ENABLE(ospf6d,
   AS_HELP_STRING([--disable-ospf6d], [do not build ospf6d]))
-AC_ARG_ENABLE(nhrpd,
-  AS_HELP_STRING([--disable-nhrpd], [do not build nhrpd]))
-AC_ARG_ENABLE(watchquagga,
-  AS_HELP_STRING([--disable-watchquagga], [do not build watchquagga]))
 AC_ARG_ENABLE(isisd,
   AS_HELP_STRING([--disable-isisd], [do not build isisd]))
 AC_ARG_ENABLE(pimd,
@@ -290,15 +264,10 @@ AC_ARG_ENABLE(bgp-announce,
   AS_HELP_STRING([--disable-bgp-announce,], [turn off BGP route announcement]))
 AC_ARG_ENABLE(snmp,
   AS_HELP_STRING([--enable-snmp=ARG], [enable SNMP support (smux or agentx)]))
-AC_ARG_WITH(libpam,
-  AS_HELP_STRING([--with-libpam], [use libpam for PAM support in vtysh]))
 AC_ARG_ENABLE(tcp-zebra,
   AS_HELP_STRING([--enable-tcp-zebra], [enable TCP/IP socket connection between zebra and protocol daemon]))
 AC_ARG_ENABLE(ospfapi,
   AS_HELP_STRING([--disable-ospfapi], [do not build OSPFAPI to access the OSPF LSA Database]))
-AC_ARG_ENABLE(ospfclient,
-  AS_HELP_STRING([--disable-ospfclient], [do not build OSPFAPI client for OSPFAPI,
-                          (this is the default if --disable-ospfapi is set)]))
 AC_ARG_ENABLE(multipath,
   AS_HELP_STRING([--enable-multipath=ARG], [enable multipath function, ARG must be digit]))
 AC_ARG_ENABLE(user,
@@ -334,8 +303,6 @@ AC_ARG_ENABLE(time-check,
   AS_HELP_STRING([--disable-time-check], [disable slow thread warning messages]))
 AC_ARG_ENABLE(pcreposix,
   AS_HELP_STRING([--enable-pcreposix], [enable using PCRE Posix libs for regex functions]))
-AC_ARG_ENABLE(fpm,
-  AS_HELP_STRING([--enable-fpm], [enable Forwarding Plane Manager support]))
 AC_ARG_ENABLE(werror,
   AS_HELP_STRING([--enable-werror], [enable -Werror (recommended for developers only)]))
 AC_ARG_ENABLE([protobuf],
@@ -356,10 +323,6 @@ if test x"${enable_time_check}" != x"no" ; then
   else
     AC_DEFINE_UNQUOTED(CONSUMED_TIME_CHECK,$enable_time_check,Consumed Time Check)
   fi
-fi
-
-if test "${enable_fpm}" = "yes"; then
-   AC_DEFINE(HAVE_FPM,,Forwarding Plane Manager support)
 fi
 
 if test "x${enable_dev_build}" = "xyes"; then
@@ -716,105 +679,6 @@ case "$host" in
 esac
 
 AC_SYS_LARGEFILE
-
-dnl ---------------------
-dnl Integrated VTY option
-dnl ---------------------
-case "${enable_vtysh}" in
-  "no") VTYSH="";;
-  *)    VTYSH="vtysh";
-         AC_DEFINE(VTYSH,,VTY shell)
-dnl	 Vtysh uses libreadline, which looks for termcap functions at
-dnl	 configure time.  We follow readlines search order.
-dnl	 The required procedures are in libtermcap on NetBSD, in
-dnl	 [TODO] on Linux, and in [TODO] on Solaris.
-	 AC_CHECK_LIB(termcap, tputs, LIBREADLINE="$LIBREADLINE -ltermcap",
-	   [AC_CHECK_LIB(tinfo, tputs, LIBREADLINE="$LIBREADLINE -ltinfo",
-	     [AC_CHECK_LIB(curses, tputs, LIBREADLINE="$LIBREADLINE -lcurses",
-	       [AC_CHECK_LIB(ncurses, tputs,
-	                     LIBREADLINE="$LIBREADLINE -lncurses")]
-	      )]
-	    )]
-	  )
-         AC_CHECK_LIB(readline, main, LIBREADLINE="-lreadline $LIBREADLINE",,
-                      "$LIBREADLINE")
-         if test $ac_cv_lib_readline_main = no; then
-           AC_MSG_ERROR([vtysh needs libreadline but was not found and usable on your system.])
-         fi
-	 AC_CHECK_HEADER(readline/history.h)
-	 if test $ac_cv_header_readline_history_h = no;then
-           AC_MSG_ERROR([readline is too old to have readline/history.h, please update to the latest readline library.])
-	 fi
-	 AC_CHECK_LIB(readline, rl_completion_matches,
-	              LIBREADLINE="$LIBREADLINE",, "$LIBREADLINE")
-         if test $ac_cv_lib_readline_rl_completion_matches = no; then
-           AC_DEFINE(rl_completion_matches,completion_matches,Old readline)
-	 fi
-	 ;;
-  "no" ) VTYSH="";;
-esac
-AC_SUBST(LIBREADLINE)
-AM_CONDITIONAL(VTYSH, test "x$VTYSH" = "xvtysh")
-
-dnl ----------
-dnl PAM module
-dnl
-dnl Quagga detects the PAM library it is built against by checking for a
-dnl functional pam_misc.h (Linux-PAM) or openpam.h (OpenPAM) header. pam_misc.h
-dnl is known to #include pam_appl.h, the standard header of a PAM library, and
-dnl openpam.h doesn't do that, although depends on the header too. Hence a
-dnl little assistance to AC_CHECK_HEADER is necessary for the proper detection
-dnl of OpenPAM.
-dnl ----------
-if test "$with_libpam" = "yes"; then
-  AC_CHECK_HEADER([security/pam_misc.h],
-    [AC_DEFINE(HAVE_PAM_MISC_H,,Have pam_misc.h)
-     AC_DEFINE(PAM_CONV_FUNC,misc_conv,Have misc_conv)
-     pam_conv_func="misc_conv"
-    ],
-    [], QUAGGA_INCLUDES)
-  AC_CHECK_HEADER([security/openpam.h],
-    [AC_DEFINE(HAVE_OPENPAM_H,,Have openpam.h)
-     AC_DEFINE(PAM_CONV_FUNC,openpam_ttyconv,Have openpam_ttyconv)
-     pam_conv_func="openpam_ttyconv"
-    ],
-    [], QUAGGA_INCLUDES[#include <security/pam_appl.h>])
-  if test -z "$ac_cv_header_security_pam_misc_h$ac_cv_header_security_openpam_h" ; then
-    AC_MSG_WARN([*** pam support will not be built ***])
-    with_libpam="no"
-  fi
-fi
-
-if test "$with_libpam" = "yes"; then
-dnl took this test from proftpds configure.in and suited to our needs
-dnl -------------------------------------------------------------------------
-dnl
-dnl This next check looks funky due to a linker problem with some versions
-dnl of the PAM library.  Prior to 0.72 release, the Linux PAM shared library
-dnl omitted requiring libdl linking information. PAM-0.72 or better ships
-dnl with RedHat 6.2 and Debian 2.2 or better.
-AC_CHECK_LIB(pam, pam_start,
-  [AC_CHECK_LIB(pam, $pam_conv_func,
-    [AC_DEFINE(USE_PAM,,Use PAM for authentication)
-     LIBPAM="-lpam"],
-    [AC_DEFINE(USE_PAM,,Use PAM for authentication)
-     LIBPAM="-lpam -lpam_misc"]
-    )
-  ],
-
-  [AC_CHECK_LIB(pam, pam_end,
-    [AC_CHECK_LIB(pam, $pam_conv_func,
-      [AC_DEFINE(USE_PAM,,Use PAM for authentication)
-       LIBPAM="-lpam -ldl"],
-      [AC_DEFINE(USE_PAM,,Use PAM for authentication)
-       LIBPAM="-lpam -ldl -lpam_misc"]
-     )
-  ],AC_MSG_WARN([*** pam support will not be built ***]),
-  [-ldl])
-  ]
-)
-fi
-AC_SUBST(LIBPAM)
 
 dnl -------------------------------
 dnl Endian-ness check
@@ -1214,35 +1078,6 @@ else
 fi
 AM_CONDITIONAL(OSPFD, test "x$OSPFD" = "xospfd")
 
-if test x"$opsys" != x"gnu-linux"; then
-	dnl NHRPd works currently with Linux only.
-	enable_nhrpd="no"
-fi
-if test "${enable_nhrpd}" = "no";then
-  NHRPD=""
-else
-  NHRPD="nhrpd"
-fi
-AM_CONDITIONAL(NHRPD, test "x$NHRPD" = "xnhrpd")
-
-if test "${enable_watchquagga}" = "no";then
-  WATCHQUAGGA=""
-else
-  WATCHQUAGGA="watchquagga"
-fi
-AM_CONDITIONAL(WATCHQUAGGA, test "x$WATCHQUAGGA" = "xwatchquagga")
-
-OSPFCLIENT=""
-if test "${enable_ospfapi}" != "no";then
-    AC_DEFINE(SUPPORT_OSPF_API,,OSPFAPI)
-
-  if test "${enable_ospfclient}" != "no";then
-      OSPFCLIENT="ospfclient"
-  fi
-fi
-
-AM_CONDITIONAL(OSPFCLIENT, test "x$OSPFCLIENT" = "xospfclient")
-
 case "${enable_ripngd}" in
   "no" ) RIPNGD="";;
   *    ) RIPNGD="ripngd";;
@@ -1273,21 +1108,15 @@ else
   AC_DEFINE(DISABLE_BGP_ANNOUNCE,0,Disable BGP installation to zebra)
 fi
 
-AC_SUBST(DOC)
 AC_SUBST(ZEBRA)
 AC_SUBST(BGPD)
 AC_SUBST(RIPD)
 AC_SUBST(RIPNGD)
 AC_SUBST(OSPFD)
 AC_SUBST(OSPF6D)
-AC_SUBST(NHRPD)
-AC_SUBST(WATCHQUAGGA)
 AC_SUBST(ISISD)
 AC_SUBST(PIMD)
-AC_SUBST(SOLARIS)
-AC_SUBST(VTYSH)
 AC_SUBST(CURSES)
-AC_SUBST(OSPFCLIENT)
 AC_SUBST(OSPFAPI)
 AC_CHECK_LIB(c, inet_ntop, [AC_DEFINE(HAVE_INET_NTOP,,inet_ntop)])
 AC_CHECK_LIB(c, inet_pton, [AC_DEFINE(HAVE_INET_PTON,,inet_pton)])
@@ -1314,14 +1143,6 @@ AC_CHECK_LIB(c, regexec,
 fi
 AC_SUBST(HAVE_LIBPCREPOSIX)
 AC_SUBST(LIB_REGEX)
-
-dnl ------------------
-dnl check C-Ares library
-dnl ------------------
-if test "${enable_nhrpd}" != "no";then
-   PKG_CHECK_MODULES([CARES], [libcares])
-fi
-
 
 dnl ------------------
 dnl check Net-SNMP library
@@ -1581,21 +1402,9 @@ AC_DEFINE_UNQUOTED(PATH_RIPNGD_PID, "$quagga_statedir/ripngd.pid",ripngd PID)
 AC_DEFINE_UNQUOTED(PATH_BGPD_PID, "$quagga_statedir/bgpd.pid",bgpd PID)
 AC_DEFINE_UNQUOTED(PATH_OSPFD_PID, "$quagga_statedir/ospfd.pid",ospfd PID)
 AC_DEFINE_UNQUOTED(PATH_OSPF6D_PID, "$quagga_statedir/ospf6d.pid",ospf6d PID)
-AC_DEFINE_UNQUOTED(PATH_NHRPD_PID, "$quagga_statedir/nhrpd.pid",nhrpd PID)
 AC_DEFINE_UNQUOTED(PATH_ISISD_PID, "$quagga_statedir/isisd.pid",isisd PID)
 AC_DEFINE_UNQUOTED(PATH_PIMD_PID, "$quagga_statedir/pimd.pid",pimd PID)
-AC_DEFINE_UNQUOTED(PATH_WATCHQUAGGA_PID, "$quagga_statedir/watchquagga.pid",watchquagga PID)
 AC_DEFINE_UNQUOTED(ZEBRA_SERV_PATH, "$quagga_statedir/zserv.api",zebra api socket)
-AC_DEFINE_UNQUOTED(ZEBRA_VTYSH_PATH, "$quagga_statedir/zebra.vty",zebra vty socket)
-AC_DEFINE_UNQUOTED(RIP_VTYSH_PATH, "$quagga_statedir/ripd.vty",rip vty socket)
-AC_DEFINE_UNQUOTED(RIPNG_VTYSH_PATH, "$quagga_statedir/ripngd.vty",ripng vty socket)
-AC_DEFINE_UNQUOTED(BGP_VTYSH_PATH, "$quagga_statedir/bgpd.vty",bgpd vty socket)
-AC_DEFINE_UNQUOTED(OSPF_VTYSH_PATH, "$quagga_statedir/ospfd.vty",ospfd vty socket)
-AC_DEFINE_UNQUOTED(OSPF6_VTYSH_PATH, "$quagga_statedir/ospf6d.vty",ospf6d vty socket)
-AC_DEFINE_UNQUOTED(NHRP_VTYSH_PATH, "$quagga_statedir/nhrpd.vty",nhrpd vty socket)
-AC_DEFINE_UNQUOTED(ISIS_VTYSH_PATH, "$quagga_statedir/isisd.vty",isisd vty socket)
-AC_DEFINE_UNQUOTED(PIM_VTYSH_PATH, "$quagga_statedir/pimd.vty",pimd vty socket)
-AC_DEFINE_UNQUOTED(DAEMON_VTY_DIR, "$quagga_statedir",daemon vty directory)
 
 dnl -------------------------------
 dnl Quagga sources should always be
@@ -1616,19 +1425,14 @@ AC_CACHE_VAL(ac_cv_htonl_works,
 )
 AC_MSG_RESULT($ac_cv_htonl_works)
 
-AC_CONFIG_FILES([Makefile lib/Makefile qpb/Makefile zebra/Makefile ripd/Makefile
-	  ripngd/Makefile bgpd/Makefile ospfd/Makefile watchquagga/Makefile
-	  ospf6d/Makefile isisd/Makefile vtysh/Makefile
-	  ospfclient/Makefile tests/Makefile m4/Makefile
-	  pimd/Makefile nhrpd/Makefile
-	  pkgsrc/Makefile
-	  fpm/Makefile
+AC_CONFIG_FILES([Makefile lib/Makefile zebra/Makefile ripd/Makefile
+	  ripngd/Makefile bgpd/Makefile ospfd/Makefile ospf6d/Makefile
+	  isisd/Makefile pimd/Makefile
 	  lib/version.h
 	  isisd/topology/Makefile
-	  pkgsrc/bgpd.sh pkgsrc/ospf6d.sh pkgsrc/ospfd.sh
-	  pkgsrc/ripd.sh pkgsrc/ripngd.sh pkgsrc/zebra.sh])
+	])
 
-AC_CONFIG_FILES([vtysh/extract.pl],[chmod +x vtysh/extract.pl])
+
 ## Hack, but working solution to avoid rebuilding of quagga.info.
 ## It's already in CVS until texinfo 4.7 is more common.
 AC_OUTPUT
@@ -1642,7 +1446,7 @@ source code location    : ${srcdir}
 compiler                : ${CC}
 compiler flags          : ${CFLAGS}
 make                    : ${MAKE-make}
-linker flags            : ${LDFLAGS} ${LIBS} ${LIBCAP} ${LIBREADLINE} ${LIBM}
+linker flags            : ${LDFLAGS} ${LIBS} ${LIBCAP} ${LIBM} ${LIBREADLINE}
 state file directory    : ${quagga_statedir}
 config file directory   : `eval echo \`echo ${sysconfdir}\``
 example directory       : `eval echo \`echo ${exampledir}\``

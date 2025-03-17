@@ -297,7 +297,7 @@ int main(int argc, char **argv) {
 	pid_output(pid_file);
 
 	/* Create VTY socket */
-	vty_serv_sock(vty_addr, vty_port, OSPF_VTYSH_PATH);
+	vty_serv_sock(vty_addr, vty_port);
 
 	/* Print banner. */
 	zlog_notice("OSPFd %s starting: vty@%d", QUAGGA_VERSION, vty_port);

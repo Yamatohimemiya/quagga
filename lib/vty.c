@@ -2047,7 +2047,7 @@ static int vtysh_write(struct thread *thread) {
 #endif /* VTYSH */
 
 /* Determine address family to bind. */
-void vty_serv_sock(const char *addr, unsigned short port, const char *path) {
+void vty_serv_sock(const char *addr, unsigned short port) {
 	/* If port is set to 0, do not listen on TCP/IP at all! */
 	if(port) {
 #ifdef HAVE_IPV6
@@ -2056,10 +2056,6 @@ void vty_serv_sock(const char *addr, unsigned short port, const char *path) {
 		vty_serv_sock_family(addr, port, AF_INET);
 #endif /* HAVE_IPV6 */
 	}
-
-#ifdef VTYSH
-	vty_serv_un(path);
-#endif /* VTYSH */
 }
 
 /* Close vty interface.  Warning: call this only from functions that

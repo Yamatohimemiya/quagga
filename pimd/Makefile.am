@@ -8,12 +8,12 @@
 # it under the terms of the GNU General Public License as
 # published by the Free Software Foundation; either version 2,
 # or (at your option) any later version.
-# 
+#
 # qpimd is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public
 # License along with qpimd; see the file COPYING.  If not, write
 # to the Free Software Foundation, Inc., 59 Temple Place - Suite
@@ -42,8 +42,7 @@ LIBS = @LIBS@
 AM_CFLAGS = $(WERROR)
 
 noinst_LIBRARIES = libpim.a
-sbin_PROGRAMS = pimd 
-bin_PROGRAMS = test_igmpv3_join
+sbin_PROGRAMS = pimd
 
 libpim_a_SOURCES = \
 	pimd.c pim_version.c pim_cmd.c pim_signals.c pim_iface.c \
@@ -66,9 +65,6 @@ noinst_HEADERS = \
 
 pimd_SOURCES = \
 	pim_main.c $(libpim_a_SOURCES)
-
-test_igmpv3_join_SOURCES = \
-	test_igmpv3_join.c pim_igmp_join.c
 
 pimd_LDADD = ../lib/libzebra.la @LIBCAP@
 

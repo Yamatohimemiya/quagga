@@ -440,7 +440,7 @@ int main(int argc, char **argv) {
 	zebra_zserv_socket_init(zserv_path);
 
 	/* Make vty server socket. */
-	vty_serv_sock(vty_addr, vty_port, ZEBRA_VTYSH_PATH);
+	vty_serv_sock(vty_addr, vty_port);
 
 	/* Print banner. */
 	zlog_notice("Zebra %s starting: vty@%d", QUAGGA_VERSION, vty_port);

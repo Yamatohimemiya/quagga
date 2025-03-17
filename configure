@@ -276,10 +276,10 @@ then :
     printf "%s\n" "$0: be upgraded to zsh 4.3.4 or later."
   else
     printf "%s\n" "$0: Please tell bug-autoconf@gnu.org and
-$0: http://oss.xprj.org/quagga about your system,
-$0: including any error possibly output before this
-$0: message. Then install a modern shell, or manually run
-$0: the script under such a shell if you do have one."
+$0: http://oss.xprj.org/quagga about your system, including
+$0: any error possibly output before this message. Then
+$0: install a modern shell, or manually run the script
+$0: under such a shell if you do have one."
   fi
   exit 1
 fi
@@ -673,30 +673,20 @@ am__EXEEXT_TRUE
 LTLIBOBJS
 quagga_statedir
 CONFDATE
-WEAK_ALIAS_CROSSFILE
-WEAK_ALIAS
 LIBCAP
 NETSNMP_CONFIG
-CARES_LIBS
-CARES_CFLAGS
 LIB_REGEX
 HAVE_LIBPCREPOSIX
 OSPFAPI
-OSPFCLIENT
 CURSES
-VTYSH
-SOLARIS
 PIMD
 ISISD
-WATCHQUAGGA
-NHRPD
 OSPF6D
 OSPFD
 RIPNGD
 RIPD
 BGPD
 ZEBRA
-DOC
 PIMD_FALSE
 PIMD_TRUE
 ISISD_FALSE
@@ -705,12 +695,6 @@ OSPF6D_FALSE
 OSPF6D_TRUE
 RIPNGD_FALSE
 RIPNGD_TRUE
-OSPFCLIENT_FALSE
-OSPFCLIENT_TRUE
-WATCHQUAGGA_FALSE
-WATCHQUAGGA_TRUE
-NHRPD_FALSE
-NHRPD_TRUE
 OSPFD_FALSE
 OSPFD_TRUE
 RIPD_FALSE
@@ -729,10 +713,6 @@ KERNEL_METHOD
 RT_METHOD
 LIBM
 LIBOBJS
-LIBPAM
-VTYSH_FALSE
-VTYSH_TRUE
-LIBREADLINE
 GIT_VERSION_FALSE
 GIT_VERSION_TRUE
 enable_vty_group
@@ -792,11 +772,7 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
-pkgsrcrcdir
-pkgsrcdir
 exampledir
-GAWK
-PERL
 AM_BACKSLASH
 AM_DEFAULT_VERBOSITY
 AM_DEFAULT_V
@@ -889,7 +865,6 @@ enable_option_checking
 enable_maintainer_mode
 enable_silent_rules
 enable_exampledir
-enable_pkgsrcrcdir
 with_cflags
 enable_dependency_tracking
 enable_shared
@@ -902,23 +877,18 @@ with_sysroot
 enable_libtool_lock
 with_pkg_extra_version
 with_pkg_git_version
-enable_vtysh
 enable_zebra
 enable_bgpd
 enable_ripd
 enable_ripngd
 enable_ospfd
 enable_ospf6d
-enable_nhrpd
-enable_watchquagga
 enable_isisd
 enable_pimd
 enable_bgp_announce
 enable_snmp
-with_libpam
 enable_tcp_zebra
 enable_ospfapi
-enable_ospfclient
 enable_multipath
 enable_user
 enable_group
@@ -936,7 +906,6 @@ enable_gcc_rdynamic
 enable_backtrace
 enable_time_check
 enable_pcreposix
-enable_fpm
 enable_werror
 enable_protobuf
 enable_dev_build
@@ -945,7 +914,6 @@ enable_largefile
       ac_precious_vars='build_alias
 host_alias
 target_alias
-GAWK
 CC
 CFLAGS
 LDFLAGS
@@ -957,9 +925,7 @@ PKG_CONFIG_PATH
 PKG_CONFIG_LIBDIR
 LT_SYS_LIBRARY_PATH
 PROTOBUF_C_CFLAGS
-PROTOBUF_C_LIBS
-CARES_CFLAGS
-CARES_LIBS'
+PROTOBUF_C_LIBS'
 
 
 # Initialize some variables set by options.
@@ -1594,7 +1560,6 @@ Optional Features:
   --enable-silent-rules   less verbose build output (undo: "make V=1")
   --disable-silent-rules  verbose build output (undo: "make V=0")
   --enable-exampledir     specify alternate directory for examples
-  --enable-pkgsrcrcdir    specify directory for rc.d scripts
   --enable-dependency-tracking
                           do not reject slow dependency extractors
   --disable-dependency-tracking
@@ -1604,15 +1569,12 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
-  --disable-vtysh         do not build integrated vty shell for Quagga
   --disable-zebra         do not build zebra daemon
   --disable-bgpd          do not build bgpd
   --disable-ripd          do not build ripd
   --disable-ripngd        do not build ripngd
   --disable-ospfd         do not build ospfd
   --disable-ospf6d        do not build ospf6d
-  --disable-nhrpd         do not build nhrpd
-  --disable-watchquagga   do not build watchquagga
   --disable-isisd         do not build isisd
   --disable-pimd          do not build pimd
   --disable-bgp-announce, turn off BGP route announcement
@@ -1620,8 +1582,6 @@ Optional Features:
   --enable-tcp-zebra      enable TCP/IP socket connection between zebra and
                           protocol daemon
   --disable-ospfapi       do not build OSPFAPI to access the OSPF LSA Database
-  --disable-ospfclient    do not build OSPFAPI client for OSPFAPI, (this is
-                          the default if --disable-ospfapi is set)
   --enable-multipath=ARG  enable multipath function, ARG must be digit
   --enable-user=USER      user to run Quagga suite as (default quagga)
   --enable-group=GROUP    group to run Quagga suite as (default quagga)
@@ -1644,7 +1604,6 @@ Optional Features:
   --disable-backtrace,    disable crash backtraces (default autodetect)
   --disable-time-check    disable slow thread warning messages
   --enable-pcreposix      enable using PCRE Posix libs for regex functions
-  --enable-fpm            enable Forwarding Plane Manager support
   --enable-werror         enable -Werror (recommended for developers only)
   --enable-protobuf       Enable experimental protobuf support
   --enable-dev-build      build for development
@@ -1665,10 +1624,8 @@ Optional Packages:
   --with-pkg-extra-version=VER
                           add extra version field, for packagers/distributions
   --with-pkg-git-version  add git information to MOTD and build version string
-  --with-libpam           use libpam for PAM support in vtysh
 
 Some influential environment variables:
-  GAWK        GNU AWK
   CC          C compiler command
   CFLAGS      C compiler flags
   LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
@@ -1688,9 +1645,6 @@ Some influential environment variables:
               C compiler flags for PROTOBUF_C, overriding pkg-config
   PROTOBUF_C_LIBS
               linker flags for PROTOBUF_C, overriding pkg-config
-  CARES_CFLAGS
-              C compiler flags for CARES, overriding pkg-config
-  CARES_LIBS  linker flags for CARES, overriding pkg-config
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -3026,7 +2980,6 @@ CONFIG_ARGS="$*"
 
 
 
-
   # Make sure we can run config.sub.
 $SHELL "${ac_aux_dir}config.sub" sun4 >/dev/null 2>&1 ||
   as_fn_error $? "cannot run $SHELL ${ac_aux_dir}config.sub" "$LINENO" 5
@@ -3805,117 +3758,12 @@ AM_BACKSLASH='\'
 ac_config_headers="$ac_config_headers config.h"
 
 
-# Extract the first word of "perl", so it can be a program name with args.
-set dummy perl; ac_word=$2
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-printf %s "checking for $ac_word... " >&6; }
-if test ${ac_cv_path_PERL+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  case $PERL in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_PERL="$PERL" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  case $as_dir in #(((
-    '') as_dir=./ ;;
-    */) ;;
-    *) as_dir=$as_dir/ ;;
-  esac
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
-    ac_cv_path_PERL="$as_dir$ac_word$ac_exec_ext"
-    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-PERL=$ac_cv_path_PERL
-if test -n "$PERL"; then
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $PERL" >&5
-printf "%s\n" "$PERL" >&6; }
-else
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-fi
-
-
-# Extract the first word of "gawk", so it can be a program name with args.
-set dummy gawk; ac_word=$2
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-printf %s "checking for $ac_word... " >&6; }
-if test ${ac_cv_prog_GAWK+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  if test -n "$GAWK"; then
-  ac_cv_prog_GAWK="$GAWK" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  case $as_dir in #(((
-    '') as_dir=./ ;;
-    */) ;;
-    *) as_dir=$as_dir/ ;;
-  esac
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
-    ac_cv_prog_GAWK="gawk"
-    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_prog_GAWK" && ac_cv_prog_GAWK="not-in-PATH"
-fi
-fi
-GAWK=$ac_cv_prog_GAWK
-if test -n "$GAWK"; then
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $GAWK" >&5
-printf "%s\n" "$GAWK" >&6; }
-else
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-fi
-
-
-if test "x$GAWK" = "xnot-in-PATH" ; then
-	as_fn_error $? "GNU awk is required for lib/memtype.h made by memtypes.awk.
-BSD awk complains: awk: gensub doesn't support backreferences (subst \"\1\") " "$LINENO" 5
-fi
-
-
 exampledir=${sysconfdir}
 # Check whether --enable-exampledir was given.
 if test ${enable_exampledir+y}
 then :
   enableval=$enable_exampledir; exampledir="$enableval"
 fi
-
-
-
-pkgsrcrcdir=""
-pkgsrcdir=""
-# Check whether --enable-pkgsrcrcdir was given.
-if test ${enable_pkgsrcrcdir+y}
-then :
-  enableval=$enable_pkgsrcrcdir; pkgsrcrcdir="$enableval"; pkgsrcdir="pkgsrc"
-fi
-
 
 
 
@@ -10775,10 +10623,6 @@ _lt_linker_boilerplate=`cat conftest.err`
 $RM -r conftest*
 
 
-## CAVEAT EMPTOR:
-## There is no encapsulation within the following macros, do not change
-## the running order or otherwise move them around unless you know exactly
-## what you are doing...
 if test -n "$compiler"; then
 
 lt_prog_compiler_no_builtin_flag=
@@ -17836,12 +17680,6 @@ then :
   withval=$with_pkg_git_version;  test "x$withval" != "xno" && with_pkg_git_version="yes"
 fi
 
-# Check whether --enable-vtysh was given.
-if test ${enable_vtysh+y}
-then :
-  enableval=$enable_vtysh;
-fi
-
 # Check whether --enable-zebra was given.
 if test ${enable_zebra+y}
 then :
@@ -17878,18 +17716,6 @@ then :
   enableval=$enable_ospf6d;
 fi
 
-# Check whether --enable-nhrpd was given.
-if test ${enable_nhrpd+y}
-then :
-  enableval=$enable_nhrpd;
-fi
-
-# Check whether --enable-watchquagga was given.
-if test ${enable_watchquagga+y}
-then :
-  enableval=$enable_watchquagga;
-fi
-
 # Check whether --enable-isisd was given.
 if test ${enable_isisd+y}
 then :
@@ -17914,13 +17740,6 @@ then :
   enableval=$enable_snmp;
 fi
 
-
-# Check whether --with-libpam was given.
-if test ${with_libpam+y}
-then :
-  withval=$with_libpam;
-fi
-
 # Check whether --enable-tcp-zebra was given.
 if test ${enable_tcp_zebra+y}
 then :
@@ -17931,12 +17750,6 @@ fi
 if test ${enable_ospfapi+y}
 then :
   enableval=$enable_ospfapi;
-fi
-
-# Check whether --enable-ospfclient was given.
-if test ${enable_ospfclient+y}
-then :
-  enableval=$enable_ospfclient;
 fi
 
 # Check whether --enable-multipath was given.
@@ -18042,12 +17855,6 @@ then :
   enableval=$enable_pcreposix;
 fi
 
-# Check whether --enable-fpm was given.
-if test ${enable_fpm+y}
-then :
-  enableval=$enable_fpm;
-fi
-
 # Check whether --enable-werror was given.
 if test ${enable_werror+y}
 then :
@@ -18084,12 +17891,6 @@ printf "%s\n" "#define CONSUMED_TIME_CHECK 5000000" >>confdefs.h
 printf "%s\n" "#define CONSUMED_TIME_CHECK $enable_time_check" >>confdefs.h
 
   fi
-fi
-
-if test "${enable_fpm}" = "yes"; then
-
-printf "%s\n" "#define HAVE_FPM /**/" >>confdefs.h
-
 fi
 
 if test "x${enable_dev_build}" = "xyes"; then
@@ -20837,673 +20638,6 @@ printf "%s\n" "#define _LARGE_FILES $ac_cv_sys_large_files" >>confdefs.h
 esac
 rm -rf conftest*
   fi
-fi
-
-
-case "${enable_vtysh}" in
-  "no") VTYSH="";;
-  *)    VTYSH="vtysh";
-
-printf "%s\n" "#define VTYSH /**/" >>confdefs.h
-
-	 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for tputs in -ltermcap" >&5
-printf %s "checking for tputs in -ltermcap... " >&6; }
-if test ${ac_cv_lib_termcap_tputs+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-ltermcap  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char tputs ();
-int
-main (void)
-{
-return tputs ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_termcap_tputs=yes
-else $as_nop
-  ac_cv_lib_termcap_tputs=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_termcap_tputs" >&5
-printf "%s\n" "$ac_cv_lib_termcap_tputs" >&6; }
-if test "x$ac_cv_lib_termcap_tputs" = xyes
-then :
-  LIBREADLINE="$LIBREADLINE -ltermcap"
-else $as_nop
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for tputs in -ltinfo" >&5
-printf %s "checking for tputs in -ltinfo... " >&6; }
-if test ${ac_cv_lib_tinfo_tputs+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-ltinfo  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char tputs ();
-int
-main (void)
-{
-return tputs ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_tinfo_tputs=yes
-else $as_nop
-  ac_cv_lib_tinfo_tputs=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_tinfo_tputs" >&5
-printf "%s\n" "$ac_cv_lib_tinfo_tputs" >&6; }
-if test "x$ac_cv_lib_tinfo_tputs" = xyes
-then :
-  LIBREADLINE="$LIBREADLINE -ltinfo"
-else $as_nop
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for tputs in -lcurses" >&5
-printf %s "checking for tputs in -lcurses... " >&6; }
-if test ${ac_cv_lib_curses_tputs+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcurses  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char tputs ();
-int
-main (void)
-{
-return tputs ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_curses_tputs=yes
-else $as_nop
-  ac_cv_lib_curses_tputs=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_curses_tputs" >&5
-printf "%s\n" "$ac_cv_lib_curses_tputs" >&6; }
-if test "x$ac_cv_lib_curses_tputs" = xyes
-then :
-  LIBREADLINE="$LIBREADLINE -lcurses"
-else $as_nop
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for tputs in -lncurses" >&5
-printf %s "checking for tputs in -lncurses... " >&6; }
-if test ${ac_cv_lib_ncurses_tputs+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lncurses  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char tputs ();
-int
-main (void)
-{
-return tputs ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_ncurses_tputs=yes
-else $as_nop
-  ac_cv_lib_ncurses_tputs=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ncurses_tputs" >&5
-printf "%s\n" "$ac_cv_lib_ncurses_tputs" >&6; }
-if test "x$ac_cv_lib_ncurses_tputs" = xyes
-then :
-  LIBREADLINE="$LIBREADLINE -lncurses"
-fi
-
-
-fi
-
-
-fi
-
-
-fi
-
-         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for main in -lreadline" >&5
-printf %s "checking for main in -lreadline... " >&6; }
-if test ${ac_cv_lib_readline_main+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lreadline "$LIBREADLINE" $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main (void)
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_readline_main=yes
-else $as_nop
-  ac_cv_lib_readline_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_readline_main" >&5
-printf "%s\n" "$ac_cv_lib_readline_main" >&6; }
-if test "x$ac_cv_lib_readline_main" = xyes
-then :
-  LIBREADLINE="-lreadline $LIBREADLINE"
-fi
-
-         if test $ac_cv_lib_readline_main = no; then
-           as_fn_error $? "vtysh needs libreadline but was not found and usable on your system." "$LINENO" 5
-         fi
-	 ac_fn_c_check_header_compile "$LINENO" "readline/history.h" "ac_cv_header_readline_history_h" "$ac_includes_default"
-if test "x$ac_cv_header_readline_history_h" = xyes
-then :
-
-fi
-
-	 if test $ac_cv_header_readline_history_h = no;then
-           as_fn_error $? "readline is too old to have readline/history.h, please update to the latest readline library." "$LINENO" 5
-	 fi
-	 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for rl_completion_matches in -lreadline" >&5
-printf %s "checking for rl_completion_matches in -lreadline... " >&6; }
-if test ${ac_cv_lib_readline_rl_completion_matches+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lreadline "$LIBREADLINE" $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char rl_completion_matches ();
-int
-main (void)
-{
-return rl_completion_matches ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_readline_rl_completion_matches=yes
-else $as_nop
-  ac_cv_lib_readline_rl_completion_matches=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_readline_rl_completion_matches" >&5
-printf "%s\n" "$ac_cv_lib_readline_rl_completion_matches" >&6; }
-if test "x$ac_cv_lib_readline_rl_completion_matches" = xyes
-then :
-  LIBREADLINE="$LIBREADLINE"
-fi
-
-         if test $ac_cv_lib_readline_rl_completion_matches = no; then
-
-printf "%s\n" "#define rl_completion_matches completion_matches" >>confdefs.h
-
-	 fi
-	 ;;
-  "no" ) VTYSH="";;
-esac
-
- if test "x$VTYSH" = "xvtysh"; then
-  VTYSH_TRUE=
-  VTYSH_FALSE='#'
-else
-  VTYSH_TRUE='#'
-  VTYSH_FALSE=
-fi
-
-
-if test "$with_libpam" = "yes"; then
-  ac_fn_c_check_header_compile "$LINENO" "security/pam_misc.h" "ac_cv_header_security_pam_misc_h" "#ifdef SUNOS_5
-#define _XPG4_2
-#define __EXTENSIONS__
-#endif
-#include <stdio.h>
-#if STDC_HEADERS
-# include <stdlib.h>
-# include <stddef.h>
-#else
-# if HAVE_STDLIB_H
-#  include <stdlib.h>
-# endif
-#endif
-#if HAVE_SYS_TYPES_H
-# include <sys/types.h>
-#endif
-/* sys/conf.h depends on param.h on FBSD at least */
-#if HAVE_SYS_PARAM_H
-# include <sys/param.h>
-#endif
-/* Required for MAXSIG */
-#if HAVE_SIGNAL_H
-# include <signal.h>
-#endif
-#if HAVE_SYS_SOCKET_H
-# include <sys/socket.h>
-#endif
-#ifdef __APPLE__
-# define __APPLE_USE_RFC_3542
-#endif
-#if HAVE_NETINET_IN_H
-# include <netinet/in.h>
-#endif
-#ifdef TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
-#else
-# ifdef HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else
-#  include <time.h>
-# endif
-#endif /* TIME_WITH_SYS_TIME */
-
-#if HAVE_NET_IF_H
-# include <net/if.h>
-#endif
-
-#if HAVE_NET_IF_VAR_H
-# include <net/if_var.h>
-#endif
-
-#if HAVE_SYS_UN_H
-# include <sys/un.h>
-#endif
-#if HAVE_NETINET_IN_SYSTM_H
-# include <netinet/in_systm.h>
-#endif
-#if HAVE_NETINET_IN_VAR_H
-# include <netinet/in_var.h>
-#endif
-#if HAVE_NET_IF_DL_H
-# include <net/if_dl.h>
-#endif
-#if HAVE_NET_NETOPT_H
-# include <net/netopt.h>
-#endif
-#if HAVE_NET_ROUTE_H
-# include <net/route.h>
-#endif
-#if HAVE_INET_ND_H
-# include <inet/nd.h>
-#endif
-#if HAVE_ARPA_INET_H
-# include <arpa/inet.h>
-#endif
-/* Required for IDRP */
-#if HAVE_NETINET_IP_ICMP_H
-# include <netinet/ip_icmp.h>
-#endif
-
-"
-if test "x$ac_cv_header_security_pam_misc_h" = xyes
-then :
-
-printf "%s\n" "#define HAVE_PAM_MISC_H /**/" >>confdefs.h
-
-
-printf "%s\n" "#define PAM_CONV_FUNC misc_conv" >>confdefs.h
-
-     pam_conv_func="misc_conv"
-
-fi
-
-  ac_fn_c_check_header_compile "$LINENO" "security/openpam.h" "ac_cv_header_security_openpam_h" "#ifdef SUNOS_5
-#define _XPG4_2
-#define __EXTENSIONS__
-#endif
-#include <stdio.h>
-#if STDC_HEADERS
-# include <stdlib.h>
-# include <stddef.h>
-#else
-# if HAVE_STDLIB_H
-#  include <stdlib.h>
-# endif
-#endif
-#if HAVE_SYS_TYPES_H
-# include <sys/types.h>
-#endif
-/* sys/conf.h depends on param.h on FBSD at least */
-#if HAVE_SYS_PARAM_H
-# include <sys/param.h>
-#endif
-/* Required for MAXSIG */
-#if HAVE_SIGNAL_H
-# include <signal.h>
-#endif
-#if HAVE_SYS_SOCKET_H
-# include <sys/socket.h>
-#endif
-#ifdef __APPLE__
-# define __APPLE_USE_RFC_3542
-#endif
-#if HAVE_NETINET_IN_H
-# include <netinet/in.h>
-#endif
-#ifdef TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
-#else
-# ifdef HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else
-#  include <time.h>
-# endif
-#endif /* TIME_WITH_SYS_TIME */
-
-#if HAVE_NET_IF_H
-# include <net/if.h>
-#endif
-
-#if HAVE_NET_IF_VAR_H
-# include <net/if_var.h>
-#endif
-
-#if HAVE_SYS_UN_H
-# include <sys/un.h>
-#endif
-#if HAVE_NETINET_IN_SYSTM_H
-# include <netinet/in_systm.h>
-#endif
-#if HAVE_NETINET_IN_VAR_H
-# include <netinet/in_var.h>
-#endif
-#if HAVE_NET_IF_DL_H
-# include <net/if_dl.h>
-#endif
-#if HAVE_NET_NETOPT_H
-# include <net/netopt.h>
-#endif
-#if HAVE_NET_ROUTE_H
-# include <net/route.h>
-#endif
-#if HAVE_INET_ND_H
-# include <inet/nd.h>
-#endif
-#if HAVE_ARPA_INET_H
-# include <arpa/inet.h>
-#endif
-/* Required for IDRP */
-#if HAVE_NETINET_IP_ICMP_H
-# include <netinet/ip_icmp.h>
-#endif
-#include <security/pam_appl.h>
-"
-if test "x$ac_cv_header_security_openpam_h" = xyes
-then :
-
-printf "%s\n" "#define HAVE_OPENPAM_H /**/" >>confdefs.h
-
-
-printf "%s\n" "#define PAM_CONV_FUNC openpam_ttyconv" >>confdefs.h
-
-     pam_conv_func="openpam_ttyconv"
-
-fi
-
-  if test -z "$ac_cv_header_security_pam_misc_h$ac_cv_header_security_openpam_h" ; then
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: *** pam support will not be built ***" >&5
-printf "%s\n" "$as_me: WARNING: *** pam support will not be built ***" >&2;}
-    with_libpam="no"
-  fi
-fi
-
-if test "$with_libpam" = "yes"; then
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for pam_start in -lpam" >&5
-printf %s "checking for pam_start in -lpam... " >&6; }
-if test ${ac_cv_lib_pam_pam_start+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lpam  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char pam_start ();
-int
-main (void)
-{
-return pam_start ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_pam_pam_start=yes
-else $as_nop
-  ac_cv_lib_pam_pam_start=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_pam_pam_start" >&5
-printf "%s\n" "$ac_cv_lib_pam_pam_start" >&6; }
-if test "x$ac_cv_lib_pam_pam_start" = xyes
-then :
-  as_ac_Lib=`printf "%s\n" "ac_cv_lib_pam_$pam_conv_func" | $as_tr_sh`
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $pam_conv_func in -lpam" >&5
-printf %s "checking for $pam_conv_func in -lpam... " >&6; }
-if eval test \${$as_ac_Lib+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lpam  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char $pam_conv_func ();
-int
-main (void)
-{
-return $pam_conv_func ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  eval "$as_ac_Lib=yes"
-else $as_nop
-  eval "$as_ac_Lib=no"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-eval ac_res=\$$as_ac_Lib
-	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-printf "%s\n" "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_Lib"\" = x"yes"
-then :
-
-printf "%s\n" "#define USE_PAM /**/" >>confdefs.h
-
-     LIBPAM="-lpam"
-else $as_nop
-
-printf "%s\n" "#define USE_PAM /**/" >>confdefs.h
-
-     LIBPAM="-lpam -lpam_misc"
-
-fi
-
-
-else $as_nop
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for pam_end in -lpam" >&5
-printf %s "checking for pam_end in -lpam... " >&6; }
-if test ${ac_cv_lib_pam_pam_end+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lpam -ldl $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char pam_end ();
-int
-main (void)
-{
-return pam_end ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_pam_pam_end=yes
-else $as_nop
-  ac_cv_lib_pam_pam_end=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_pam_pam_end" >&5
-printf "%s\n" "$ac_cv_lib_pam_pam_end" >&6; }
-if test "x$ac_cv_lib_pam_pam_end" = xyes
-then :
-  as_ac_Lib=`printf "%s\n" "ac_cv_lib_pam_$pam_conv_func" | $as_tr_sh`
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $pam_conv_func in -lpam" >&5
-printf %s "checking for $pam_conv_func in -lpam... " >&6; }
-if eval test \${$as_ac_Lib+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lpam  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char $pam_conv_func ();
-int
-main (void)
-{
-return $pam_conv_func ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  eval "$as_ac_Lib=yes"
-else $as_nop
-  eval "$as_ac_Lib=no"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-eval ac_res=\$$as_ac_Lib
-	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-printf "%s\n" "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_Lib"\" = x"yes"
-then :
-
-printf "%s\n" "#define USE_PAM /**/" >>confdefs.h
-
-       LIBPAM="-lpam -ldl"
-else $as_nop
-
-printf "%s\n" "#define USE_PAM /**/" >>confdefs.h
-
-       LIBPAM="-lpam -ldl -lpam_misc"
-
-fi
-
-
-else $as_nop
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: *** pam support will not be built ***" >&5
-printf "%s\n" "$as_me: WARNING: *** pam support will not be built ***" >&2;}
-fi
-
-
-
-fi
-
 fi
 
 
@@ -24775,57 +23909,6 @@ else
 fi
 
 
-if test x"$opsys" != x"gnu-linux"; then
-		enable_nhrpd="no"
-fi
-if test "${enable_nhrpd}" = "no";then
-  NHRPD=""
-else
-  NHRPD="nhrpd"
-fi
- if test "x$NHRPD" = "xnhrpd"; then
-  NHRPD_TRUE=
-  NHRPD_FALSE='#'
-else
-  NHRPD_TRUE='#'
-  NHRPD_FALSE=
-fi
-
-
-if test "${enable_watchquagga}" = "no";then
-  WATCHQUAGGA=""
-else
-  WATCHQUAGGA="watchquagga"
-fi
- if test "x$WATCHQUAGGA" = "xwatchquagga"; then
-  WATCHQUAGGA_TRUE=
-  WATCHQUAGGA_FALSE='#'
-else
-  WATCHQUAGGA_TRUE='#'
-  WATCHQUAGGA_FALSE=
-fi
-
-
-OSPFCLIENT=""
-if test "${enable_ospfapi}" != "no";then
-
-printf "%s\n" "#define SUPPORT_OSPF_API /**/" >>confdefs.h
-
-
-  if test "${enable_ospfclient}" != "no";then
-      OSPFCLIENT="ospfclient"
-  fi
-fi
-
- if test "x$OSPFCLIENT" = "xospfclient"; then
-  OSPFCLIENT_TRUE=
-  OSPFCLIENT_FALSE='#'
-else
-  OSPFCLIENT_TRUE='#'
-  OSPFCLIENT_FALSE=
-fi
-
-
 case "${enable_ripngd}" in
   "no" ) RIPNGD="";;
   *    ) RIPNGD="ripngd";;
@@ -24887,12 +23970,6 @@ else
 printf "%s\n" "#define DISABLE_BGP_ANNOUNCE 0" >>confdefs.h
 
 fi
-
-
-
-
-
-
 
 
 
@@ -25175,101 +24252,6 @@ fi
 
 fi
 
-
-
-if test "${enable_nhrpd}" != "no";then
-
-pkg_failed=no
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libcares" >&5
-printf %s "checking for libcares... " >&6; }
-
-if test -n "$CARES_CFLAGS"; then
-    pkg_cv_CARES_CFLAGS="$CARES_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libcares\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libcares") 2>&5
-  ac_status=$?
-  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_CARES_CFLAGS=`$PKG_CONFIG --cflags "libcares" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-if test -n "$CARES_LIBS"; then
-    pkg_cv_CARES_LIBS="$CARES_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libcares\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libcares") 2>&5
-  ac_status=$?
-  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_CARES_LIBS=`$PKG_CONFIG --libs "libcares" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-                CARES_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libcares" 2>&1`
-        else
-                CARES_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libcares" 2>&1`
-        fi
-        # Put the nasty error message in config.log where it belongs
-        echo "$CARES_PKG_ERRORS" >&5
-
-        as_fn_error $? "Package requirements (libcares) were not met:
-
-$CARES_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables CARES_CFLAGS
-and CARES_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details." "$LINENO" 5
-elif test $pkg_failed = untried; then
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-        { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-printf "%s\n" "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables CARES_CFLAGS
-and CARES_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details" "$LINENO" 5; }
-else
-        CARES_CFLAGS=$pkg_cv_CARES_CFLAGS
-        CARES_LIBS=$pkg_cv_CARES_LIBS
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf "%s\n" "yes" >&6; }
-
-fi
-fi
 
 
 if test "${enable_snmp}" != ""; then
@@ -28803,343 +27785,7 @@ printf "%s\n" "#define HAVE_CAPABILITIES 1" >>confdefs.h
 fi
 
 
-
-  # starting point: no aliasing scheme yet...
-  ax_sys_weak_alias=no
-
-  # Figure out what kind of aliasing may be supported...
-   # Test whether compiler accepts __attribute__ form of weak aliasing
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts function __attribute__((weak,alias()))" >&5
-printf %s "checking whether $CC accepts function __attribute__((weak,alias()))... " >&6; }
-if test ${ax_cv_sys_weak_alias_attribute+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-
-    # We add -Werror if it's gcc to force an error exit if the weak attribute
-    # isn't understood
-    if test $GCC = yes
-then :
-
-      save_CFLAGS=$CFLAGS
-      CFLAGS=-Werror
-fi
-
-    # Try linking with a weak alias...
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-void __weakf(int c) {}
-void weakf(int c) __attribute__((weak, alias("__weakf")));
-int
-main (void)
-{
-weakf(0)
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ax_cv_sys_weak_alias_attribute=yes
-else $as_nop
-  ax_cv_sys_weak_alias_attribute=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-
-    # Restore original CFLAGS
-    if test $GCC = yes
-then :
-
-      CFLAGS=$save_CFLAGS
-fi
-
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_sys_weak_alias_attribute" >&5
-printf "%s\n" "$ax_cv_sys_weak_alias_attribute" >&6; }
-
-  # What was the result of the test?
-  if test $ax_cv_sys_weak_alias_attribute = yes
-then :
-
-    test $ax_sys_weak_alias = no && ax_sys_weak_alias=attribute
-
-printf "%s\n" "#define HAVE_SYS_WEAK_ALIAS_ATTRIBUTE 1" >>confdefs.h
-
-
-fi
-
-   # Test whether compiler accepts #pragma form of weak aliasing
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether $CC supports #pragma weak" >&5
-printf %s "checking whether $CC supports #pragma weak... " >&6; }
-if test ${ax_cv_sys_weak_alias_pragma+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-
-
-    # Try linking with a weak alias...
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-extern void weakf(int c);
-#pragma weak weakf = __weakf
-void __weakf(int c) {}
-int
-main (void)
-{
-weakf(0)
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ax_cv_sys_weak_alias_pragma=yes
-else $as_nop
-  ax_cv_sys_weak_alias_pragma=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_sys_weak_alias_pragma" >&5
-printf "%s\n" "$ax_cv_sys_weak_alias_pragma" >&6; }
-
-  # What was the result of the test?
-  if test $ax_cv_sys_weak_alias_pragma = yes
-then :
-
-    test $ax_sys_weak_alias = no && ax_sys_weak_alias=pragma
-
-printf "%s\n" "#define HAVE_SYS_WEAK_ALIAS_PRAGMA 1" >>confdefs.h
-
-
-fi
-
-   # Test whether compiler accepts _HP_SECONDARY_DEF pragma from HP...
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether $CC supports #pragma _HP_SECONDARY_DEF" >&5
-printf %s "checking whether $CC supports #pragma _HP_SECONDARY_DEF... " >&6; }
-if test ${ax_cv_sys_weak_alias_hpsecondary+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-
-
-    # Try linking with a weak alias...
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-extern void weakf(int c);
-#pragma _HP_SECONDARY_DEF __weakf weakf
-void __weakf(int c) {}
-int
-main (void)
-{
-weakf(0)
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ax_cv_sys_weak_alias_hpsecondary=yes
-else $as_nop
-  ax_cv_sys_weak_alias_hpsecondary=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_sys_weak_alias_hpsecondary" >&5
-printf "%s\n" "$ax_cv_sys_weak_alias_hpsecondary" >&6; }
-
-  # What was the result of the test?
-  if test $ax_cv_sys_weak_alias_hpsecondary = yes
-then :
-
-    test $ax_sys_weak_alias = no && ax_sys_weak_alias=hpsecondary
-
-printf "%s\n" "#define HAVE_SYS_WEAK_ALIAS_HPSECONDARY 1" >>confdefs.h
-
-
-fi
-
-   # Test whether compiler accepts "_CRI duplicate" pragma from Cray
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether $CC supports #pragma _CRI duplicate" >&5
-printf %s "checking whether $CC supports #pragma _CRI duplicate... " >&6; }
-if test ${ax_cv_sys_weak_alias_criduplicate+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-
-
-    # Try linking with a weak alias...
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-extern void weakf(int c);
-#pragma _CRI duplicate weakf as __weakf
-void __weakf(int c) {}
-int
-main (void)
-{
-weakf(0)
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ax_cv_sys_weak_alias_criduplicate=yes
-else $as_nop
-  ax_cv_sys_weak_alias_criduplicate=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_sys_weak_alias_criduplicate" >&5
-printf "%s\n" "$ax_cv_sys_weak_alias_criduplicate" >&6; }
-
-  # What was the result of the test?
-  if test $ax_cv_sys_weak_alias_criduplicate = yes
-then :
-
-    test $ax_sys_weak_alias = no && ax_sys_weak_alias=criduplicate
-
-printf "%s\n" "#define HAVE_SYS_WEAK_ALIAS_CRIDUPLICATE 1" >>confdefs.h
-
-
-fi
-
-
-  # Do we actually support aliasing?
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking how to create weak aliases with $CC" >&5
-printf %s "checking how to create weak aliases with $CC... " >&6; }
-if test ${ax_cv_sys_weak_alias+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ax_cv_sys_weak_alias=$ax_sys_weak_alias
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_sys_weak_alias" >&5
-printf "%s\n" "$ax_cv_sys_weak_alias" >&6; }
-
-  # OK, set a #define
-  if test $ax_cv_sys_weak_alias != no
-then :
-
-
-printf "%s\n" "#define HAVE_SYS_WEAK_ALIAS 1" >>confdefs.h
-
-
-fi
-
-  # Can aliases cross object file boundaries?
-   # Check to see if weak aliases can cross object file boundaries
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether $CC supports weak aliases across object file boundaries" >&5
-printf %s "checking whether $CC supports weak aliases across object file boundaries... " >&6; }
-if test ${ax_cv_sys_weak_alias_crossfile+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-
-    if test $ax_cv_sys_weak_alias = no
-then :
-  ax_cv_sys_weak_alias_crossfile=no
-else $as_nop
-
-      # conftest1 contains our weak alias definition...
-      cat >conftest1.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-      cat confdefs.h >>conftest1.$ac_ext
-      cat >>conftest1.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-#ifndef HAVE_SYS_WEAK_ALIAS_ATTRIBUTE
-extern void weakf(int c);
-#if defined(HAVE_SYS_WEAK_ALIAS_PRAGMA)
-#pragma weak weakf = __weakf
-#elif defined(HAVE_SYS_WEAK_ALIAS_HPSECONDARY)
-#pragma _HP_SECONDARY_DEF __weakf weakf
-#elif defined(HAVE_SYS_WEAK_ALIAS_CRIDUPLICATE)
-#pragma _CRI duplicate weakf as __weakf
-#endif
-#endif
-void __weakf(int c) {}
-#ifdef HAVE_SYS_WEAK_ALIAS_ATTRIBUTE
-void weakf(int c) __attribute((weak, alias("__weakf")));
-#endif
-_ACEOF
-      # And conftest2 contains our main routine that calls it
-      cat >conftest2.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-      cat confdefs.h >> conftest2.$ac_ext
-      cat >>conftest2.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-extern void weakf(int c);
-int
-main ()
-{
-  weakf(0);
-  return 0;
-}
-_ACEOF
-      # We must remove the object files (if any) ourselves...
-      rm -f conftest2.$ac_objext conftest$ac_exeext
-
-      # Change ac_link to compile *2* files together
-      save_aclink=$ac_link
-      ac_link=`echo "$ac_link" | \
-               sed -e 's/conftest\(\.\$ac_ext\)/conftest1\1 conftest2\1/'`
-      # Since we created the files ourselves, don't use SOURCE argument
-      if ac_fn_c_try_link "$LINENO"
-then :
-  ax_cv_sys_weak_alias_crossfile=yes
-else $as_nop
-  ax_cv_sys_weak_alias_crossfile=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext
-      # Restore ac_link
-      ac_link=$save_aclink
-
-      # We must remove the object files (if any) and C files ourselves...
-      rm -f conftest1.$ac_ext conftest2.$ac_ext \
-            conftest1.$ac_objext conftest2.$ac_objext
-
-fi
-
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_cv_sys_weak_alias_crossfile" >&5
-printf "%s\n" "$ax_cv_sys_weak_alias_crossfile" >&6; }
-
-  # What were the results of the test?
-  if test $ax_cv_sys_weak_alias_crossfile = yes
-then :
-
-
-printf "%s\n" "#define HAVE_SYS_WEAK_ALIAS_CROSSFILE 1" >>confdefs.h
-
-
-fi
-
-
-  # OK, remember the results
-  WEAK_ALIAS=$ax_cv_sys_weak_alias
-
-  WEAK_ALIAS_CROSSFILE=$ax_cv_sys_weak_alias_crossfile
-
-
+AX_SYS_WEAK_ALIAS
 
 if test x"${enable_backtrace}" != x"no" ; then
   backtrace_ok=no
@@ -29402,49 +28048,13 @@ printf "%s\n" "#define PATH_OSPFD_PID \"$quagga_statedir/ospfd.pid\"" >>confdefs
 printf "%s\n" "#define PATH_OSPF6D_PID \"$quagga_statedir/ospf6d.pid\"" >>confdefs.h
 
 
-printf "%s\n" "#define PATH_NHRPD_PID \"$quagga_statedir/nhrpd.pid\"" >>confdefs.h
-
-
 printf "%s\n" "#define PATH_ISISD_PID \"$quagga_statedir/isisd.pid\"" >>confdefs.h
 
 
 printf "%s\n" "#define PATH_PIMD_PID \"$quagga_statedir/pimd.pid\"" >>confdefs.h
 
 
-printf "%s\n" "#define PATH_WATCHQUAGGA_PID \"$quagga_statedir/watchquagga.pid\"" >>confdefs.h
-
-
 printf "%s\n" "#define ZEBRA_SERV_PATH \"$quagga_statedir/zserv.api\"" >>confdefs.h
-
-
-printf "%s\n" "#define ZEBRA_VTYSH_PATH \"$quagga_statedir/zebra.vty\"" >>confdefs.h
-
-
-printf "%s\n" "#define RIP_VTYSH_PATH \"$quagga_statedir/ripd.vty\"" >>confdefs.h
-
-
-printf "%s\n" "#define RIPNG_VTYSH_PATH \"$quagga_statedir/ripngd.vty\"" >>confdefs.h
-
-
-printf "%s\n" "#define BGP_VTYSH_PATH \"$quagga_statedir/bgpd.vty\"" >>confdefs.h
-
-
-printf "%s\n" "#define OSPF_VTYSH_PATH \"$quagga_statedir/ospfd.vty\"" >>confdefs.h
-
-
-printf "%s\n" "#define OSPF6_VTYSH_PATH \"$quagga_statedir/ospf6d.vty\"" >>confdefs.h
-
-
-printf "%s\n" "#define NHRP_VTYSH_PATH \"$quagga_statedir/nhrpd.vty\"" >>confdefs.h
-
-
-printf "%s\n" "#define ISIS_VTYSH_PATH \"$quagga_statedir/isisd.vty\"" >>confdefs.h
-
-
-printf "%s\n" "#define PIM_VTYSH_PATH \"$quagga_statedir/pimd.vty\"" >>confdefs.h
-
-
-printf "%s\n" "#define DAEMON_VTY_DIR \"$quagga_statedir\"" >>confdefs.h
 
 
 
@@ -29579,10 +28189,9 @@ fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_htonl_works" >&5
 printf "%s\n" "$ac_cv_htonl_works" >&6; }
 
-ac_config_files="$ac_config_files Makefile lib/Makefile qpb/Makefile zebra/Makefile ripd/Makefile ripngd/Makefile bgpd/Makefile ospfd/Makefile watchquagga/Makefile ospf6d/Makefile isisd/Makefile vtysh/Makefile ospfclient/Makefile tests/Makefile m4/Makefile pimd/Makefile nhrpd/Makefile pkgsrc/Makefile fpm/Makefile lib/version.h isisd/topology/Makefile pkgsrc/bgpd.sh pkgsrc/ospf6d.sh pkgsrc/ospfd.sh pkgsrc/ripd.sh pkgsrc/ripngd.sh pkgsrc/zebra.sh"
+ac_config_files="$ac_config_files Makefile lib/Makefile zebra/Makefile ripd/Makefile ripngd/Makefile bgpd/Makefile ospfd/Makefile ospf6d/Makefile isisd/Makefile pimd/Makefile lib/version.h isisd/topology/Makefile"
 
 
-ac_config_files="$ac_config_files vtysh/extract.pl"
 
 ## Hack, but working solution to avoid rebuilding of quagga.info.
 ## It's already in CVS until texinfo 4.7 is more common.
@@ -29739,10 +28348,6 @@ if test -z "${GIT_VERSION_TRUE}" && test -z "${GIT_VERSION_FALSE}"; then
   as_fn_error $? "conditional \"GIT_VERSION\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${VTYSH_TRUE}" && test -z "${VTYSH_FALSE}"; then
-  as_fn_error $? "conditional \"VTYSH\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
 
 if test -z "${HAVE_NETLINK_TRUE}" && test -z "${HAVE_NETLINK_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_NETLINK\" was never defined.
@@ -29762,18 +28367,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${OSPFD_TRUE}" && test -z "${OSPFD_FALSE}"; then
   as_fn_error $? "conditional \"OSPFD\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${NHRPD_TRUE}" && test -z "${NHRPD_FALSE}"; then
-  as_fn_error $? "conditional \"NHRPD\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${WATCHQUAGGA_TRUE}" && test -z "${WATCHQUAGGA_FALSE}"; then
-  as_fn_error $? "conditional \"WATCHQUAGGA\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${OSPFCLIENT_TRUE}" && test -z "${OSPFCLIENT_FALSE}"; then
-  as_fn_error $? "conditional \"OSPFCLIENT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${RIPNGD_TRUE}" && test -z "${RIPNGD_FALSE}"; then
@@ -30670,32 +29263,16 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "lib/Makefile") CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
-    "qpb/Makefile") CONFIG_FILES="$CONFIG_FILES qpb/Makefile" ;;
     "zebra/Makefile") CONFIG_FILES="$CONFIG_FILES zebra/Makefile" ;;
     "ripd/Makefile") CONFIG_FILES="$CONFIG_FILES ripd/Makefile" ;;
     "ripngd/Makefile") CONFIG_FILES="$CONFIG_FILES ripngd/Makefile" ;;
     "bgpd/Makefile") CONFIG_FILES="$CONFIG_FILES bgpd/Makefile" ;;
     "ospfd/Makefile") CONFIG_FILES="$CONFIG_FILES ospfd/Makefile" ;;
-    "watchquagga/Makefile") CONFIG_FILES="$CONFIG_FILES watchquagga/Makefile" ;;
     "ospf6d/Makefile") CONFIG_FILES="$CONFIG_FILES ospf6d/Makefile" ;;
     "isisd/Makefile") CONFIG_FILES="$CONFIG_FILES isisd/Makefile" ;;
-    "vtysh/Makefile") CONFIG_FILES="$CONFIG_FILES vtysh/Makefile" ;;
-    "ospfclient/Makefile") CONFIG_FILES="$CONFIG_FILES ospfclient/Makefile" ;;
-    "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
-    "m4/Makefile") CONFIG_FILES="$CONFIG_FILES m4/Makefile" ;;
     "pimd/Makefile") CONFIG_FILES="$CONFIG_FILES pimd/Makefile" ;;
-    "nhrpd/Makefile") CONFIG_FILES="$CONFIG_FILES nhrpd/Makefile" ;;
-    "pkgsrc/Makefile") CONFIG_FILES="$CONFIG_FILES pkgsrc/Makefile" ;;
-    "fpm/Makefile") CONFIG_FILES="$CONFIG_FILES fpm/Makefile" ;;
     "lib/version.h") CONFIG_FILES="$CONFIG_FILES lib/version.h" ;;
     "isisd/topology/Makefile") CONFIG_FILES="$CONFIG_FILES isisd/topology/Makefile" ;;
-    "pkgsrc/bgpd.sh") CONFIG_FILES="$CONFIG_FILES pkgsrc/bgpd.sh" ;;
-    "pkgsrc/ospf6d.sh") CONFIG_FILES="$CONFIG_FILES pkgsrc/ospf6d.sh" ;;
-    "pkgsrc/ospfd.sh") CONFIG_FILES="$CONFIG_FILES pkgsrc/ospfd.sh" ;;
-    "pkgsrc/ripd.sh") CONFIG_FILES="$CONFIG_FILES pkgsrc/ripd.sh" ;;
-    "pkgsrc/ripngd.sh") CONFIG_FILES="$CONFIG_FILES pkgsrc/ripngd.sh" ;;
-    "pkgsrc/zebra.sh") CONFIG_FILES="$CONFIG_FILES pkgsrc/zebra.sh" ;;
-    "vtysh/extract.pl") CONFIG_FILES="$CONFIG_FILES vtysh/extract.pl" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
@@ -31936,7 +30513,6 @@ ltmain=$ac_aux_dir/ltmain.sh
   chmod +x "$ofile"
 
  ;;
-    "vtysh/extract.pl":F) chmod +x vtysh/extract.pl ;;
 
   esac
 done # for ac_tag
@@ -31985,7 +30561,7 @@ source code location    : ${srcdir}
 compiler                : ${CC}
 compiler flags          : ${CFLAGS}
 make                    : ${MAKE-make}
-linker flags            : ${LDFLAGS} ${LIBS} ${LIBCAP} ${LIBREADLINE} ${LIBM}
+linker flags            : ${LDFLAGS} ${LIBS} ${LIBCAP} ${LIBM} ${LIBREADLINE}
 state file directory    : ${quagga_statedir}
 config file directory   : `eval echo \`echo ${sysconfdir}\``
 example directory       : `eval echo \`echo ${exampledir}\``
@@ -32005,3 +30581,4 @@ via the MAKE variable, is not GNU Make. GNU make may be installed as
 gmake on some systems. and is required to complete a build of Quagga
 " > /dev/stderr
 fi
+

@@ -132,7 +132,7 @@ static void sighup(void) {
 	/* Reload config file. */
 	vty_read_config(config_file, config_default);
 	/* Create VTY's socket */
-	vty_serv_sock(vty_addr, vty_port, RIPNG_VTYSH_PATH);
+	vty_serv_sock(vty_addr, vty_port);
 
 	/* Try to return to normal operation. */
 }
@@ -264,7 +264,7 @@ int main(int argc, char **argv) {
 	}
 
 	/* Create VTY socket */
-	vty_serv_sock(vty_addr, vty_port, RIPNG_VTYSH_PATH);
+	vty_serv_sock(vty_addr, vty_port);
 
 	/* Process id file create. */
 	pid_output(pid_file);

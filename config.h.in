@@ -3,17 +3,11 @@
 /* Define if building universal (internal helper macro) */
 #undef AC_APPLE_UNIVERSAL_BUILD
 
-/* bgpd vty socket */
-#undef BGP_VTYSH_PATH
-
 /* Mask for config files */
 #undef CONFIGFILE_MASK
 
 /* Consumed Time Check */
 #undef CONSUMED_TIME_CHECK
-
-/* daemon vty directory */
-#undef DAEMON_VTY_DIR
 
 /* Build for development */
 #undef DEV_BUILD
@@ -87,9 +81,6 @@
 
 /* Define to 1 if you have the `fork' function. */
 #undef HAVE_FORK
-
-/* Forwarding Plane Manager support */
-#undef HAVE_FPM
 
 /* Define to 1 if you have the `ftruncate' function. */
 #undef HAVE_FTRUNCATE
@@ -267,12 +258,6 @@
 
 /* NET_RT_IFLIST */
 #undef HAVE_NET_RT_IFLIST
-
-/* Have openpam.h */
-#undef HAVE_OPENPAM_H
-
-/* Have pam_misc.h */
-#undef HAVE_PAM_MISC_H
 
 /* Define to 1 if you have the `pow' function. */
 #undef HAVE_POW
@@ -537,25 +522,6 @@
 /* Define to 1 if you have <sys/wait.h> that is POSIX.1 compatible. */
 #undef HAVE_SYS_WAIT_H
 
-/* Define this if your system can create weak aliases */
-#undef HAVE_SYS_WEAK_ALIAS
-
-/* Define this if weak aliases may be created with __attribute__ */
-#undef HAVE_SYS_WEAK_ALIAS_ATTRIBUTE
-
-/* Define this if weak aliases may be created with #pragma _CRI duplicate */
-#undef HAVE_SYS_WEAK_ALIAS_CRIDUPLICATE
-
-/* Define this if weak aliases in other files are honored */
-#undef HAVE_SYS_WEAK_ALIAS_CROSSFILE
-
-/* Define this if weak aliases may be created with #pragma _HP_SECONDARY_DEF
-   */
-#undef HAVE_SYS_WEAK_ALIAS_HPSECONDARY
-
-/* Define this if weak aliases may be created with #pragma weak */
-#undef HAVE_SYS_WEAK_ALIAS_PRAGMA
-
 /* Old Linux 2.4 TCP MD5 Signature Patch */
 #undef HAVE_TCP_MD5_LINUX24
 
@@ -628,9 +594,6 @@
 /* constant value for isis method pfpacket */
 #undef ISIS_METHOD_PFPACKET
 
-/* isisd vty socket */
-#undef ISIS_VTYSH_PATH
-
 /* KAME IPv6 */
 #undef KAME
 
@@ -650,17 +613,8 @@
 /* Maximum number of paths for a route */
 #undef MULTIPATH_NUM
 
-/* nhrpd vty socket */
-#undef NHRP_VTYSH_PATH
-
 /* OpenBSD */
 #undef OPEN_BSD
-
-/* ospf6d vty socket */
-#undef OSPF6_VTYSH_PATH
-
-/* ospfd vty socket */
-#undef OSPF_VTYSH_PATH
 
 /* Name of package */
 #undef PACKAGE
@@ -683,17 +637,11 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Have openpam_ttyconv */
-#undef PAM_CONV_FUNC
-
 /* bgpd PID */
 #undef PATH_BGPD_PID
 
 /* isisd PID */
 #undef PATH_ISISD_PID
-
-/* nhrpd PID */
-#undef PATH_NHRPD_PID
 
 /* ospf6d PID */
 #undef PATH_OSPF6D_PID
@@ -710,14 +658,8 @@
 /* ripngd PID */
 #undef PATH_RIPNGD_PID
 
-/* watchquagga PID */
-#undef PATH_WATCHQUAGGA_PID
-
 /* zebra PID */
 #undef PATH_ZEBRA_PID
-
-/* pimd vty socket */
-#undef PIM_VTYSH_PATH
 
 /* Quagga Group */
 #undef QUAGGA_GROUP
@@ -727,12 +669,6 @@
 
 /* Quagga User */
 #undef QUAGGA_USER
-
-/* ripng vty socket */
-#undef RIPNG_VTYSH_PATH
-
-/* rip vty socket */
-#undef RIP_VTYSH_PATH
 
 /* Define to the type of arg 1 for `select'. */
 #undef SELECT_TYPE_ARG1
@@ -766,17 +702,11 @@
 /* SunOS 5.8 up */
 #undef SUNOS_59
 
-/* OSPFAPI */
-#undef SUPPORT_OSPF_API
-
 /* Define to 1 if your <sys/time.h> declares `struct tm'. */
 #undef TM_IN_SYS_TIME
 
 /* Enable IS-IS topology generator code */
 #undef TOPOLOGY_GENERATE
-
-/* Use PAM for authentication */
-#undef USE_PAM
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE
@@ -869,9 +799,6 @@
 /* Version number of package */
 #undef VERSION
 
-/* VTY shell */
-#undef VTYSH
-
 /* VTY Sockets Group */
 #undef VTY_GROUP
 
@@ -889,9 +816,6 @@
 
 /* zebra api socket */
 #undef ZEBRA_SERV_PATH
-
-/* zebra vty socket */
-#undef ZEBRA_VTYSH_PATH
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS
@@ -931,9 +855,6 @@
 # define _Restrict
 # define __restrict__
 #endif
-
-/* Old readline */
-#undef rl_completion_matches
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t

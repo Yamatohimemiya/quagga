@@ -134,7 +134,7 @@ static void sighup(void) {
 	vty_read_config(config_file, config_default);
 
 	/* Create VTY's socket */
-	vty_serv_sock(vty_addr, vty_port, RIP_VTYSH_PATH);
+	vty_serv_sock(vty_addr, vty_port);
 
 	/* Try to return to normal operation. */
 }
@@ -273,7 +273,7 @@ int main(int argc, char **argv) {
 	pid_output(pid_file);
 
 	/* Create VTY's socket */
-	vty_serv_sock(vty_addr, vty_port, RIP_VTYSH_PATH);
+	vty_serv_sock(vty_addr, vty_port);
 
 	/* Print banner. */
 	zlog_notice("RIPd %s starting: vty@%d", QUAGGA_VERSION, vty_port);

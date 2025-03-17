@@ -183,7 +183,7 @@ void sighup(void) {
 	vty_read_config(config_file, config_default);
 
 	/* Create VTY's socket */
-	vty_serv_sock(vty_addr, vty_port, BGP_VTYSH_PATH);
+	vty_serv_sock(vty_addr, vty_port);
 
 	/* Try to return to normal operation. */
 }
@@ -439,7 +439,7 @@ int main(int argc, char **argv) {
 	pid_output(pid_file);
 
 	/* Make bgp vty socket. */
-	vty_serv_sock(vty_addr, vty_port, BGP_VTYSH_PATH);
+	vty_serv_sock(vty_addr, vty_port);
 
 	/* Print banner. */
 	zlog_notice("BGPd %s starting: vty@%d, bgp@%s:%d pid %d", QUAGGA_VERSION, vty_port, (bm->address ? bm->address : "<all>"), bm->port, getpid());

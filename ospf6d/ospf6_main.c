@@ -312,7 +312,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	if(!vty_port) {
 		vty_port = OSPF6_VTY_PORT;
 	}
-	vty_serv_sock(vty_addr, vty_port, OSPF6_VTYSH_PATH);
+	vty_serv_sock(vty_addr, vty_port);
 
 	/* Print start message */
 	zlog_notice("OSPF6d (Quagga-%s ospf6d-%s) starts: vty@%d", QUAGGA_VERSION, OSPF6_DAEMON_VERSION, vty_port);

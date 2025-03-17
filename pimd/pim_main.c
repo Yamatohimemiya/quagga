@@ -219,7 +219,7 @@ int main(int argc, char **argv, char **envp) {
 	if(vty_port < 0) {
 		vty_port = PIMD_VTY_PORT;
 	}
-	vty_serv_sock(vty_addr, vty_port, PIM_VTYSH_PATH);
+	vty_serv_sock(vty_addr, vty_port);
 
 	zlog_notice("Quagga %s " PIMD_PROGNAME " %s starting, VTY interface at port TCP %d", QUAGGA_VERSION, PIMD_VERSION, vty_port);
 
