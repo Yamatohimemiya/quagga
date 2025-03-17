@@ -589,8 +589,13 @@ void install_element(enum node_type ntype, struct cmd_element *cmd) {
 		cmd->tokens = cmd_parse_format(cmd->string, cmd->doc);
 	}
 
-	if(ntype == VIEW_NODE) {
-		install_element(ENABLE_NODE, cmd);
+	switch(ntype){
+		case RESTRICTED_NODE:
+			install_element(VIEW_NODE, cmd);
+			break;
+		case VIEW_NODE:
+			install_element(ENABLE_NODE, cmd);
+			break;
 	}
 }
 

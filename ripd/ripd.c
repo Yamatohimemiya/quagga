@@ -2601,31 +2601,28 @@ static int rip_route_add(struct vty *vty, const char* prefix_str, const char* me
 	return CMD_SUCCESS;
 }
 
-DEFUN(router_rip, router_rip_cmd, "router rip",
+DEFUN_WITH_NO(router_rip, router_rip_cmd, "router rip",
       "Enable a routing process\n"
       "Routing Information Protocol (RIP)\n") {
 	int ret;
 
 	/* If rip is not enabled before. */
-	if(!rip) {
-		ret = rip_create();
-		if(ret < 0) {
-			zlog_info("Can't create RIP");
-			return CMD_WARNING;
+	if(IS_NO){
+		if(rip) {
+			rip_clean();
 		}
+	} else {
+		if(!rip) {
+			ret = rip_create();
+			if(ret < 0) {
+				zlog_info("Can't create RIP");
+				return CMD_WARNING;
+			}
+		}
+		vty->node = RIP_NODE;
+		vty->index = rip;
 	}
-	vty->node = RIP_NODE;
-	vty->index = rip;
 
-	return CMD_SUCCESS;
-}
-
-DEFUN(no_router_rip, no_router_rip_cmd, "no router rip",
-      NO_STR "Enable a routing process\n"
-	     "Routing Information Protocol (RIP)\n") {
-	if(rip) {
-		rip_clean();
-	}
 	return CMD_SUCCESS;
 }
 
@@ -3636,8 +3633,7 @@ void rip_init(void) {
 	/* Install rip commands. */
 	install_element(VIEW_NODE, &show_ip_rip_cmd);
 	install_element(VIEW_NODE, &show_ip_rip_status_cmd);
-	install_element(CONFIG_NODE, &router_rip_cmd);
-	install_element(CONFIG_NODE, &no_router_rip_cmd);
+	install_element_with_no(CONFIG_NODE, &router_rip_cmd);
 
 	install_default(RIP_NODE);
 	install_element(RIP_NODE, &rip_version_cmd);
@@ -3660,6 +3656,8 @@ void rip_init(void) {
 	install_element(RIP_NODE, &no_rip_distance_source_access_list_cmd);
 	install_element(RIP_NODE, &rip_allow_ecmp_cmd);
 	install_element(RIP_NODE, &no_rip_allow_ecmp_cmd);
+
+	install_element(RIP_NODE, &rip_limit_hop_cmd);
 
 	/* Debug related init. */
 	rip_debug_init();

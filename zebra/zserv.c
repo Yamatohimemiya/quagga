@@ -1749,32 +1749,20 @@ DEFUN(config_table, config_table_cmd, "table TABLENO",
 	return CMD_SUCCESS;
 }
 
-DEFUN(ip_forwarding, ip_forwarding_cmd, "ip forwarding", IP_STR "Turn on IP forwarding") {
+DEFUN_WITH_NO(ip_forwarding, ip_forwarding_cmd, "ip forwarding", IP_STR "Turn on/off IP forwarding") {
 	int ret;
 
 	ret = ipforward();
 	if(ret == 0) {
-		ret = ipforward_on();
+		if(IS_NO){
+			ret = ipforward_off();
+		} else {
+			ret = ipforward_on();
+		}
 	}
 
 	if(ret == 0) {
-		vty_out(vty, "Can't turn on IP forwarding%s", VTY_NEWLINE);
-		return CMD_WARNING;
-	}
-
-	return CMD_SUCCESS;
-}
-
-DEFUN(no_ip_forwarding, no_ip_forwarding_cmd, "no ip forwarding", NO_STR IP_STR "Turn off IP forwarding") {
-	int ret;
-
-	ret = ipforward();
-	if(ret != 0) {
-		ret = ipforward_off();
-	}
-
-	if(ret != 0) {
-		vty_out(vty, "Can't turn off IP forwarding%s", VTY_NEWLINE);
+		vty_out(vty, "Can't change IP forwarding%s", VTY_NEWLINE);
 		return CMD_WARNING;
 	}
 
@@ -1857,32 +1845,20 @@ DEFUN(show_ipv6_forwarding, show_ipv6_forwarding_cmd, "show ipv6 forwarding",
 	return CMD_SUCCESS;
 }
 
-DEFUN(ipv6_forwarding, ipv6_forwarding_cmd, "ipv6 forwarding", IPV6_STR "Turn on IPv6 forwarding") {
+DEFUN_WITH_NO(ipv6_forwarding, ipv6_forwarding_cmd, "ipv6 forwarding", IPV6_STR "Turn on/off IPv6 forwarding") {
 	int ret;
 
 	ret = ipforward_ipv6();
 	if(ret == 0) {
-		ret = ipforward_ipv6_on();
+		if(IS_NO){
+			ret = ipforward_ipv6_off();
+		} else {
+			ret = ipforward_ipv6_on();
+		}
 	}
 
 	if(ret == 0) {
-		vty_out(vty, "Can't turn on IPv6 forwarding%s", VTY_NEWLINE);
-		return CMD_WARNING;
-	}
-
-	return CMD_SUCCESS;
-}
-
-DEFUN(no_ipv6_forwarding, no_ipv6_forwarding_cmd, "no ipv6 forwarding", NO_STR IPV6_STR "Turn off IPv6 forwarding") {
-	int ret;
-
-	ret = ipforward_ipv6();
-	if(ret != 0) {
-		ret = ipforward_ipv6_off();
-	}
-
-	if(ret != 0) {
-		vty_out(vty, "Can't turn off IPv6 forwarding%s", VTY_NEWLINE);
+		vty_out(vty, "Can't change IPv6 forwarding%s", VTY_NEWLINE);
 		return CMD_WARNING;
 	}
 
@@ -1935,8 +1911,7 @@ void zebra_init(void) {
 #endif
 
 	install_element(VIEW_NODE, &show_ip_forwarding_cmd);
-	install_element(CONFIG_NODE, &ip_forwarding_cmd);
-	install_element(CONFIG_NODE, &no_ip_forwarding_cmd);
+	install_element_with_no(CONFIG_NODE, &ip_forwarding_cmd);
 	install_element(ENABLE_NODE, &show_zebra_client_cmd);
 	install_element(ENABLE_NODE, &show_zebra_client_summary_cmd);
 
@@ -1947,8 +1922,7 @@ void zebra_init(void) {
 
 #ifdef HAVE_IPV6
 	install_element(VIEW_NODE, &show_ipv6_forwarding_cmd);
-	install_element(CONFIG_NODE, &ipv6_forwarding_cmd);
-	install_element(CONFIG_NODE, &no_ipv6_forwarding_cmd);
+	install_element_with_no(CONFIG_NODE, &ipv6_forwarding_cmd);
 #endif /* HAVE_IPV6 */
 
 	/* Route-map */

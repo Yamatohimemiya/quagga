@@ -203,6 +203,14 @@ struct cmd_token {
 /* Argc max counts. */
 #define CMD_ARGC_MAX 25
 
+#define IS_NO ( \
+		self->string \
+		&& (self->string[0] == 'n') \
+		&& (self->string[1] == 'o') \
+		&& (self->string[2] == ' ') \
+	)
+
+
 /* Turn off these macros when uisng cpp with extract.pl */
 #ifndef VTYSH_EXTRACT_PL
 
@@ -389,6 +397,12 @@ struct cmd_token {
 		DEFUN_CMD_ELEMENT(funcname, cmdname, cmdstr, helpstr, 0, 0) \
 		DEFUN_CMD_FUNC_TEXT(funcname)
 
+	#define DEFUN_WITH_NO(funcname, cmdname, cmdstr, helpstr) \
+		DEFUN_CMD_FUNC_DECL(funcname) \
+		DEFUN_CMD_ELEMENT(funcname, cmdname, cmdstr, helpstr, 0, 0) \
+		DEFUN_CMD_ELEMENT(funcname, cmdname##_no_auto, "no " cmdstr, NO_STR helpstr, 0, 0) \
+		DEFUN_CMD_FUNC_TEXT(funcname)
+
 	#define DEFUN_ATTR(funcname, cmdname, cmdstr, helpstr, attr) \
 		DEFUN_CMD_FUNC_DECL(funcname) \
 		DEFUN_CMD_ELEMENT(funcname, cmdname, cmdstr, helpstr, attr, 0) \
@@ -514,6 +528,9 @@ struct cmd_token {
 extern void install_node(struct cmd_node *, int (*)(struct vty *));
 extern void install_default(enum node_type);
 extern void install_element(enum node_type, struct cmd_element *);
+#define install_element_with_no(node_type, cmd_element) \
+	install_element(node_type, cmd_element); \
+	install_element(node_type, cmd_element##_no_auto);
 
 /* Concatenates argv[shift] through argv[argc-1] into a single NUL-terminated
    string with a space between each element (allocated using
