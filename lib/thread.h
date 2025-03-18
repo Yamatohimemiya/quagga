@@ -65,6 +65,7 @@ struct thread_master {
 	thread_fd_set writefd;
 	thread_fd_set exceptfd;
 	unsigned long alloc;
+	struct EventHandler *EventHandler;
 };
 
 typedef unsigned char thread_type;

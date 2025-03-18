@@ -24,6 +24,8 @@
 #ifndef _ZEBRA_TABLE_H
 #define _ZEBRA_TABLE_H
 
+#include "MemoryNew.h"
+
 /*
  * Forward declarations.
  */
@@ -129,8 +131,10 @@ struct route_table_iter_t_ {
 
 /* Prototypes. */
 extern struct route_table *route_table_init(void);
+extern struct route_table *route_table_init_new(struct MemoryPoolKey *);
 
 extern struct route_table *route_table_init_with_delegate(route_table_delegate_t *);
+extern struct route_table *route_table_init_with_delegate_new(struct MemoryPoolKey *, route_table_delegate_t *);
 
 extern void route_table_finish(struct route_table *);
 extern void route_unlock_node(struct route_node *node);

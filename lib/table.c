@@ -26,6 +26,7 @@
 #include "prefix.h"
 #include "table.h"
 #include "memory.h"
+#include "MemoryNew.h"
 #include "sockunion.h"
 
 static void route_node_delete(struct route_node *);
@@ -38,6 +39,14 @@ struct route_table *route_table_init_with_delegate(route_table_delegate_t *deleg
 	struct route_table *rt;
 
 	rt = XCALLOC(MTYPE_ROUTE_TABLE, sizeof(struct route_table));
+	rt->delegate = delegate;
+	return rt;
+}
+
+struct route_table *route_table_init_with_delegate_new(struct MemoryPoolKey *MPK, route_table_delegate_t *delegate) {
+	struct route_table *rt;
+
+	rt = MPCALLOC(MPK, sizeof(struct route_table));
 	rt->delegate = delegate;
 	return rt;
 }
@@ -460,6 +469,9 @@ static route_table_delegate_t default_delegate = { .create_node = route_node_cre
  */
 struct route_table *route_table_init(void) {
 	return route_table_init_with_delegate(&default_delegate);
+}
+struct route_table *route_table_init_new(struct MemoryPoolKey *MPK) {
+	return route_table_init_with_delegate_new(MPK, &default_delegate);
 }
 
 /**

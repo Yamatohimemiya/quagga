@@ -896,7 +896,7 @@ static unsigned int thread_process(struct thread_list *list) {
 }
 
 /* Fetch next ready thread. */
-static struct thread *thread_fetch(struct thread_master *m) {
+struct thread *thread_fetch_ex(struct thread_master *m, int ReturnIfNothingToDo) {
 	struct thread *thread;
 	thread_fd_set readfd;
 	thread_fd_set writefd;
@@ -943,6 +943,11 @@ static struct thread *thread_fetch(struct thread_master *m) {
 			}
 		}
 
+		if(ReturnIfNothingToDo){
+			timer_wait->tv_sec = 0;
+			timer_wait->tv_usec = 0;
+		}
+
 		num = fd_select(FD_SETSIZE, &readfd, &writefd, &exceptfd, timer_wait);
 
 		/* Signals should get quick treatment */
@@ -980,7 +985,14 @@ static struct thread *thread_fetch(struct thread_master *m) {
 		if((thread = thread_trim_head(&m->ready)) != NULL) {
 			return thread;
 		}
+
+		if(ReturnIfNothingToDo && num == 0){
+			return 0;
+		}
 	}
+}
+struct thread *thread_fetch(struct thread_master *m) {
+	return thread_fetch_ex(m, 0);
 }
 
 unsigned long thread_consumed_time(RUSAGE_T *now, RUSAGE_T *start, unsigned long *cputime) {
@@ -1034,7 +1046,7 @@ struct thread *thread_current = NULL;
    thread->master == NULL.
  */
 
-static void thread_call(struct thread *thread) {
+void thread_call(struct thread *thread) {
 	unsigned long realtime, cputime;
 	RUSAGE_T before, after;
 
