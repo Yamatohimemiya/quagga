@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GNU Zebra; see the file COPYING.  If not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 /* This file is required in order to support properly the RIPng nexthop
@@ -31,7 +31,7 @@
 #include "linklist.h"
 #include "stream.h"
 #include "log.h"
-#include "memory.h"
+#include "MemoryNew.h"
 #include "vty.h"
 #include "if.h"
 #include "prefix.h"
@@ -73,7 +73,7 @@ void ripng_rte_free(struct list *ripng_rte_list) {
 
 /* Delete RTE */
 void _ripng_rte_del(struct ripng_rte_data *A) {
-	XFREE(MTYPE_RIPNG_RTE_DATA, A);
+	MPFREE(ripng->mpool_session, A);
 }
 
 /* Compare RTE:
@@ -92,7 +92,7 @@ void ripng_rte_add(struct list *ripng_rte_list, struct prefix_ipv6 *p, struct ri
 	/* At least one should not be null */
 	assert(!rinfo || !aggregate);
 
-	data = XMALLOC(MTYPE_RIPNG_RTE_DATA, sizeof(*data));
+	data = MPALLOC(ripng->mpool_session, sizeof(*data));
 	data->p = p;
 	data->rinfo = rinfo;
 	data->aggregate = aggregate;

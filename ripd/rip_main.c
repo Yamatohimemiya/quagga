@@ -24,9 +24,10 @@
 
 #include <lib/version.h>
 #include "getopt.h"
+#include "EventNew.h"
 #include "thread.h"
 #include "command.h"
-#include "memory.h"
+#include "MemoryNew.h"
 #include "prefix.h"
 #include "filter.h"
 #include "keychain.h"
@@ -37,6 +38,9 @@
 #include "vrf.h"
 
 #include "ripd/ripd.h"
+
+/* Startup argv */
+static char** startup_argv = 0;
 
 /* ripd options. */
 static struct option longopts[] = {
@@ -130,13 +134,7 @@ static void sighup(void) {
 	rip_reset();
 	zlog_info("ripd restarting!");
 
-	/* Reload config file. */
-	vty_read_config(config_file, config_default);
-
-	/* Create VTY's socket */
-	vty_serv_sock(vty_addr, vty_port);
-
-	/* Try to return to normal operation. */
+	execv(startup_argv[0], startup_argv);
 }
 
 /* SIGINT handler. */
@@ -181,6 +179,8 @@ int main(int argc, char **argv) {
 	int dryrun = 0;
 	char *progname;
 	int skip_runas = 0;
+
+	startup_argv = argv;
 
 	/* Set umask before anything for security */
 	umask(0027);
@@ -242,10 +242,9 @@ int main(int argc, char **argv) {
 		memset(&ripd_privs, 0, sizeof(ripd_privs));
 	}
 	zprivs_init(&ripd_privs);
-	signal_init(master, array_size(ripd_signals), ripd_signals);
+	signal_init(master, MemoryGetArraySize(ripd_signals), ripd_signals);
 	cmd_init(1);
 	vty_init(master);
-	memory_init();
 	keychain_init();
 	vrf_init();
 
@@ -278,8 +277,8 @@ int main(int argc, char **argv) {
 	/* Print banner. */
 	zlog_notice("RIPd %s starting: vty@%d", QUAGGA_VERSION, vty_port);
 
-	/* Execute each thread. */
-	thread_main(master);
+	master->EventHandler = EventInitialize();
+	EventRunLoop(master->EventHandler, master);
 
 	/* Not reached. */
 	return (0);

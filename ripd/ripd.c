@@ -23,12 +23,13 @@
 
 #include <zebra.h>
 
+#include "EventNew.h"
 #include "if.h"
 #include "command.h"
 #include "prefix.h"
 #include "table.h"
 #include "thread.h"
-#include "memory.h"
+#include "MemoryNew.h"
 #include "log.h"
 #include "stream.h"
 #include "filter.h"
@@ -104,15 +105,15 @@ static int rip_route_rte(struct rip_info *rinfo) {
 }
 
 static struct rip_info *rip_info_new(void) {
-	return XCALLOC(MTYPE_RIP_INFO, sizeof(struct rip_info));
+	return MPALLOC(rip->mpool_session, sizeof(struct rip_info));
 }
 
 void rip_info_free(struct rip_info *rinfo) {
-	XFREE(MTYPE_RIP_INFO, rinfo);
+	MPFREE(rip->mpool_session, rinfo);
 }
 
 /* RIP route garbage collect timer. */
-static int rip_garbage_collect(struct thread *t) {
+static int rip_garbage_collect(struct EventKey *t) {
 	struct rip_info *rinfo;
 	struct route_node *rp;
 
@@ -242,7 +243,7 @@ struct rip_info *rip_ecmp_delete(struct rip_info *rinfo) {
 	struct route_node *rp = rinfo->rp;
 	struct list *list = (struct list *) rp->info;
 
-	//RIP_TIMER_OFF(rinfo->t_timeout);
+	RIP_TIMER_OFF(rinfo->t_timeout);
 
 	if(listcount(list) > 1) {
 		/* Some other ECMP entries still exist. Just delete this entry. */
@@ -279,7 +280,7 @@ struct rip_info *rip_ecmp_delete(struct rip_info *rinfo) {
 }
 
 /* Timeout RIP routes. */
-static int rip_timeout(struct thread *t) {
+static int rip_timeout(struct EventKey *t) {
 	rip_ecmp_delete((struct rip_info *) THREAD_ARG(t));
 	return 0;
 }
@@ -2469,7 +2470,7 @@ void rip_redistribute_withdraw(int type) {
 
 /* Create new RIP instance and set it to global variable. */
 static int rip_create(void) {
-	rip = XCALLOC(MTYPE_RIP, sizeof(struct rip));
+	rip = MemoryClearAlloc(sizeof(struct rip));
 
 	/* Set initial value. */
 	rip->version_send = RI_RIP_VERSION_2;
@@ -2479,10 +2480,14 @@ static int rip_create(void) {
 	rip->garbage_time = RIP_GARBAGE_TIMER_DEFAULT;
 	rip->default_metric = RIP_DEFAULT_METRIC_DEFAULT;
 
+	/* per interface settings */
+	rip->interface = list_new();
+	rip->mpool_session = MemoryPoolCreate();
+
 	/* Initialize RIP routig table. */
-	rip->table = route_table_init();
-	rip->route = route_table_init();
-	rip->neighbor = route_table_init();
+	rip->table = route_table_init_new(rip->mpool_session);
+	rip->route = route_table_init_new(rip->mpool_session);
+	rip->neighbor = route_table_init_new(rip->mpool_session);
 
 	/* Make output stream. */
 	rip->obuf = stream_new(1500);
@@ -2499,9 +2504,6 @@ static int rip_create(void) {
 
 	/* Default limits */
 	rip->limit_hop = RIP_METRIC_INFINITY;
-
-	/* per interface settings */
-	rip->interface = list_new();
 
 	return 0;
 }
@@ -2835,11 +2837,11 @@ struct rip_distance {
 };
 
 static struct rip_distance *rip_distance_new(void) {
-	return XCALLOC(MTYPE_RIP_DISTANCE, sizeof(struct rip_distance));
+return MPCALLOC(rip->mpool_session, sizeof(struct rip_distance));
 }
 
 static void rip_distance_free(struct rip_distance *rdistance) {
-	XFREE(MTYPE_RIP_DISTANCE, rdistance);
+	MPFREE(rip->mpool_session, rdistance);
 }
 
 static int rip_distance_set(struct vty *vty, const char *distance_str, const char *ip_str, const char *access_list_str) {
@@ -3111,15 +3113,16 @@ static void rip_vty_out_uptime(struct vty *vty, struct rip_info *rinfo) {
 	struct tm *tm;
 #define TIME_BUF 25
 	char timebuf[TIME_BUF];
-	struct thread *thread;
 
-	if((thread = rinfo->t_timeout) != NULL) {
-		clock = thread_timer_remain_second(thread);
+	struct EventKey *EK;
+
+	if((EK = rinfo->t_timeout) != NULL) {
+		clock = EK->Timer;
 		tm = gmtime(&clock);
 		strftime(timebuf, TIME_BUF, "%M:%S", tm);
 		vty_out(vty, "%5s", timebuf);
-	} else if((thread = rinfo->t_garbage_collect) != NULL) {
-		clock = thread_timer_remain_second(thread);
+	} else if((EK = rinfo->t_garbage_collect) != NULL) {
+		clock = EK->Timer;
 		tm = gmtime(&clock);
 		strftime(timebuf, TIME_BUF, "%M:%S", tm);
 		vty_out(vty, "%5s", timebuf);
@@ -3505,9 +3508,9 @@ void rip_clean(void) {
 		}
 
 		/* Cancel RIP related timers. */
-		RIP_TIMER_OFF(rip->t_update);
-		RIP_TIMER_OFF(rip->t_triggered_update);
-		RIP_TIMER_OFF(rip->t_triggered_interval);
+		RIP_TIMER_OFF_LEGACY(rip->t_update);
+		RIP_TIMER_OFF_LEGACY(rip->t_triggered_update);
+		RIP_TIMER_OFF_LEGACY(rip->t_triggered_interval);
 
 		/* Cancel read thread. */
 		if(rip->t_read) {
@@ -3548,9 +3551,9 @@ void rip_clean(void) {
 			}
 		}
 
-		XFREE(MTYPE_ROUTE_TABLE, rip->table);
-		XFREE(MTYPE_ROUTE_TABLE, rip->route);
-		XFREE(MTYPE_ROUTE_TABLE, rip->neighbor);
+		MPFREE(rip->mpool_session, rip->table);
+		MPFREE(rip->mpool_session, rip->route);
+		MPFREE(rip->mpool_session, rip->neighbor);
 	}
 
 	rip_clean_network();
@@ -3560,19 +3563,10 @@ void rip_clean(void) {
 	rip_distance_reset();
 	rip_redistribute_clean();
 
-	if(rip->interface){
-		struct rip_config_interface *RCI = 0;
-		struct listnode *node, *nnode;
-		for(ALL_LIST_ELEMENTS(rip->interface, node, nnode, RCI)) {
-			if(RCI){
-				XFREE(MTYPE_RIP_INTERFACE, RCI->ifname);
-				XFREE(MTYPE_RIP_INTERFACE, RCI);
-			}
-		}
-		list_free(rip->interface);
-	}
+	list_free(rip->interface);
+	MemoryPoolClear(rip->mpool_session);
 
-	XFREE(MTYPE_RIP, rip);
+	MemoryFree(rip);
 	rip = NULL;
 }
 
@@ -3585,7 +3579,6 @@ void rip_reset(void) {
 	/* Call ripd related reset functions. */
 	rip_debug_reset();
 	rip_route_map_reset();
-
 	/* Call library reset functions. */
 	vty_reset();
 	access_list_reset();

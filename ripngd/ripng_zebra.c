@@ -27,7 +27,7 @@
 #include "prefix.h"
 #include "table.h"
 #include "stream.h"
-#include "memory.h"
+#include "MemoryNew.h"
 #include "routemap.h"
 #include "zclient.h"
 #include "log.h"
@@ -59,8 +59,8 @@ static void ripng_zebra_ipv6_send(struct route_node *rp, u_char cmd) {
 
 		if(nexthops_len < listcount(list)) {
 			nexthops_len = listcount(list);
-			nexthops = XREALLOC(MTYPE_TMP, nexthops, nexthops_len * sizeof(struct in6_addr *));
-			ifindexes = XREALLOC(MTYPE_TMP, ifindexes, nexthops_len * sizeof(unsigned int));
+			nexthops = MPREALLOC(ripng->mpool_session, nexthops, nexthops_len * sizeof(struct in6_addr *));
+			ifindexes = MPREALLOC(ripng->mpool_session, ifindexes, nexthops_len * sizeof(unsigned int));
 		}
 
 		SET_FLAG(api.message, ZAPI_MESSAGE_NEXTHOP);

@@ -499,7 +499,7 @@ static u_char *rip2PeerTable(struct variable *v, oid name[], size_t *length, int
 
 /* Register RIPv2-MIB. */
 void rip_snmp_init() {
-	rip_ifaddr_table = route_table_init();
+	rip_ifaddr_table = route_table_init_new(rip->mpool_session);
 
 	smux_init(master);
 	REGISTER_MIB("mibII/rip", rip_variables, variable, rip_oid);

@@ -26,7 +26,7 @@
 #include "if.h"
 #include "sockunion.h"
 #include "prefix.h"
-#include "memory.h"
+#include "MemoryNew.h"
 #include "network.h"
 #include "table.h"
 #include "log.h"
@@ -67,31 +67,31 @@ static int passive_default; /* are we in passive-interface default mode? */
 
 /* RIP interface priority. */
 static struct rip_config_interface* GetRIPConfigInterface(const char* ifname){
-	struct rip_config_interface *icfg = 0;
+	struct rip_config_interface *RCI = 0;
 	struct listnode *node, *nnode;
 
-	for(ALL_LIST_ELEMENTS(rip->interface, node, nnode, icfg)) {
-		if(icfg){
-			if(strcmp(icfg->ifname, ifname) == 0){
-				return icfg;
+	for(ALL_LIST_ELEMENTS(rip->interface, node, nnode, RCI)) {
+		if(RCI){
+			if(strcmp(RCI->ifname, ifname) == 0){
+				return RCI;
 			}
 		}
 	}
 
 	//If not exist, create it
-	icfg = XCALLOC(MTYPE_RIP_INTERFACE, sizeof(struct rip_config_interface));
-	if(icfg == 0){
+	RCI = MPCALLOC(rip->mpool_session, sizeof(struct rip_config_interface));
+	if(RCI == 0){
 		return 0;
 	}
 
 	int l = strlen(ifname);
 
-	icfg->ifname = XCALLOC(MTYPE_RIP_INTERFACE, l);
-	icfg->priority = RIP_DEFAULT_PRIORITY;
+	RCI->ifname = MPCALLOC(rip->mpool_session, l);
+	RCI->priority = RIP_DEFAULT_PRIORITY;
 
-	memcpy(icfg->ifname, ifname, l);
-	listnode_add(rip->interface, icfg);
-	return icfg;
+	memcpy(RCI->ifname, ifname, l);
+	listnode_add(rip->interface, RCI);
+	return RCI;
 }
 
 /* Join to the RIP version 2 multicast group. */
@@ -126,8 +126,7 @@ static void rip_interface_reset(struct rip_interface *);
 static struct rip_interface *rip_interface_new(void) {
 	struct rip_interface *ri;
 
-	ri = XCALLOC(MTYPE_RIP_INTERFACE, sizeof(struct rip_interface));
-
+	ri = MPCALLOC(rip->mpool_session, sizeof(struct rip_interface));
 	rip_interface_reset(ri);
 
 	return ri;
@@ -1046,11 +1045,11 @@ void rip_clean_network() {
 	}
 
 	/* rip_enable_interface. */
-	struct rip_config_interface *icfg = 0;
+	struct rip_config_interface *RCI = 0;
 	struct listnode *node, *nnode;
-	for(ALL_LIST_ELEMENTS(rip->interface, node, nnode, icfg)) {
-		if(icfg){
-			UNSET_FLAG(icfg->flags, RIP_FLAG_INTERFACE_ENABLED);
+	for(ALL_LIST_ELEMENTS(rip->interface, node, nnode, RCI)) {
+		if(RCI){
+			UNSET_FLAG(RCI->flags, RIP_FLAG_INTERFACE_ENABLED);
 		}
 	}
 }
@@ -1123,11 +1122,11 @@ void rip_passive_nondefault_clean(void) {
 	unsigned int i;
 	char *str;
 
-	struct rip_config_interface *icfg = 0;
+	struct rip_config_interface *RCI = 0;
 	struct listnode *node, *nnode;
-	for(ALL_LIST_ELEMENTS(rip->interface, node, nnode, icfg)) {
-		if(icfg){
-			UNSET_FLAG(icfg->flags, RIP_FLAG_INTERFACE_PASSIVE);
+	for(ALL_LIST_ELEMENTS(rip->interface, node, nnode, RCI)) {
+		if(RCI){
+			UNSET_FLAG(RCI->flags, RIP_FLAG_INTERFACE_PASSIVE);
 		}
 	}
 
@@ -1823,7 +1822,7 @@ static int rip_interface_new_hook(struct interface *ifp) {
 
 /* Called when interface structure deleted. */
 static int rip_interface_delete_hook(struct interface *ifp) {
-	XFREE(MTYPE_RIP_INTERFACE, ifp->info);
+	MPFREE(rip->mpool_session, ifp->info);
 	ifp->info = NULL;
 	return 0;
 }

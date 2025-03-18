@@ -26,7 +26,7 @@
 #include "linklist.h"
 #include "if.h"
 #include "prefix.h"
-#include "memory.h"
+#include "MemoryNew.h"
 #include "network.h"
 #include "filter.h"
 #include "log.h"
@@ -60,31 +60,31 @@ static void ripng_enable_apply_all(void);
 
 /* RIPng interface priority. */
 static struct ripng_config_interface* GetRIPngConfigInterface(const char* ifname){
-	struct ripng_config_interface *icfg = 0;
+	struct ripng_config_interface *RCI = 0;
 	struct listnode *node, *nnode;
 
-	for(ALL_LIST_ELEMENTS(ripng->interface, node, nnode, icfg)) {
-		if(icfg){
-			if(strcmp(icfg->ifname, ifname) == 0){
-				return icfg;
+	for(ALL_LIST_ELEMENTS(ripng->interface, node, nnode, RCI)) {
+		if(RCI){
+			if(strcmp(RCI->ifname, ifname) == 0){
+				return RCI;
 			}
 		}
 	}
 
 	//If not exist, create it
-	icfg = XCALLOC(MTYPE_RIP_INTERFACE, sizeof(struct ripng_config_interface));
-	if(icfg == 0){
+	RCI = MPCALLOC(ripng->mpool_session, sizeof(struct ripng_config_interface));
+	if(RCI == 0){
 		return 0;
 	}
 
 	int l = strlen(ifname);
 
-	icfg->ifname = XCALLOC(MTYPE_RIP_INTERFACE, l);
-	icfg->priority = RIPNG_DEFAULT_PRIORITY;
+	RCI->ifname = MPCALLOC(ripng->mpool_session, l);
+	RCI->priority = RIPNG_DEFAULT_PRIORITY;
 
-	memcpy(icfg->ifname, ifname, l);
-	listnode_add(ripng->interface, icfg);
-	return icfg;
+	memcpy(RCI->ifname, ifname, l);
+	listnode_add(ripng->interface, RCI);
+	return RCI;
 }
 
 /* Join to the all rip routers multicast group. */
@@ -779,11 +779,11 @@ void ripng_clean_network() {
 	}
 
 	/* ripng_enable_if */
-	struct ripng_config_interface *icfg = 0;
+	struct ripng_config_interface *RCI = 0;
 	struct listnode *node, *nnode;
-	for(ALL_LIST_ELEMENTS(ripng->interface, node, nnode, icfg)) {
-		if(icfg){
-			UNSET_FLAG(icfg->flags, RIPNG_FLAG_INTERFACE_ENABLED);
+	for(ALL_LIST_ELEMENTS(ripng->interface, node, nnode, RCI)) {
+		if(RCI){
+			UNSET_FLAG(RCI->flags, RIPNG_FLAG_INTERFACE_ENABLED);
  		}
  	}
 }
@@ -861,11 +861,11 @@ void ripng_passive_interface_clean(void) {
 	unsigned int i;
 	char *str;
 
-	struct ripng_config_interface *icfg = 0;
+	struct ripng_config_interface *RCI = 0;
 	struct listnode *node, *nnode;
-	for(ALL_LIST_ELEMENTS(ripng->interface, node, nnode, icfg)) {
-		if(icfg){
-			UNSET_FLAG(icfg->flags, RIPNG_FLAG_INTERFACE_PASSIVE);
+	for(ALL_LIST_ELEMENTS(ripng->interface, node, nnode, RCI)) {
+		if(RCI){
+			UNSET_FLAG(RCI->flags, RIPNG_FLAG_INTERFACE_PASSIVE);
  		}
  	}
 
@@ -1031,7 +1031,7 @@ DEFUN(no_ripng_passive_interface, no_ripng_passive_interface_cmd, "no passive-in
 
 static struct ripng_interface *ri_new(void) {
 	struct ripng_interface *ri;
-	ri = XCALLOC(MTYPE_IF, sizeof(struct ripng_interface));
+	ri = MPCALLOC(ripng->mpool_session, sizeof(struct ripng_interface));
 
 	/* Set default split-horizon behavior.  If the interface is Frame
      Relay or SMDS is enabled, the default value for split-horizon is
@@ -1050,7 +1050,7 @@ static int ripng_if_new_hook(struct interface *ifp) {
 
 /* Called when interface structure deleted. */
 static int ripng_if_delete_hook(struct interface *ifp) {
-	XFREE(MTYPE_IF, ifp->info);
+	MPFREE(ripng->mpool_session, ifp->info);
 	ifp->info = NULL;
 	return 0;
 }

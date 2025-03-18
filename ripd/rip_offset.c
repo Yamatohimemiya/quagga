@@ -27,7 +27,7 @@
 #include "filter.h"
 #include "command.h"
 #include "linklist.h"
-#include "memory.h"
+#include "MemoryNew.h"
 
 #include "ripd/ripd.h"
 
@@ -61,11 +61,11 @@ static int strcmp_safe(const char *s1, const char *s2) {
 }
 
 static struct rip_offset_list *rip_offset_list_new(void) {
-	return XCALLOC(MTYPE_RIP_OFFSET_LIST, sizeof(struct rip_offset_list));
+	return MPCALLOC(rip->mpool_session, sizeof(struct rip_offset_list));
 }
 
 static void rip_offset_list_free(struct rip_offset_list *offset) {
-	XFREE(MTYPE_RIP_OFFSET_LIST, offset);
+	MPFREE(rip->mpool_session, offset);
 }
 
 static struct rip_offset_list *rip_offset_list_lookup(const char *ifname) {

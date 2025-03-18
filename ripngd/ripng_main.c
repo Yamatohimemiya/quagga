@@ -28,7 +28,8 @@
 #include "vector.h"
 #include "vty.h"
 #include "command.h"
-#include "memory.h"
+#include "MemoryNew.h"
+#include "EventNew.h"
 #include "thread.h"
 #include "log.h"
 #include "prefix.h"
@@ -38,6 +39,9 @@
 #include "vrf.h"
 
 #include "ripngd/ripngd.h"
+
+/* Startup argv */
+static char** startup_argv = 0;
 
 /* Configuration filename and directory. */
 char config_default[] = SYSCONFDIR RIPNG_DEFAULT_CONFIG;
@@ -125,16 +129,11 @@ Report bugs to %s\n",
 
 /* SIGHUP handler. */
 static void sighup(void) {
-	zlog_info("SIGHUP received");
+	zlog_info("SIGHUP: Restarting...");
 	ripng_clean();
 	ripng_reset();
 
-	/* Reload config file. */
-	vty_read_config(config_file, config_default);
-	/* Create VTY's socket */
-	vty_serv_sock(vty_addr, vty_port);
-
-	/* Try to return to normal operation. */
+	execv(startup_argv[0], startup_argv);
 }
 
 /* SIGINT handler. */
@@ -180,6 +179,8 @@ int main(int argc, char **argv) {
 	char *progname;
 	int dryrun = 0;
 	int skip_runas = 0;
+
+	startup_argv = argv;
 
 	/* Set umask before anything for security */
 	umask(0027);
@@ -238,10 +239,9 @@ int main(int argc, char **argv) {
 		memset(&ripngd_privs, 0, sizeof(ripngd_privs));
 	}
 	zprivs_init(&ripngd_privs);
-	signal_init(master, array_size(ripng_signals), ripng_signals);
+	signal_init(master, MemoryGetArraySize(ripng_signals), ripng_signals);
 	cmd_init(1);
 	vty_init(master);
-	memory_init();
 	vrf_init();
 
 	/* RIPngd inits. */
@@ -272,8 +272,8 @@ int main(int argc, char **argv) {
 	/* Print banner. */
 	zlog_notice("RIPNGd %s starting: vty@%d", QUAGGA_VERSION, vty_port);
 
-	/* Fetch next active thread. */
-	thread_main(master);
+	master->EventHandler = EventInitialize();
+	EventRunLoop(master->EventHandler, master);
 
 	/* Not reached. */
 	return 0;

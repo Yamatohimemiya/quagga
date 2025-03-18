@@ -22,11 +22,12 @@
 
 #include <zebra.h>
 
+#include "EventNew.h"
 #include "prefix.h"
 #include "filter.h"
 #include "log.h"
 #include "thread.h"
-#include "memory.h"
+#include "MemoryNew.h"
 #include "if.h"
 #include "stream.h"
 #include "table.h"
@@ -77,13 +78,13 @@ static int ripng_route_rte(struct ripng_info *rinfo) {
 struct ripng_info *ripng_info_new() {
 	struct ripng_info *new;
 
-	new = XCALLOC(MTYPE_RIPNG_ROUTE, sizeof(struct ripng_info));
+	new = MPCALLOC(ripng->mpool_session, sizeof(struct ripng_info));
 	return new;
 }
 
 /* Free ripng information. */
 void ripng_info_free(struct ripng_info *rinfo) {
-	XFREE(MTYPE_RIPNG_ROUTE, rinfo);
+	MPFREE(ripng->mpool_session, rinfo);
 }
 
 /* Create ripng socket. */
@@ -372,7 +373,7 @@ static int ripng_lladdr_check(struct interface *ifp, struct in6_addr *addr) {
 }
 
 /* RIPng route garbage collect timer. */
-static int ripng_garbage_collect(struct thread *t) {
+static int ripng_garbage_collect(struct EventKey *t) {
 	struct ripng_info *rinfo;
 	struct route_node *rp;
 
@@ -510,7 +511,7 @@ struct ripng_info *ripng_ecmp_delete(struct ripng_info *rinfo) {
 	struct route_node *rp = rinfo->rp;
 	struct list *list = (struct list *) rp->info;
 
-	//RIPNG_TIMER_OFF(rinfo->t_timeout);
+	RIPNG_TIMER_OFF(rinfo->t_timeout);
 
 	if(rinfo->metric != RIPNG_METRIC_INFINITY) {
 		ripng_aggregate_decrement(rp, rinfo);
@@ -551,7 +552,7 @@ struct ripng_info *ripng_ecmp_delete(struct ripng_info *rinfo) {
 }
 
 /* Timeout RIPng routes. */
-static int ripng_timeout(struct thread *t) {
+static int ripng_timeout(struct EventKey *t) {
 	ripng_ecmp_delete((struct ripng_info *) THREAD_ARG(t));
 	return 0;
 }
@@ -1656,7 +1657,7 @@ static int ripng_create(void) {
 	assert(ripng == NULL);
 
 	/* Allocaste RIPng instance. */
-	ripng = XCALLOC(MTYPE_RIPNG, sizeof(struct ripng));
+	ripng = MemoryClearAlloc(sizeof(struct ripng));
 
 	/* Default version and timer values. */
 	ripng->version = RIPNG_V1;
@@ -1665,14 +1666,19 @@ static int ripng_create(void) {
 	ripng->garbage_time = RIPNG_GARBAGE_TIMER_DEFAULT;
 	ripng->default_metric = RIPNG_DEFAULT_METRIC_DEFAULT;
 
+	/* per interface settings */
+	ripng->interface = list_new();
+	ripng->mpool_session = MemoryPoolCreate();
+
+
 	/* Make buffer.  */
 	ripng->ibuf = stream_new(RIPNG_MAX_PACKET_SIZE * 5);
 	ripng->obuf = stream_new(RIPNG_MAX_PACKET_SIZE);
 
 	/* Initialize RIPng routig table. */
-	ripng->table = route_table_init();
-	ripng->route = route_table_init();
-	ripng->aggregate = route_table_init();
+	ripng->table = route_table_init_new(ripng->mpool_session);
+	ripng->route = route_table_init_new(ripng->mpool_session);
+	ripng->aggregate = route_table_init_new(ripng->mpool_session);
 
 	/* Make socket. */
 	ripng->sock = ripng_make_socket();
@@ -1687,8 +1693,6 @@ static int ripng_create(void) {
 	/* Default limits */
 	ripng->limit_hop = RIPNG_METRIC_INFINITY;
 
-	/* per interface settings */
-	ripng->interface = list_new();
 	return 0;
 }
 
@@ -1760,15 +1764,16 @@ static void ripng_vty_out_uptime(struct vty *vty, struct ripng_info *rinfo) {
 	struct tm *tm;
 #define TIME_BUF 25
 	char timebuf[TIME_BUF];
-	struct thread *thread;
 
-	if((thread = rinfo->t_timeout) != NULL) {
-		clock = thread_timer_remain_second(thread);
+	struct EventKey *EK;
+
+	if((EK = rinfo->t_timeout) != NULL) {
+		clock = EK->Timer;
 		tm = gmtime(&clock);
 		strftime(timebuf, TIME_BUF, "%M:%S", tm);
 		vty_out(vty, "%5s", timebuf);
-	} else if((thread = rinfo->t_garbage_collect) != NULL) {
-		clock = thread_timer_remain_second(thread);
+	} else if((EK = rinfo->t_garbage_collect) != NULL) {
+		clock = EK->Timer;
 		tm = gmtime(&clock);
 		strftime(timebuf, TIME_BUF, "%M:%S", tm);
 		vty_out(vty, "%5s", timebuf);
@@ -2582,9 +2587,9 @@ void ripng_clean() {
 		}
 
 		/* Cancel the RIPng timers */
-		RIPNG_TIMER_OFF(ripng->t_update);
-		RIPNG_TIMER_OFF(ripng->t_triggered_update);
-		RIPNG_TIMER_OFF(ripng->t_triggered_interval);
+		RIPNG_TIMER_OFF_LEGACY(ripng->t_update);
+		RIPNG_TIMER_OFF_LEGACY(ripng->t_triggered_update);
+		RIPNG_TIMER_OFF_LEGACY(ripng->t_triggered_interval);
 
 		/* Cancel the read thread */
 		if(ripng->t_read) {
@@ -2620,9 +2625,9 @@ void ripng_clean() {
 			}
 		}
 
-		XFREE(MTYPE_ROUTE_TABLE, ripng->table);
-		XFREE(MTYPE_ROUTE_TABLE, ripng->route);
-		XFREE(MTYPE_ROUTE_TABLE, ripng->aggregate);
+		MPFREE(ripng->mpool_session, ripng->table);
+		MPFREE(ripng->mpool_session, ripng->route);
+		MPFREE(ripng->mpool_session, ripng->aggregate);
 
 	} /* if (ripng) */
 
@@ -2632,19 +2637,10 @@ void ripng_clean() {
 	ripng_interface_clean();
 	ripng_redistribute_clean();
 
-	if(ripng->interface){
-		struct ripng_config_interface *RCI = 0;
-		struct listnode *node, *nnode;
-		for(ALL_LIST_ELEMENTS(ripng->interface, node, nnode, RCI)) {
-			if(RCI){
-				XFREE(MTYPE_RIP_INTERFACE, RCI->ifname);
-				XFREE(MTYPE_RIP_INTERFACE, RCI);
-			}
-		}
-		list_free(ripng->interface);
-	}
+	list_free(ripng->interface);
+	MemoryPoolClear(ripng->mpool_session);
 
-	XFREE(MTYPE_RIP, ripng);
+	MemoryFree(ripng);
 	ripng = NULL;
 }
 

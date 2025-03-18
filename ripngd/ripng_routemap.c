@@ -23,7 +23,7 @@
 #include <zebra.h>
 
 #include "if.h"
-#include "memory.h"
+#include "MemoryNew.h"
 #include "prefix.h"
 #include "routemap.h"
 #include "command.h"
@@ -116,20 +116,20 @@ static route_map_result_t route_match_metric(void *rule, struct prefix *prefix, 
 static void *route_match_metric_compile(const char *arg) {
 	u_int32_t *metric;
 
-	metric = XMALLOC(MTYPE_ROUTE_MAP_COMPILED, sizeof(u_int32_t));
+	metric = MPALLOC(ripng->mpool_session, sizeof(u_int32_t));
 	*metric = atoi(arg);
 
 	if(*metric > 0) {
 		return metric;
 	}
 
-	XFREE(MTYPE_ROUTE_MAP_COMPILED, metric);
+	MPFREE(ripng->mpool_session, metric);
 	return NULL;
 }
 
 /* Free route map's compiled `match metric' value. */
 static void route_match_metric_free(void *rule) {
-	XFREE(MTYPE_ROUTE_MAP_COMPILED, rule);
+	MPFREE(ripng->mpool_session, rule);
 }
 
 /* Route map commands for metric matching. */
@@ -163,11 +163,11 @@ static route_map_result_t route_match_interface(void *rule, struct prefix *prefi
 
 /* Route map `match interface' match statement. `arg' is IFNAME value */
 static void *route_match_interface_compile(const char *arg) {
-	return XSTRDUP(MTYPE_ROUTE_MAP_COMPILED, arg);
+	return MPSTRDUP(ripng->mpool_session, arg);
 }
 
 static void route_match_interface_free(void *rule) {
-	XFREE(MTYPE_ROUTE_MAP_COMPILED, rule);
+	MPFREE(ripng->mpool_session, rule);
 }
 
 static struct route_map_rule_cmd route_match_interface_cmd = { "match-interface", route_match_interface, route_match_interface_compile, route_match_interface_free };
@@ -274,7 +274,7 @@ static void *route_set_metric_compile(const char *arg) {
 		return NULL;
 	}
 
-	mod = XMALLOC(MTYPE_ROUTE_MAP_COMPILED, sizeof(struct rip_metric_modifier));
+	mod = MPALLOC(ripng->mpool_session, sizeof(struct rip_metric_modifier));
 	mod->type = type;
 	mod->metric = metric;
 
@@ -283,7 +283,7 @@ static void *route_set_metric_compile(const char *arg) {
 
 /* Free route map's compiled `set metric' value. */
 static void route_set_metric_free(void *rule) {
-	XFREE(MTYPE_ROUTE_MAP_COMPILED, rule);
+	MPFREE(ripng->mpool_session, rule);
 }
 
 static struct route_map_rule_cmd route_set_metric_cmd = {
@@ -318,12 +318,12 @@ static void *route_set_ipv6_nexthop_local_compile(const char *arg) {
 	int ret;
 	struct in6_addr *address;
 
-	address = XMALLOC(MTYPE_ROUTE_MAP_COMPILED, sizeof(struct in6_addr));
+	address = MPALLOC(ripng->mpool_session, sizeof(struct in6_addr));
 
 	ret = inet_pton(AF_INET6, arg, address);
 
 	if(ret == 0) {
-		XFREE(MTYPE_ROUTE_MAP_COMPILED, address);
+		MPFREE(ripng->mpool_session, address);
 		return NULL;
 	}
 
@@ -332,7 +332,7 @@ static void *route_set_ipv6_nexthop_local_compile(const char *arg) {
 
 /* Free route map's compiled `ipv6 nexthop local' value. */
 static void route_set_ipv6_nexthop_local_free(void *rule) {
-	XFREE(MTYPE_ROUTE_MAP_COMPILED, rule);
+	MPFREE(ripng->mpool_session, rule);
 }
 
 /* Route map commands for ipv6 nexthop local set. */

@@ -161,6 +161,9 @@ struct rip {
 	/* interface list */
 	struct list *interface;
 
+	/* Memory Pool */
+	struct MemoryPoolKey *mpool_session;
+
 };
 
 struct rip_config_interface {
@@ -230,8 +233,8 @@ struct rip_info {
 	u_char flags;
 
 	/* Garbage collect timer. */
-	struct thread *t_timeout;
-	struct thread *t_garbage_collect;
+	struct EventKey *t_timeout;
+	struct EventKey *t_garbage_collect;
 
 	/* Route-map futures - this variables can be changed. */
 	struct in_addr nexthop_out;
@@ -378,11 +381,19 @@ enum rip_event {
 /* Macro for timer turn on. */
 #define RIP_TIMER_ON(T, F, V) \
 	do { \
-		if(!(T)) (T) = thread_add_timer(master, (F), rinfo, (V)); \
+		if(!(T)) (T) = EventAddTimer(master->EventHandler, F, rinfo, (time_t) V); \
 	} while(0)
 
 /* Macro for timer turn off. */
 #define RIP_TIMER_OFF(X) \
+	do { \
+		if(X) { \
+			EventCancel(master->EventHandler, X); \
+			(X) = NULL; \
+		} \
+	} while(0)
+
+#define RIP_TIMER_OFF_LEGACY(X) \
 	do { \
 		if(X) { \
 			thread_cancel(X); \

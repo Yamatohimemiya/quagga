@@ -26,7 +26,7 @@
 #include "prefix.h"
 #include "table.h"
 #include "stream.h"
-#include "memory.h"
+#include "MemoryNew.h"
 #include "routemap.h"
 #include "zclient.h"
 #include "log.h"
@@ -58,7 +58,7 @@ static void rip_zebra_ipv4_send(struct route_node *rp, u_char cmd) {
 
 		if(nexthops_len < listcount(list)) {
 			nexthops_len = listcount(list);
-			nexthops = XREALLOC(MTYPE_TMP, nexthops, nexthops_len * sizeof(struct in_addr *));
+			nexthops = MPREALLOC(rip->mpool_session, nexthops, nexthops_len * sizeof(struct in_addr *));
 		}
 
 		SET_FLAG(api.message, ZAPI_MESSAGE_NEXTHOP);

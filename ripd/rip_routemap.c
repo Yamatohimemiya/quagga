@@ -23,7 +23,7 @@
 
 #include <zebra.h>
 
-#include "memory.h"
+#include "MemoryNew.h"
 #include "prefix.h"
 #include "routemap.h"
 #include "command.h"
@@ -149,20 +149,20 @@ static route_map_result_t route_match_metric(void *rule, struct prefix *prefix, 
 static void *route_match_metric_compile(const char *arg) {
 	u_int32_t *metric;
 
-	metric = XMALLOC(MTYPE_ROUTE_MAP_COMPILED, sizeof(u_int32_t));
+	metric = MPALLOC(rip->mpool_session, sizeof(u_int32_t));
 	*metric = atoi(arg);
 
 	if(*metric > 0) {
 		return metric;
 	}
 
-	XFREE(MTYPE_ROUTE_MAP_COMPILED, metric);
+	MPFREE(rip->mpool_session, metric);
 	return NULL;
 }
 
 /* Free route map's compiled `match metric' value. */
 static void route_match_metric_free(void *rule) {
-	XFREE(MTYPE_ROUTE_MAP_COMPILED, rule);
+	MPFREE(rip->mpool_session, rule);
 }
 
 /* Route map commands for metric matching. */
@@ -197,12 +197,12 @@ static route_map_result_t route_match_interface(void *rule, struct prefix *prefi
 /* Route map `match interface' match statement. `arg' is IFNAME value */
 /* XXX I don`t know if I need to check does interface exist? */
 static void *route_match_interface_compile(const char *arg) {
-	return XSTRDUP(MTYPE_ROUTE_MAP_COMPILED, arg);
+	return MPSTRDUP(rip->mpool_session, arg);
 }
 
 /* Free route map's compiled `match interface' value. */
 static void route_match_interface_free(void *rule) {
-	XFREE(MTYPE_ROUTE_MAP_COMPILED, rule);
+	MPFREE(rip->mpool_session, rule);
 }
 
 /* Route map commands for interface matching. */
@@ -235,12 +235,12 @@ static route_map_result_t route_match_ip_next_hop(void *rule, struct prefix *pre
 /* Route map `ip next-hop' match statement.  `arg' should be
    access-list name. */
 static void *route_match_ip_next_hop_compile(const char *arg) {
-	return XSTRDUP(MTYPE_ROUTE_MAP_COMPILED, arg);
+	return MPSTRDUP(rip->mpool_session, arg);
 }
 
 /* Free route map's compiled `. */
 static void route_match_ip_next_hop_free(void *rule) {
-	XFREE(MTYPE_ROUTE_MAP_COMPILED, rule);
+	MPFREE(rip->mpool_session, rule);
 }
 
 /* Route map commands for ip next-hop matching. */
@@ -270,11 +270,11 @@ static route_map_result_t route_match_ip_next_hop_prefix_list(void *rule, struct
 }
 
 static void *route_match_ip_next_hop_prefix_list_compile(const char *arg) {
-	return XSTRDUP(MTYPE_ROUTE_MAP_COMPILED, arg);
+	return MPSTRDUP(rip->mpool_session, arg);
 }
 
 static void route_match_ip_next_hop_prefix_list_free(void *rule) {
-	XFREE(MTYPE_ROUTE_MAP_COMPILED, rule);
+	MPFREE(rip->mpool_session, rule);
 }
 
 static struct route_map_rule_cmd route_match_ip_next_hop_prefix_list_cmd = { "ip next-hop prefix-list", route_match_ip_next_hop_prefix_list, route_match_ip_next_hop_prefix_list_compile, route_match_ip_next_hop_prefix_list_free };
@@ -300,12 +300,12 @@ static route_map_result_t route_match_ip_address(void *rule, struct prefix *pref
 /* Route map `ip address' match statement.  `arg' should be
    access-list name. */
 static void *route_match_ip_address_compile(const char *arg) {
-	return XSTRDUP(MTYPE_ROUTE_MAP_COMPILED, arg);
+	return MPSTRDUP(rip->mpool_session, arg);
 }
 
 /* Free route map's compiled `ip address' value. */
 static void route_match_ip_address_free(void *rule) {
-	XFREE(MTYPE_ROUTE_MAP_COMPILED, rule);
+	MPFREE(rip->mpool_session, rule);
 }
 
 /* Route map commands for ip address matching. */
@@ -328,11 +328,11 @@ static route_map_result_t route_match_ip_address_prefix_list(void *rule, struct 
 }
 
 static void *route_match_ip_address_prefix_list_compile(const char *arg) {
-	return XSTRDUP(MTYPE_ROUTE_MAP_COMPILED, arg);
+	return MPSTRDUP(rip->mpool_session, arg);
 }
 
 static void route_match_ip_address_prefix_list_free(void *rule) {
-	XFREE(MTYPE_ROUTE_MAP_COMPILED, rule);
+	MPFREE(rip->mpool_session, rule);
 }
 
 static struct route_map_rule_cmd route_match_ip_address_prefix_list_cmd = { "ip address prefix-list", route_match_ip_address_prefix_list, route_match_ip_address_prefix_list_compile, route_match_ip_address_prefix_list_free };
@@ -438,7 +438,7 @@ static void *route_set_metric_compile(const char *arg) {
 		return NULL;
 	}
 
-	mod = XMALLOC(MTYPE_ROUTE_MAP_COMPILED, sizeof(struct rip_metric_modifier));
+	mod = MPALLOC(rip->mpool_session, sizeof(struct rip_metric_modifier));
 	mod->type = type;
 	mod->metric = metric;
 
@@ -447,7 +447,7 @@ static void *route_set_metric_compile(const char *arg) {
 
 /* Free route map's compiled `set metric' value. */
 static void route_set_metric_free(void *rule) {
-	XFREE(MTYPE_ROUTE_MAP_COMPILED, rule);
+	MPFREE(rip->mpool_session, rule);
 }
 
 /* Set metric rule structure. */
@@ -483,12 +483,12 @@ static void *route_set_ip_nexthop_compile(const char *arg) {
 	int ret;
 	struct in_addr *address;
 
-	address = XMALLOC(MTYPE_ROUTE_MAP_COMPILED, sizeof(struct in_addr));
+	address = MPALLOC(rip->mpool_session, sizeof(struct in_addr));
 
 	ret = inet_aton(arg, address);
 
 	if(ret == 0) {
-		XFREE(MTYPE_ROUTE_MAP_COMPILED, address);
+		MPFREE(rip->mpool_session, address);
 		return NULL;
 	}
 
@@ -497,7 +497,7 @@ static void *route_set_ip_nexthop_compile(const char *arg) {
 
 /* Free route map's compiled `ip nexthop' value. */
 static void route_set_ip_nexthop_free(void *rule) {
-	XFREE(MTYPE_ROUTE_MAP_COMPILED, rule);
+	MPFREE(rip->mpool_session, rule);
 }
 
 /* Route map commands for ip nexthop set. */

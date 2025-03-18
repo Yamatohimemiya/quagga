@@ -25,7 +25,7 @@
 
 #include "prefix.h"
 #include "table.h"
-#include "memory.h"
+#include "MemoryNew.h"
 #include "if.h"
 #include "vty.h"
 
@@ -35,12 +35,12 @@
 static struct ripng_aggregate *ripng_aggregate_new() {
 	struct ripng_aggregate *new;
 
-	new = XCALLOC(MTYPE_RIPNG_AGGREGATE, sizeof(struct ripng_aggregate));
+	new = MPCALLOC(ripng->mpool_session, sizeof(struct ripng_aggregate));
 	return new;
 }
 
 void ripng_aggregate_free(struct ripng_aggregate *aggregate) {
-	XFREE(MTYPE_RIPNG_AGGREGATE, aggregate);
+	MPFREE(ripng->mpool_session, aggregate);
 }
 
 /* Aggregate count increment check. */

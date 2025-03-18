@@ -27,7 +27,7 @@
 #include "command.h"
 #include "linklist.h"
 #include "thread.h"
-#include "memory.h"
+#include "MemoryNew.h"
 
 #include "ripd/ripd.h"
 
@@ -35,11 +35,11 @@
 struct list *peer_list;
 
 static struct rip_peer *rip_peer_new(void) {
-	return XCALLOC(MTYPE_RIP_PEER, sizeof(struct rip_peer));
+	return MPCALLOC(rip->mpool_session, sizeof(struct rip_peer));
 }
 
 static void rip_peer_free(struct rip_peer *peer) {
-	XFREE(MTYPE_RIP_PEER, peer);
+	MPFREE(rip->mpool_session, peer);
 }
 
 struct rip_peer *rip_peer_lookup(struct in_addr *addr) {

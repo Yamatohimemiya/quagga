@@ -148,6 +148,9 @@ struct ripng {
 	/* interface list */
 	struct list *interface;
 
+	/* Memory pool */
+	struct MemoryPoolKey *mpool_session;
+
 };
 
 struct ripng_config_interface {
@@ -210,8 +213,8 @@ struct ripng_info {
 	u_char flags;
 
 	/* Garbage collect timer. */
-	struct thread *t_timeout;
-	struct thread *t_garbage_collect;
+	struct EventKey *t_timeout;
+	struct EventKey *t_garbage_collect;
 
 	/* Route-map features - this variables can be changed. */
 	struct in6_addr nexthop_out;
@@ -344,10 +347,18 @@ enum ripng_event {
 /* RIPng timer on/off macro. */
 #define RIPNG_TIMER_ON(T, F, V) \
 	do { \
-		if(!(T)) (T) = thread_add_timer(master, (F), rinfo, (V)); \
+		if(!(T)) (T) = EventAddTimer(master->EventHandler, F, rinfo, (time_t) V); \
 	} while(0)
 
-#define RIPNG_TIMER_OFF(T) \
+#define RIPNG_TIMER_OFF(X) \
+	do { \
+		if(X) { \
+			EventCancel(master->EventHandler, X); \
+			(X) = NULL; \
+		} \
+	} while(0)
+
+#define RIPNG_TIMER_OFF_LEGACY(T) \
 	do { \
 		if(T) { \
 			thread_cancel(T); \

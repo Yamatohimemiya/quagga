@@ -31,7 +31,7 @@
 #include "filter.h"
 #include "command.h"
 #include "linklist.h"
-#include "memory.h"
+#include "MemoryNew.h"
 
 #include "ripngd/ripngd.h"
 
@@ -67,12 +67,12 @@ static int strcmp_safe(const char *s1, const char *s2) {
 static struct ripng_offset_list *ripng_offset_list_new() {
 	struct ripng_offset_list *new;
 
-	new = XCALLOC(MTYPE_RIPNG_OFFSET_LIST, sizeof(struct ripng_offset_list));
+	new = MPCALLOC(ripng->mpool_session, sizeof(struct ripng_offset_list));
 	return new;
 }
 
 static void ripng_offset_list_free(struct ripng_offset_list *offset) {
-	XFREE(MTYPE_RIPNG_OFFSET_LIST, offset);
+	MPFREE(ripng->mpool_session, offset);
 }
 
 static struct ripng_offset_list *ripng_offset_list_lookup(const char *ifname) {

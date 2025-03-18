@@ -31,7 +31,7 @@
 #include "command.h"
 #include "linklist.h"
 #include "thread.h"
-#include "memory.h"
+#include "MemoryNew.h"
 
 #include "ripngd/ripngd.h"
 #include "ripngd/ripng_nexthop.h"
@@ -40,11 +40,11 @@
 struct list *peer_list;
 
 static struct ripng_peer *ripng_peer_new(void) {
-	return XCALLOC(MTYPE_RIPNG_PEER, sizeof(struct ripng_peer));
+	return MPCALLOC(ripng->mpool_session, sizeof(struct ripng_peer));
 }
 
 static void ripng_peer_free(struct ripng_peer *peer) {
-	XFREE(MTYPE_RIPNG_PEER, peer);
+	MPFREE(ripng->mpool_session, peer);
 }
 
 struct ripng_peer *ripng_peer_lookup(struct in6_addr *addr) {
