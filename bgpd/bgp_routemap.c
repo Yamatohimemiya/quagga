@@ -2862,7 +2862,6 @@ DEFUN(set_aspath_prepend_by_metric, set_aspath_prepend_by_metric_cmd, "set as-pa
 	char *str;
 
 	str = argv_concat(argv, argc, 0);
-	printf("prepend by metric: %s\n", str);
 	ret = bgp_route_set_add(vty, vty->index, "as-path prepend by", str);
 	XFREE(MTYPE_TMP, str);
 
