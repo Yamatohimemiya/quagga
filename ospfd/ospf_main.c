@@ -37,6 +37,8 @@
 #include "plist.h"
 #include "stream.h"
 #include "log.h"
+#include "MemoryNew.h"
+#include "EventNew.h"
 #include "memory.h"
 #include "privs.h"
 #include "sigevent.h"
@@ -52,6 +54,9 @@
 #include "ospfd/ospf_dump.h"
 #include "ospfd/ospf_zebra.h"
 #include "ospfd/ospf_vty.h"
+
+/* Startup argv */
+static char** startup_argv = 0;
 
 /* ospfd privileges */
 zebra_capabilities_t _caps_p[] = {
@@ -135,7 +140,8 @@ Report bugs to %s\n",
 
 /* SIGHUP handler. */
 static void sighup(void) {
-	zlog(NULL, LOG_INFO, "SIGHUP received");
+	zlog_info("SIGHUP: Restarting...");
+	execv(startup_argv[0], startup_argv);
 }
 
 /* SIGINT / SIGTERM handler. */
@@ -178,6 +184,8 @@ int main(int argc, char **argv) {
 	char *progname;
 	int dryrun = 0;
 	int skip_runas = 0;
+
+	startup_argv = argv;
 
 	/* Set umask before anything for security */
 	umask(0027);
@@ -302,7 +310,8 @@ int main(int argc, char **argv) {
 	/* Print banner. */
 	zlog_notice("OSPFd %s starting: vty@%d", QUAGGA_VERSION, vty_port);
 
-	thread_main(master);
+	master->EventHandler = EventInitialize();
+	EventRunLoop(master->EventHandler, master);
 
 	/* Not reached. */
 	return (0);

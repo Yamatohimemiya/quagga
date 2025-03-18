@@ -25,6 +25,7 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 #include "vty.h"
 #include "command.h"
 #include "getopt.h"
+#include "EventNew.h"
 #include "thread.h"
 #include <lib/version.h>
 #include "memory.h"
@@ -52,6 +53,9 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 #include "bgpd/bgp_debug.h"
 #include "bgpd/bgp_filter.h"
 #include "bgpd/bgp_zebra.h"
+
+/* Startup argv */
+static char** startup_argv = 0;
 
 /* bgpd options, we use GNU getopt library. */
 static const struct option longopts[] = {
@@ -179,13 +183,7 @@ void sighup(void) {
 	bgp_reset();
 	zlog_info("bgpd restarting!");
 
-	/* Reload config file. */
-	vty_read_config(config_file, config_default);
-
-	/* Create VTY's socket */
-	vty_serv_sock(vty_addr, vty_port);
-
-	/* Try to return to normal operation. */
+	execv(startup_argv[0], startup_argv);
 }
 
 /* SIGINT handler. */
@@ -340,6 +338,8 @@ int main(int argc, char **argv) {
 	char *progname;
 	int tmp_port;
 	int skip_runas = 0;
+
+	startup_argv = argv;
 
 	/* Set umask before anything for security */
 	umask(0027);

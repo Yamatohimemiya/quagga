@@ -27,6 +27,8 @@
 #include "log.h"
 #include "command.h"
 #include "vty.h"
+#include "MemoryNew.h"
+#include "EventNew.h"
 #include "memory.h"
 #include "if.h"
 #include "filter.h"
@@ -44,6 +46,9 @@
 #include "ospf6_lsa.h"
 #include "ospf6_interface.h"
 #include "ospf6_zebra.h"
+
+/* Startup argv */
+static char** startup_argv = 0;
 
 /* Default configuration file name for ospf6d. */
 #define OSPF6_DEFAULT_CONFIG "ospf6d.conf"
@@ -167,7 +172,8 @@ static void __attribute__((noreturn)) ospf6_exit(int status) {
 
 /* SIGHUP handler. */
 static void sighup(void) {
-	zlog_info("SIGHUP received");
+	zlog_info("SIGHUP: Restarting...");
+	execv(startup_argv[0], startup_argv);
 }
 
 /* SIGINT handler. */
@@ -218,6 +224,8 @@ int main(int argc, char *argv[], char *envp[]) {
 	char *config_file = NULL;
 	int dryrun = 0;
 	int skip_runas = 0;
+
+	startup_argv = argv;
 
 	/* Set umask before anything for security */
 	umask(0027);
@@ -317,8 +325,8 @@ int main(int argc, char *argv[], char *envp[]) {
 	/* Print start message */
 	zlog_notice("OSPF6d (Quagga-%s ospf6d-%s) starts: vty@%d", QUAGGA_VERSION, OSPF6_DAEMON_VERSION, vty_port);
 
-	/* Start finite state machine, here we go! */
-	thread_main(master);
+	master->EventHandler = EventInitialize();
+	EventRunLoop(master->EventHandler, master);
 
 	/* Log in case thread failed */
 	zlog_warn("Thread failed");

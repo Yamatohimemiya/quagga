@@ -11,12 +11,12 @@
   WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
   along with this program; see the file COPYING; if not, write to the
   Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston,
   MA 02110-1301 USA
-  
+
   $QuaggaId: $Format:%an, %ai, %h$ $
 */
 
@@ -31,12 +31,15 @@
 #include "pim_signals.h"
 #include "pimd.h"
 
+char **startup_argv;
+
 /*
  * Signal handlers
  */
 
 static void pim_sighup() {
-	zlog_info("SIGHUP received, ignoring");
+	zlog_info("SIGHUP: Restarting...");
+	execv(startup_argv[0], startup_argv);
 }
 
 static void pim_sigint() {
@@ -75,6 +78,7 @@ static struct quagga_signal_t pimd_signals[] = {
 	 },
 };
 
-void pim_signals_init() {
+void pim_signals_init(char **main_argv) {
+	main_argv = startup_argv;
 	signal_init(master, array_size(pimd_signals), pimd_signals);
 }

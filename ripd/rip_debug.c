@@ -55,28 +55,53 @@ DEFUN(show_debugging_rip, show_debugging_rip_cmd, "show debugging rip", SHOW_STR
 	return CMD_SUCCESS;
 }
 
-DEFUN(debug_rip_events, debug_rip_events_cmd, "debug rip events", DEBUG_STR RIP_STR "RIP events\n") {
-	rip_debug_event = RIP_DEBUG_EVENT;
+DEFUN_WITH_NO(debug_rip_events, debug_rip_events_cmd, "debug rip events", DEBUG_STR RIP_STR "RIP events\n") {
+	if(IS_NO){
+		rip_debug_event = 0;
+	} else {
+		rip_debug_event = RIP_DEBUG_EVENT;
+	}
 	return CMD_WARNING;
 }
 
-DEFUN(debug_rip_packet, debug_rip_packet_cmd, "debug rip packet", DEBUG_STR RIP_STR "RIP packet\n") {
-	rip_debug_packet = RIP_DEBUG_PACKET;
-	rip_debug_packet |= RIP_DEBUG_SEND;
-	rip_debug_packet |= RIP_DEBUG_RECV;
+DEFUN_WITH_NO(debug_rip_packet, debug_rip_packet_cmd, "debug rip packet", DEBUG_STR RIP_STR "RIP packet\n") {
+	if(IS_NO){
+		rip_debug_packet = 0;
+	} else {
+		rip_debug_packet = RIP_DEBUG_PACKET;
+		rip_debug_packet |= RIP_DEBUG_SEND;
+		rip_debug_packet |= RIP_DEBUG_RECV;
+	}
 	return CMD_SUCCESS;
 }
 
 DEFUN(debug_rip_packet_direct, debug_rip_packet_direct_cmd, "debug rip packet (recv|send)",
-      DEBUG_STR RIP_STR "RIP packet\n"
+	DEBUG_STR RIP_STR "RIP packet\n"
 			"RIP receive packet\n"
 			"RIP send packet\n") {
-	rip_debug_packet |= RIP_DEBUG_PACKET;
-	if(strncmp("send", argv[0], strlen(argv[0])) == 0) {
-		rip_debug_packet |= RIP_DEBUG_SEND;
-	}
-	if(strncmp("recv", argv[0], strlen(argv[0])) == 0) {
-		rip_debug_packet |= RIP_DEBUG_RECV;
+
+	if(IS_NO){
+		if(strncmp("send", argv[0], strlen(argv[0])) == 0) {
+			if(IS_RIP_DEBUG_RECV) {
+				rip_debug_packet &= ~RIP_DEBUG_SEND;
+			} else {
+				rip_debug_packet = 0;
+			}
+		} else if(strncmp("recv", argv[0], strlen(argv[0])) == 0) {
+			if(IS_RIP_DEBUG_SEND) {
+				rip_debug_packet &= ~RIP_DEBUG_RECV;
+			} else {
+				rip_debug_packet = 0;
+			}
+		}
+	} else {
+		rip_debug_packet |= RIP_DEBUG_PACKET;
+		if(strncmp("send", argv[0], strlen(argv[0])) == 0) {
+			rip_debug_packet |= RIP_DEBUG_SEND;
+		}
+		if(strncmp("recv", argv[0], strlen(argv[0])) == 0) {
+			rip_debug_packet |= RIP_DEBUG_RECV;
+		}
 	}
 	return CMD_SUCCESS;
 }
@@ -103,36 +128,6 @@ DEFUN_DEPRECATED(
 DEFUN(debug_rip_zebra, debug_rip_zebra_cmd, "debug rip zebra", DEBUG_STR RIP_STR "RIP and ZEBRA communication\n") {
 	rip_debug_zebra = RIP_DEBUG_ZEBRA;
 	return CMD_WARNING;
-}
-
-DEFUN(no_debug_rip_events, no_debug_rip_events_cmd, "no debug rip events", NO_STR DEBUG_STR RIP_STR "RIP events\n") {
-	rip_debug_event = 0;
-	return CMD_SUCCESS;
-}
-
-DEFUN(no_debug_rip_packet, no_debug_rip_packet_cmd, "no debug rip packet", NO_STR DEBUG_STR RIP_STR "RIP packet\n") {
-	rip_debug_packet = 0;
-	return CMD_SUCCESS;
-}
-
-DEFUN(no_debug_rip_packet_direct, no_debug_rip_packet_direct_cmd, "no debug rip packet (recv|send)",
-      NO_STR DEBUG_STR RIP_STR "RIP packet\n"
-			       "RIP option set for receive packet\n"
-			       "RIP option set for send packet\n") {
-	if(strncmp("send", argv[0], strlen(argv[0])) == 0) {
-		if(IS_RIP_DEBUG_RECV) {
-			rip_debug_packet &= ~RIP_DEBUG_SEND;
-		} else {
-			rip_debug_packet = 0;
-		}
-	} else if(strncmp("recv", argv[0], strlen(argv[0])) == 0) {
-		if(IS_RIP_DEBUG_SEND) {
-			rip_debug_packet &= ~RIP_DEBUG_RECV;
-		} else {
-			rip_debug_packet = 0;
-		}
-	}
-	return CMD_SUCCESS;
 }
 
 DEFUN(no_debug_rip_zebra, no_debug_rip_zebra_cmd, "no debug rip zebra", NO_STR DEBUG_STR RIP_STR "RIP and ZEBRA communication\n") {
@@ -185,23 +180,17 @@ void rip_debug_init(void) {
 	install_node(&debug_node, config_write_debug);
 
 	install_element(ENABLE_NODE, &show_debugging_rip_cmd);
-	install_element(ENABLE_NODE, &debug_rip_events_cmd);
-	install_element(ENABLE_NODE, &debug_rip_packet_cmd);
-	install_element(ENABLE_NODE, &debug_rip_packet_direct_cmd);
+	install_element_with_no(ENABLE_NODE, &debug_rip_events_cmd);
+	install_element_with_no(ENABLE_NODE, &debug_rip_packet_cmd);
+//	install_element_with_no(ENABLE_NODE, &debug_rip_packet_direct_cmd);
 	install_element(ENABLE_NODE, &debug_rip_packet_detail_cmd);
 	install_element(ENABLE_NODE, &debug_rip_zebra_cmd);
-	install_element(ENABLE_NODE, &no_debug_rip_events_cmd);
-	install_element(ENABLE_NODE, &no_debug_rip_packet_cmd);
-	install_element(ENABLE_NODE, &no_debug_rip_packet_direct_cmd);
 	install_element(ENABLE_NODE, &no_debug_rip_zebra_cmd);
 
-	install_element(CONFIG_NODE, &debug_rip_events_cmd);
-	install_element(CONFIG_NODE, &debug_rip_packet_cmd);
-	install_element(CONFIG_NODE, &debug_rip_packet_direct_cmd);
+	install_element_with_no(CONFIG_NODE, &debug_rip_events_cmd);
+	install_element_with_no(CONFIG_NODE, &debug_rip_packet_cmd);
+//	install_element_with_no(CONFIG_NODE, &debug_rip_packet_direct_cmd);
 	install_element(CONFIG_NODE, &debug_rip_packet_detail_cmd);
 	install_element(CONFIG_NODE, &debug_rip_zebra_cmd);
-	install_element(CONFIG_NODE, &no_debug_rip_events_cmd);
-	install_element(CONFIG_NODE, &no_debug_rip_packet_cmd);
-	install_element(CONFIG_NODE, &no_debug_rip_packet_direct_cmd);
 	install_element(CONFIG_NODE, &no_debug_rip_zebra_cmd);
 }

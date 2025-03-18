@@ -28,6 +28,8 @@
 #include <lib/version.h>
 #include "command.h"
 #include "vty.h"
+#include "MemoryNew.h"
+#include "EventNew.h"
 #include "memory.h"
 #include "stream.h"
 #include "if.h"
@@ -52,6 +54,9 @@
 #include "isisd/isis_zebra.h"
 #include "isisd/isis_tlv.h"
 #include "isisd/isis_te.h"
+
+/* Startup argv */
+static char** startup_argv = 0;
 
 /* Default configuration file name */
 #define ISISD_DEFAULT_CONFIG "isisd.conf"
@@ -169,9 +174,8 @@ static void terminate(int i) {
  */
 
 void sighup(void) {
-	zlog_debug("SIGHUP received");
-	reload();
-
+	zlog_info("SIGHUP: Restarting...");
+	execv(startup_argv[0], startup_argv);
 	return;
 }
 
@@ -219,6 +223,8 @@ int main(int argc, char **argv, char **envp) {
 	char *vty_addr = NULL;
 	int dryrun = 0;
 	int skip_runas = 0;
+
+	startup_argv = argv;
 
 	/* Get the programname without the preceding path. */
 	progname = ((p = strrchr(argv[0], '/')) ? ++p : argv[0]);
@@ -335,8 +341,8 @@ int main(int argc, char **argv, char **envp) {
 	/* Print banner. */
 	zlog_notice("Quagga-ISISd %s starting: vty@%d", QUAGGA_VERSION, vty_port);
 
-	/* Start finite state machine. */
-	thread_main(master);
+	master->EventHandler = EventInitialize();
+	EventRunLoop(master->EventHandler, master);
 
 	/* Not reached. */
 	exit(0);

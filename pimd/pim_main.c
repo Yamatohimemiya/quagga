@@ -30,6 +30,8 @@
 #include "thread.h"
 #include <signal.h>
 
+#include "MemoryNew.h"
+#include "EventNew.h"
 #include "memory.h"
 #include "vrf.h"
 #include "filter.h"
@@ -43,6 +45,9 @@
 #include "pim_version.h"
 #include "pim_signals.h"
 #include "pim_zebra.h"
+
+/* Startup argv */
+static char** startup_argv = 0;
 
 #ifdef PIM_ZCLIENT_DEBUG
 extern int zclient_debug;
@@ -130,6 +135,8 @@ int main(int argc, char **argv, char **envp) {
 	char *zebra_sock_path = NULL;
 	int skip_runas = 0;
 
+	startup_argv = argv;
+
 	umask(0027);
 
 	progname = ((p = strrchr(argv[0], '/')) ? ++p : argv[0]);
@@ -179,7 +186,7 @@ int main(int argc, char **argv, char **envp) {
 		memset(&pimd_privs, 0, sizeof(pimd_privs));
 	}
 	zprivs_init(&pimd_privs);
-	pim_signals_init();
+	pim_signals_init(argv);
 	cmd_init(1);
 	vty_init(master);
 	memory_init();
@@ -255,7 +262,8 @@ int main(int argc, char **argv, char **envp) {
 	zlog_notice("!HAVE_CLOCK_MONOTONIC");
 #endif
 
-	thread_main(master);
+	master->EventHandler = EventInitialize();
+	EventRunLoop(master->EventHandler, master);
 
 	zlog_err("%s %s: thread_fetch() returned NULL, exiting", __FILE__, __PRETTY_FUNCTION__);
 
