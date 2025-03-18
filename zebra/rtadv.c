@@ -1,7 +1,7 @@
 /* Router advertisement
  * Copyright (C) 2005 6WIND <jean-mickael.guerin@6wind.com>
  * Copyright (C) 1999 Kunihiro Ishiguro
- * (C)2024 Hikaru Yamatohimemiya
+ * (C)2024-2025 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *

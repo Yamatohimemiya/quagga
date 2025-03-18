@@ -1,7 +1,7 @@
 /*
  * RIPng daemon
  * Copyright (C) 1998 Kunihiro Ishiguro
- * (C)2024 Hikaru Yamatohimemiya
+ * (C)2024-2025 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *

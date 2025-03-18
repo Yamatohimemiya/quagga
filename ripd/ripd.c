@@ -1,7 +1,7 @@
 /* RIP version 1 and 2.
  * Copyright (C) 2005 6WIND <alain.ritoux@6wind.com>
  * Copyright (C) 1997, 98, 99 Kunihiro Ishiguro <kunihiro@zebra.org>
- * (C)2024 Hikaru Yamatohimemiya
+ * (C)2024-2025 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *

@@ -1,6 +1,6 @@
 /* Zebra's client library.
  * Copyright (C) 1999 Kunihiro Ishiguro
- * (C)2024 Hikaru Yamatohimemiya
+ * (C)2024-2025 Hikaru Yamatohimemiya
  * Copyright (C) 2005 Andrew J. Schorr
  *
  * This file is part of GNU Zebra.

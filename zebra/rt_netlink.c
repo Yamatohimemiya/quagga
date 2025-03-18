@@ -1,6 +1,6 @@
 /* Kernel routing table updates using netlink over GNU/Linux system.
  * Copyright (C) 1997, 98, 99 Kunihiro Ishiguro
- * (C)2024 Hikaru Yamatohimemiya
+ * (C)2024-2025 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *

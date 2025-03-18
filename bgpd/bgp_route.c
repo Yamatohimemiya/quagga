@@ -1,6 +1,6 @@
 /* BGP routing information
    Copyright (C) 1996, 97, 98, 99 Kunihiro Ishiguro
-   (C)2024 Hikaru Yamatohimemiya
+   (C)2024-2025 Hikaru Yamatohimemiya
    Copyright (C) 2016 Job Snijders <job@instituut.net>
 
 This file is part of GNU Zebra.

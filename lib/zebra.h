@@ -1,6 +1,6 @@
 /* Zebra common header.
    Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002 Kunihiro Ishiguro
-   (C)2024 Hikaru Yamatohimemiya
+   (C)2024-2025 Hikaru Yamatohimemiya
 
 This file is part of GNU Zebra.
 

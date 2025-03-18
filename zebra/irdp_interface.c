@@ -25,7 +25,7 @@
  * This work includes work with the following copywrite:
  *
  * Copyright (C) 1997, 2000 Kunihiro Ishiguro
- * (C)2024 Hikaru Yamatohimemiya
+ * (C)2024-2025 Hikaru Yamatohimemiya
  *
  */
 

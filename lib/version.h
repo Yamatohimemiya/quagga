@@ -2,7 +2,7 @@
  *
  * Quagga version
  * Copyright (C) 1997, 1999 Kunihiro Ishiguro
- * (C)2024 Hikaru Yamatohimemiya
+ * (C)2024-2025 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *
@@ -38,13 +38,13 @@
 
 #define QUAGGA_PROGNAME "Quagga"
 
-#define QUAGGA_VERSION "1.2.6.3" GIT_SUFFIX
+#define QUAGGA_VERSION "1.2.7.0" GIT_SUFFIX
 
 #define ZEBRA_BUG_ADDRESS "http://oss.xprj.org/quagga/bugs"
 
 #define QUAGGA_URL "http://oss.xprj.org/quagga"
 
-#define QUAGGA_COPYRIGHT "(C)2024 Hikaru Yamatohimemiya / Copyright 1996-2005 Kunihiro Ishiguro, et al."
+#define QUAGGA_COPYRIGHT "(C)2024-2025 Hikaru Yamatohimemiya / Copyright 1996-2005 Kunihiro Ishiguro, et al."
 
 #define QUAGGA_CONFIG_ARGS ""
 

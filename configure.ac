@@ -3,12 +3,12 @@
 ## autoconf will generate configure script.
 ##
 ##  Copyright (c) 1996, 97, 98, 99, 2000 Kunihiro Ishiguro <kunihiro@zebra.org>
-##  (C)2024 Hikaru Yamatohimemiya
+##  (C)2024-2025 Hikaru Yamatohimemiya
 ##  Portions Copyright (c) 2003 Paul Jakma <paul@dishone.st>
 ##
 AC_PREREQ([2.71])
 
-AC_INIT([Quagga],[1.2.6.3],[http://oss.xprj.org/quagga])
+AC_INIT([Quagga],[1.2.7.0],[http://oss.xprj.org/quagga])
 
 # VCS friendly mode
 AM_MAINTAINER_MODE()

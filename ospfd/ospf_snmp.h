@@ -2,7 +2,7 @@
  * Copyright (C) 2000 IP Infusion Inc.
  *
  * Written by Kunihiro Ishiguro <kunihiro@zebra.org>
- * (C)2024 Hikaru Yamatohimemiya
+ * (C)2024-2025 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *

@@ -1,7 +1,7 @@
 /* RIPv2 routemap.
  * Copyright (C) 2005 6WIND <alain.ritoux@6wind.com>
  * Copyright (C) 1999 Kunihiro Ishiguro <kunihiro@zebra.org>
- * (C)2024 Hikaru Yamatohimemiya
+ * (C)2024-2025 Hikaru Yamatohimemiya
  *
  * This file is part of GNU Zebra.
  *

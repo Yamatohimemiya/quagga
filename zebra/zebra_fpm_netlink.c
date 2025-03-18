@@ -2,7 +2,7 @@
  * Code for encoding/decoding FPM messages that are in netlink format.
  *
  * Copyright (C) 1997, 98, 99 Kunihiro Ishiguro
- * (C)2024 Hikaru Yamatohimemiya
+ * (C)2024-2025 Hikaru Yamatohimemiya
  * Copyright (C) 2012 by Open Source Routing.
  * Copyright (C) 2012 by Internet Systems Consortium, Inc. ("ISC")
  *

@@ -1,7 +1,7 @@
 /*
    Command interpreter routine for virtual terminal [aka TeletYpe]
    Copyright (C) 1997, 98, 99 Kunihiro Ishiguro
-   (C)2024 Hikaru Yamatohimemiya
+   (C)2024-2025 Hikaru Yamatohimemiya
    Copyright (C) 2013 by Open Source Routing.
    Copyright (C) 2013 by Internet Systems Consortium, Inc. ("ISC")
 
