@@ -39,6 +39,7 @@
 #include "network.h"
 
 #include <arpa/telnet.h>
+#include <dirent.h>
 #include <termios.h>
 
 #define VTY_BUFSIZ 4096
@@ -2241,23 +2242,48 @@ void vty_read_config(char *config_file, char *config_default_dir) {
 		if(!IS_DIRECTORY_SEP(config_file[0])) {
 			getcwd(cwd, MAXPATHLEN);
 			tmp = XMALLOC(MTYPE_TMP, strlen(cwd) + strlen(config_file) + 2);
-			sprintf(tmp, "%s/%s", cwd, config_file);
+			//'snprintf' is too complicated
+			strcpy(tmp, cwd);
+			strcat(tmp, "/");
+			strcat(tmp, config_file);
 			fullpath = tmp;
 		} else {
 			fullpath = config_file;
 		}
 
-		confp = fopen(fullpath, "r");
+		//Support conf.d/* files
+		struct dirent **cfglist;
+		int dcfgn = scandir(fullpath, &cfglist, 0, alphasort);
+		if(dcfgn != -1){
+			for(int i=0; i<dcfgn; i++){
+				//Skip '.', '..', files begin with '.' (hidden files)
+				if(cfglist[i]->d_name && !(cfglist[i]->d_name[0] == '.')){
+					char *fpath = XMALLOC(MTYPE_TMP, strlen(fullpath) + strlen(cfglist[i]->d_name) + 2); //2: '/' and '\0'
+					strcpy(fpath, fullpath);
+					strcat(fpath, "/");
+					strcat(fpath, cfglist[i]->d_name);
+					free(cfglist[i]);
+					printf("I: Loading configuration file: '%s'\n", fpath);
+					confp = fopen(fpath, "r");
+					vty_read_file(confp);
+					fclose(confp);
+				}
+			}
+			free(cfglist);
+			goto vty_read_config_end;
+		} else {
+			confp = fopen(fullpath, "r");
 
-		if(confp == NULL) {
-			fprintf(stderr, "%s: failed to open configuration file %s: %s\n", __func__, fullpath, safe_strerror(errno));
+			if(confp == NULL) {
+				fprintf(stderr, "%s: failed to open configuration file %s: %s\n", __func__, fullpath, safe_strerror(errno));
 
-			confp = vty_use_backup_config(fullpath);
-			if(confp) {
-				fprintf(stderr, "WARNING: using backup configuration file!\n");
-			} else {
-				fprintf(stderr, "can't open configuration file [%s]\n", config_file);
-				exit(1);
+				confp = vty_use_backup_config(fullpath);
+				if(confp) {
+					fprintf(stderr, "WARNING: using backup configuration file!\n");
+				} else {
+					fprintf(stderr, "can't open configuration file [%s]\n", config_file);
+					exit(1);
+				}
 			}
 		}
 	} else {
@@ -2287,20 +2313,48 @@ void vty_read_config(char *config_file, char *config_default_dir) {
 		}
 #endif /* VTYSH */
 
-		confp = fopen(config_default_dir, "r");
-		if(confp == NULL) {
-			fprintf(stderr, "%s: failed to open configuration file %s: %s\n", __func__, config_default_dir, safe_strerror(errno));
+		//Support conf.d/* files
+		tmp = XMALLOC(MTYPE_TMP, strlen(config_default_dir) + 3); //3: '.d\0'
+		//'snprintf' is too complicated
+		strcpy(tmp, config_default_dir);
+		strcat(tmp, ".d");
 
-			confp = vty_use_backup_config(config_default_dir);
-			if(confp) {
-				fprintf(stderr, "WARNING: using backup configuration file!\n");
-				fullpath = config_default_dir;
-			} else {
-				fprintf(stderr, "can't open configuration file [%s]\n", config_default_dir);
-				exit(1);
+		struct dirent **cfglist;
+		int dcfgn = scandir(tmp, &cfglist, 0, alphasort);
+		if(dcfgn != -1){
+			printf("I: Directory '%s' found. Using it.\n", tmp);
+			for(int i=0; i<dcfgn; i++){
+				//Skip '.', '..', files begin with '.' (hidden files)
+				if(cfglist[i]->d_name && !(cfglist[i]->d_name[0] == '.')){
+					char *fpath = XMALLOC(MTYPE_TMP, strlen(tmp) + strlen(cfglist[i]->d_name) + 2); //2: '/' and '\0'
+					strcpy(fpath, tmp);
+					strcat(fpath, "/");
+					strcat(fpath, cfglist[i]->d_name);
+					free(cfglist[i]);
+					printf("I: Loading configuration file: '%s'\n", fpath);
+					confp = fopen(fpath, "r");
+					vty_read_file(confp);
+					fclose(confp);
+				}
 			}
+			free(cfglist);
+			goto vty_read_config_end;
 		} else {
-			fullpath = config_default_dir;
+			confp = fopen(config_default_dir, "r");
+			if(confp == NULL) {
+				fprintf(stderr, "%s: failed to open configuration file %s: %s\n", __func__, config_default_dir, safe_strerror(errno));
+
+				confp = vty_use_backup_config(config_default_dir);
+				if(confp) {
+					fprintf(stderr, "WARNING: using backup configuration file!\n");
+					fullpath = config_default_dir;
+				} else {
+					fprintf(stderr, "can't open configuration file [%s]\n", config_default_dir);
+					exit(1);
+				}
+			} else {
+				fullpath = config_default_dir;
+			}
 		}
 	}
 
@@ -2308,10 +2362,12 @@ void vty_read_config(char *config_file, char *config_default_dir) {
 
 	fclose(confp);
 
+vty_read_config_end:
+
 	host_config_set(fullpath);
 
 	if(tmp) {
-		XFREE(MTYPE_TMP, fullpath);
+		XFREE(MTYPE_TMP, tmp);
 	}
 }
 
